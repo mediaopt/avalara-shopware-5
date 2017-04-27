@@ -16,7 +16,5 @@
             "type": "vcs",
             "url":  "git@bitbucket.org:mediaopt/avalara-sdk.git"
         }
-    ],
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    ]
 }
