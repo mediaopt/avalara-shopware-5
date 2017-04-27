@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "dfccc52bf7de0f75f304922cba20438f",
+    "content-hash": "cdcc8dc8ced5619b67f90e7b895ab843",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -214,11 +214,11 @@
         },
         {
             "name": "mediaopt/avalara-sdk",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "git@bitbucket.org:mediaopt/avalara-sdk.git",
-                "reference": "60ca26a5b8f42b74c02f0c630283f7eba7b1d698"
+                "reference": "ab4f34c9232ad073e8948366089b72c3098f58d4"
             },
             "type": "library",
             "autoload": {
@@ -229,7 +229,7 @@
             "license": [
                 "proprietary"
             ],
-            "time": "2017-04-27T10:17:12+00:00"
+            "time": "2017-04-27T11:11:53+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -399,9 +399,9 @@
     ],
     "packages-dev": [],
     "aliases": [],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "stability-flags": [],
-    "prefer-stable": true,
+    "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": []
