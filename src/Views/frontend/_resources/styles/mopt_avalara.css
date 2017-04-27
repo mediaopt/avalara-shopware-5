@@ -1,0 +1,14 @@
+.mopt_avalara__address_change label {
+    margin-top: 0px;
+}
+
+.mopt_avalara__address_change span {
+    display: inline-block;
+    font-style: italic;
+    color: #8A1F11;
+    width: 100%;
+}
+
+.mopt_avalara__address_change span.zipcode {
+    margin-right: 15px;
+}

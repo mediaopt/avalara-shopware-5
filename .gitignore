@@ -1,0 +1,8 @@
+bundles
+shops
+src/vendor/*
+AvaTax-Calc-REST-PHP-master
+/nbproject/private/
+*~
+/nbproject
+/.idea

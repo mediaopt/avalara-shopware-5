@@ -1,0 +1,16 @@
+{
+    "platform": "Shopware",
+    "pluginEnvironment": "Backend",
+    "pluginFolder": "Community",
+    "prefix": "Mopt",
+    "suffix": "",
+    "version": "2.0.0",
+    "projectName": "Avalara",
+    "pathToModule": "src",
+    "compatibility": {
+        "minimumVersion": "5.2.0",
+        "maximumVersion": "5.2.20",
+        "blacklist": [
+        ]
+    }
+}

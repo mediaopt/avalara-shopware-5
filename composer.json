@@ -1,0 +1,22 @@
+{
+    "name": "mediaopt/avalara-shopware",
+    "license": "proprietary",
+    "config": {
+        "prepend-autoloader": false,
+        "vendor-dir": "src/vendor"
+    },
+    "require": {
+        "monolog/monolog": "1.12.*",
+        "guzzlehttp/guzzle": "~5.0",
+        "guzzlehttp/log-subscriber": "~1.0",
+        "mediaopt/avalara-sdk": "~1.0"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url":  "git@bitbucket.org:mediaopt/avalara-sdk.git"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
