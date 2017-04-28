@@ -163,12 +163,12 @@ $config = $container->get('config');
 $context = \Shopware\Components\Routing\Context::createFromShop($shop, $config);
 
 $remoteUrlConnectionTest = Shopware()->Front()->Router()->assemble(
-    array("controller" => "MoptAvalaraBackendProxy", "action" => "getConnectionTest"),
+    array("module" => "backend", "controller" => "MoptAvalaraBackendProxy", "action" => "getConnectionTest"),
     $context
 );
 
 $downloadUrlCall = Shopware()->Front()->Router()->assemble(
-    array("controller" => "MoptAvalaraLog", "action" => "downloadLogfile"),
+    array("module" => "backend", "controller" => "MoptAvalaraLog", "action" => "downloadLogfile"),
     $context
 );
 
