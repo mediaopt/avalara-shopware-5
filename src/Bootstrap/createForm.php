@@ -153,52 +153,68 @@ $form->setElement('base', 'mopt_avalara__fieldset__test', array(
     ),
     'baseCls' => 'x-panel-header-default-top x-panel-header-default x-window-header-text-default',
 ));
+$container = Shopware()->Container();
+/** @var \Shopware\Models\Shop\Repository $repository */
+$repository = $container->get('models')->getRepository(\Shopware\Models\Shop\Shop::class);
+/** @var $shop \Shopware\Models\Shop\Shop */
+$shop = $repository->getActiveDefault();
+/** @var $config \Shopware_Components_Config */
+$config = $container->get('config');
+$context = \Shopware\Components\Routing\Context::createFromShop($shop, $config);
 
 $remoteUrlConnectionTest = Shopware()->Front()->Router()->assemble(
-        array("controller" => "MoptAvalaraBackendProxy", "action" => "getConnectionTest"));
+    array("controller" => "MoptAvalaraBackendProxy", "action" => "getConnectionTest"),
+    $context
+);
+
+$downloadUrlCall = Shopware()->Front()->Router()->assemble(
+    array("controller" => "MoptAvalaraLog", "action" => "downloadLogfile"),
+    $context
+);
+
 $form->setElement('button', 'mopt_avalara__license_check', array(
     'label' => 'Connection-Test',
     'maxWidth' => '150',
     'handler' => 'function (){
-    Ext.Ajax.request({
-       scope:this,
-       url: "' . $remoteUrlConnectionTest . '",
-       success: function(result,request) {
-       var jsonResponse = Ext.JSON.decode(result.responseText);
-       var successPrefixHtml = "<div class=\"sprite-tick-small\"  style=\"width: 25px; height: 25px; float: left;\">&nbsp;</div><div style=\"float: left;\">";
-       var failurePrefixHtml = "<div class=\"sprite-cross-small\"  style=\"width: 25px; height: 25px; float: left;\">&nbsp;</div><div style=\"float: left;\">";
-       var htmlConnectionTest;
-       if (jsonResponse.info){
-       htmlConnectionTest = successPrefixHtml + jsonResponse.info + "</div>";
-       }
-       else {
-       htmlConnectionTest = failurePrefixHtml + jsonResponse.error + "</div>";
-       }
-       var connectionTestForm = new Ext.form.Panel({
-            width: 600,
-            bodyPadding: 5,
-            title: "Avalara connection test",
-            floating: true,
-            closable : true,
-            draggable : true,
-            items: [
-              {  
+        var token = Ext.CSRFService.getToken();
+        var urlConnectionTest = "' . $remoteUrlConnectionTest . '?__csrf_token=" + token;
+        Ext.Ajax.request({
+           scope:this,
+           url: urlConnectionTest,
+           success: function(result,request) {
+           var jsonResponse = Ext.JSON.decode(result.responseText);
+           var successPrefixHtml = "<div class=\"sprite-tick-small\"  style=\"width: 25px; height: 25px; float: left;\">&nbsp;</div><div style=\"float: left;\">";
+           var failurePrefixHtml = "<div class=\"sprite-cross-small\"  style=\"width: 25px; height: 25px; float: left;\">&nbsp;</div><div style=\"float: left;\">";
+           var htmlConnectionTest;
+           if (jsonResponse.info){
+           htmlConnectionTest = successPrefixHtml + jsonResponse.info + "</div>";
+           }
+           else {
+           htmlConnectionTest = failurePrefixHtml + jsonResponse.error + "</div>";
+           }
+           var connectionTestForm = new Ext.form.Panel({
+                width: 600,
                 bodyPadding: 5,
-                title: "Connection test",
-                html: htmlConnectionTest
-              }, 
-            ]
-        });
-        connectionTestForm.show();
-        },
-         failure: function() {
-              Ext.MessageBox.alert(\'Oops\',\'Connection test failed, please check if the plugin is activated!\');
-         }
-      });
- }'
+                title: "Avalara connection test",
+                floating: true,
+                closable : true,
+                draggable : true,
+                items: [
+                  {  
+                    bodyPadding: 5,
+                    title: "Connection test",
+                    html: htmlConnectionTest
+                  }, 
+                ]
+            });
+            connectionTestForm.show();
+            },
+             failure: function() {
+                  Ext.MessageBox.alert(\'Oops\',\'Connection test failed, please check if the plugin is activated!\');
+             }
+          });
+    }'
 ));
-$downloadUrlCall = Shopware()->Front()->Router()->assemble(
-        array("controller" => "MoptAvalaraLog", "action" => "downloadLogfile"));
 
 $form->setElement('button', 'mopt_avalara__log', array(
     'label' => 'Download logfile',
