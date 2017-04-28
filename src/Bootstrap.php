@@ -1,5 +1,5 @@
 <?php
-
+error_reporting( E_ALL );
 /**
  * this class configures:
  * installment, uninstallment, updates, hooks, events, payment methods
@@ -81,6 +81,9 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
         if (version_compare($oldVersion, '1.0.2', '<=')) {
             $this->update_1_1_0();
         }
+        if (version_compare($oldVersion, '2.0.0', '<=')) {
+            $this->update_2_0_0();
+        }
         return true;
     }
 
@@ -90,6 +93,15 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
     protected function update_1_1_0()
     {
         $this->addAttributes();
+    }
+
+    /**
+     * @TODO Add new fields to categories and articles
+     *  New fields
+     */
+    protected function update_2_0_0()
+    {
+        
     }
 
     /**
@@ -104,18 +116,27 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
     }
 
     /**
-     * include plugin bootstrap
+     * Create SDK
      */
     public function afterInit()
     {
         $this->Application()->Loader()->registerNamespace('Shopware\\Plugins\\MoptAvalara', $this->Path());
-
+        require_once $this->Path() . 'vendor/autoload.php';
+        Shopware()->Container()->set('AvalaraSdkAdapter', $this->getAvalaraSdkAdapter());
+        
         //add snippets
         $this->get('Snippets')->addConfigDir($this->Path() . 'Snippets/');
-
-        require_once __DIR__ . '/vendor/mediaopt/avalara-sdk/src/Adapter/Shopware4/bootstrap.php';
     }
-
+    
+    /**
+     * 
+     * @return \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface
+     */
+    private function getAvalaraSdkAdapter()
+    {
+        return new \Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter($this);
+    }
+    
     /**
      * register for several events to extend shop functions
      * @throws \Exception

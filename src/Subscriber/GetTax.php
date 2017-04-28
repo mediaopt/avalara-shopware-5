@@ -317,7 +317,7 @@ class GetTax extends AbstractSubscriber
             return;
         }
 
-        $taxRate = $this->getTaxForOrderBasketId(\Mediaopt\Avalara\Adapter\Shopware4\Factory\Line::ARTICLEID__SHIPPING, 
+        $taxRate = $this->getTaxForOrderBasketId(\Mediaopt\Avalara\Adapter\Factory\Line::ARTICLEID__SHIPPING, 
                 $session->MoptAvalaraGetTaxResult);
         
         if(!$taxRate) {
@@ -381,7 +381,7 @@ class GetTax extends AbstractSubscriber
         }
         
         //get tax rate for voucher
-        $taxRate = $this->getTaxForOrderBasketId(\Mediaopt\Avalara\Adapter\Shopware4\Factory\Line::ARTICLEID__VOUCHER, 
+        $taxRate = $this->getTaxForOrderBasketId(\Mediaopt\Avalara\Adapter\Factory\Line::ARTICLEID__VOUCHER, 
                 $session->MoptAvalaraGetTaxResult);
         
         $config = Shopware()->Config();

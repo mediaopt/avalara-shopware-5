@@ -9,7 +9,7 @@
         "monolog/monolog": "1.12.*",
         "guzzlehttp/guzzle": "~5.0",
         "guzzlehttp/log-subscriber": "~1.0",
-        "mediaopt/avalara-sdk": "~1.0"
+        "avalara/avataxclient": "~2.17"
     },
     "repositories": [
         {
