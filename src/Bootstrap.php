@@ -10,12 +10,6 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
 {
     const PLUGIN_NAME = 'MoptAvalara';
 
-    const LOGGER_DEFAULT_ROTATING_DAYS = 7;
-
-    const LOG_FILE_NAME = 'mo_avalara';
-
-    const LOG_FILE_EXT = '.log';
-
     /**
      * get plugin capabilities
      *
@@ -63,6 +57,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
      */
     public function install()
     {
+        $this->registerControllers();
         $this->registerEvents();
         $this->addAttributes();
         $this->createForm();
@@ -138,14 +133,22 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
     }
     
     /**
+     * register controllers
+     * @throws \Exception
+     */
+    protected function registerControllers()
+    {
+        $this->registerController('Backend', 'MoptAvalaraBackendProxy');
+        $this->registerController('Backend', 'MoptAvalara');
+        $this->registerController('Backend', 'MoptAvalaraLog');
+    }
+    
+    /**
      * register for several events to extend shop functions
      * @throws \Exception
      */
     protected function registerEvents()
     {
-        $this->registerController('Backend', 'MoptAvalaraBackendProxy');
-        $this->registerController('Backend', 'MoptAvalara');
-        $this->registerController('Backend', 'MoptAvalaraLog');
         $this->subscribeEvent('Enlight_Controller_Front_DispatchLoopStartup', 'onDispatchLoopStartup');
     }
 
@@ -236,6 +239,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
      */
     public function createForm()
     {
-        include_once __DIR__ . '/Bootstrap/createForm.php';
+        $formCreator = new \Shopware\Plugins\MoptAvalara\Util\FormCreator($this);
+        $formCreator->createForms();
     }
 }

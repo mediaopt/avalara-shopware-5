@@ -1,7 +1,8 @@
 <?php
 namespace Mediaopt\Avalara\Adapter\Factory;
 
-use Mediaopt\Avalara\Sdk\Main;
+use Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface;
+
 /**
  * Description of AbstractFactory
  *
@@ -10,15 +11,9 @@ abstract class AbstractFactory
 {
     /**
      *
-     * @var Main
+     * @var \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface
      */
-    protected $sdkMain;
-    
-    /**
-     *
-     * @var \Mediaopt\Avalara\Adapter\Main
-     */
-    protected $adapterMain;
+    protected $adapter;
     
     /**
      *
@@ -32,32 +27,37 @@ abstract class AbstractFactory
      */
     protected $pluginConfig = null;
     
-    public function __construct(Main $sdkMain, \Mediaopt\Avalara\Adapter\Main $adapterMain)
+    /**
+     * 
+     * @param AdapterInterface $adapter
+     */
+    public function __construct(AdapterInterface $adapter)
     {
-        $this->sdkMain = $sdkMain;
-        $this->adapterMain = $adapterMain;
+        $this->adapter = $adapter;
     }
     
-    public function getSdkMain()
+    /**
+     * 
+     * @return \Avalara\AvaTaxClient
+     */
+    public function getSdk()
     {
-        return $this->sdkMain;
+        return $this->adapter->getClient();
     }
 
-    public function setSdkMain(Main $sdkMain)
+    /**
+     * 
+     * @return AdapterInterface
+     */
+    public function getAdapter()
     {
-        $this->sdkMain = $sdkMain;
-    }
-    
-    public function getAdapterMain()
-    {
-        return $this->adapterMain;
+        return $this->adapter;
     }
 
-    public function setAdapterMain(\Mediaopt\Avalara\Adapter\Main $adapterMain)
-    {
-        $this->adapterMain = $adapterMain;
-    }
-    
+    /**
+     * 
+     * @return array
+     */
     protected function getUserData()
     {
         if ($this->userData !== null) {
@@ -66,6 +66,10 @@ abstract class AbstractFactory
         return $this->userData = Shopware()->Modules()->Admin()->sGetUserData();
     }
     
+    /**
+     * 
+     * @return array
+     */
     protected function getPluginConfig()
     {
         if ($this->pluginConfig !== null) {

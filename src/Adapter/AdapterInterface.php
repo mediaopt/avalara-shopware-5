@@ -20,6 +20,12 @@ interface AdapterInterface
     public function getLogger();
     
     /**
+     * @param string $type
+     * @return \Mediaopt\Avalara\Sdk\Service\AbstractService
+     */
+    public function getService($type);
+    
+    /**
      * @return \Avalara\AvaTaxClient
      */
     public function getClient();

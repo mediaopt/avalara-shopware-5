@@ -6,6 +6,7 @@ use Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface;
 use Shopware_Plugins_Backend_MoptAvalara_Bootstrap;
 use Shopware\Plugins\MoptAvalara\Logger\Formatter;
 use Shopware\Plugins\MoptAvalara\Logger\LogSubscriber;
+use Shopware\Plugins\MoptAvalara\Util\FormCreator;
 use Avalara\AvaTaxClient;
 
 /**
@@ -21,6 +22,10 @@ class AvalaraSDKAdapter implements AdapterInterface
     const SENDBOX_ENV = 'sandbox';
     
     const MACHINE_NAME = 'localhost';
+    
+    const SEVICES_NAMESPACE = '\Shopware\Plugins\MoptAvalara\Service\\';
+    
+    const FACTORY_NAMESPACE = '\Shopware\Plugins\MoptAvalara\Adapter\Factory\\';
 
     /**
      *
@@ -65,8 +70,21 @@ class AvalaraSDKAdapter implements AdapterInterface
      */
     public function getFactory($type)
     {
-        $name = __NAMESPACE__ . '\Factory\\' . $type;
-        return new $name(Shopware()->Container()->get('MediaoptAvalaraSdkMain'), $this);
+        $name = self::FACTORY_NAMESPACE . ucfirst($type);
+        
+        return new $name($this);
+    }
+    
+    /**
+     * get service by type
+     *
+     * @param string $type
+     * @return AbstractService
+     */
+    public function getService($type)
+    {
+        $name = self::SEVICES_NAMESPACE . ucfirst($type);
+        return new $name($this);
     }
     
     /**
@@ -85,8 +103,8 @@ class AvalaraSDKAdapter implements AdapterInterface
             $this->getSDKEnv()
         );
         
-        $accountNumber = $this->getPluginConfig('mopt_avalara__account_number');
-        $licenseKey = $this->getPluginConfig('mopt_avalara__license_key');
+        $accountNumber = $this->getPluginConfig(FormCreator::ACCOUNT_NUMBER_FIELD);
+        $licenseKey = $this->getPluginConfig(FormCreator::LICENSE_KEY_FIELD);
         $avaClient->withSecurity($accountNumber, $licenseKey);
         $this->client = $avaClient;
         
@@ -103,7 +121,7 @@ class AvalaraSDKAdapter implements AdapterInterface
      */
     private function getSDKEnv()
     {
-        if ($env = $this->getPluginConfig('mopt_avalara__is_live_mode')) {
+        if ($env = $this->getPluginConfig(FormCreator::IS_LIVE_MODE_FIELD)) {
             return self::PRODUCTION_ENV;
         }
         
@@ -130,7 +148,7 @@ class AvalaraSDKAdapter implements AdapterInterface
 
         //setup monolog
         $this->logger = new \Monolog\Logger('mo_avalara');
-        $logFileName = Shopware_Plugins_Backend_MoptAvalara_Bootstrap::LOG_FILE_NAME . Shopware_Plugins_Backend_MoptAvalara_Bootstrap::LOG_FILE_EXT;
+        $logFileName = FormCreator::LOG_FILE_NAME . FormCreator::LOG_FILE_EXT;
         $streamHandler = new \Monolog\Handler\RotatingFileHandler(
             $this->getLogDir() . $logFileName,
             $this->getMaxFiles(),
@@ -156,7 +174,7 @@ class AvalaraSDKAdapter implements AdapterInterface
      */
     protected function getMaxFiles()
     {
-        if ($rotationDays = $this->getPluginConfig('mopt_avalara_log_rotation_days')) {
+        if ($rotationDays = $this->getPluginConfig(FormCreator::LOG_ROTATION_DAYS_FIELD)) {
             return $rotationDays;
         }
 
@@ -171,7 +189,7 @@ class AvalaraSDKAdapter implements AdapterInterface
     {
         $logLevel = 'ERROR';
         
-        if ($overrideLogLevel = $this->getPluginConfig('mopt_avalara_loglevel')) {
+        if ($overrideLogLevel = $this->getPluginConfig(FormCreator::LOG_LEVEL_FIELD)) {
             $logLevel = $overrideLogLevel;
         }
         
