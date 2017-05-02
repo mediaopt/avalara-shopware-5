@@ -5,6 +5,7 @@ namespace Shopware\Plugins\MoptAvalara\Adapter;
 use Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface;
 use Shopware_Plugins_Backend_MoptAvalara_Bootstrap;
 use Shopware\Plugins\MoptAvalara\Logger\Formatter;
+use Shopware\Plugins\MoptAvalara\Logger\LogSubscriber;
 use Avalara\AvaTaxClient;
 
 /**
@@ -47,12 +48,13 @@ class AvalaraSDKAdapter implements AdapterInterface
     
     /**
      * 
-     * @param Shopware_Plugins_Backend_MoptAvalara_Bootstrap $bootstrap
+     * @param string $pluginName
+     * @param string $pluginVersion
      */
-    public function __construct(Shopware_Plugins_Backend_MoptAvalara_Bootstrap $bootstrap)
+    public function __construct($pluginName, $pluginVersion)
     {
-        $this->pluginName = $bootstrap->getName();
-        $this->pluginVersion = $bootstrap->getVersion();
+        $this->pluginName = $pluginName;
+        $this->pluginVersion = $pluginVersion;
     }
     
     /**
@@ -75,18 +77,23 @@ class AvalaraSDKAdapter implements AdapterInterface
         if ($this->client !== null) {
             return $this->client;
         }
-        $accountNumber = $this->getPluginConfig('mopt_avalara__account_number');
-        $licenseKey = $this->getPluginConfig('mopt_avalara__license_key');
-        $companyCode = $this->getPluginConfig('mopt_avalara__company_code');
-        
-        $client = new AvaTaxClient(
+
+        $avaClient = new AvaTaxClient(
             $this->pluginName, 
             $this->pluginVersion, 
             $this->getMachineName(), 
             $this->getSDKEnv()
         );
-        $client->withSecurity($accountNumber, $licenseKey);
-        $this->client = $client;
+        
+        $accountNumber = $this->getPluginConfig('mopt_avalara__account_number');
+        $licenseKey = $this->getPluginConfig('mopt_avalara__license_key');
+        $avaClient->withSecurity($accountNumber, $licenseKey);
+        $this->client = $avaClient;
+        
+        // Attach a handler to log all requests
+        $formatter = new Formatter($this->getFormatterTemplate());
+        $subscriber = new LogSubscriber($this->getLogger(), $formatter);
+        $avaClient->getHttpClient()->getEmitter()->attach($subscriber);
         
         return $this->client;
     }
@@ -181,12 +188,25 @@ class AvalaraSDKAdapter implements AdapterInterface
     }
 
     /**
-     * get formatter template by log level
-     * @param type $logLevel
-     * @return int
+     * 
+     * @param string $messageFormat
+     * @return type
      */
-    protected function getFormatterTemplate($logLevel)
+    private function createGuzzleLoggingMiddleware($messageFormat)
     {
+        return \GuzzleHttp\Ring\Client\Middleware::log(
+            $this->getLogger(),
+            new \GuzzleHttp\MessageFormatter($messageFormat)
+        );
+    }
+
+    /**
+     * get formatter template by log level
+     * @return string
+     */
+    protected function getFormatterTemplate()
+    {
+        $logLevel = $this->getLogLevel();
         switch ($logLevel) {
             case \Monolog\Logger::INFO:
                 return Formatter::CLF;

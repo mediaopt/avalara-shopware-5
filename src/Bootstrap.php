@@ -134,7 +134,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
      */
     private function getAvalaraSdkAdapter()
     {
-        return new \Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter($this);
+        return new \Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter($this->getName(), $this->getVersion());
     }
     
     /**

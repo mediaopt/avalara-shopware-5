@@ -7,14 +7,13 @@
     },
     "require": {
         "monolog/monolog": "1.12.*",
-        "guzzlehttp/guzzle": "~5.0",
         "guzzlehttp/log-subscriber": "~1.0",
-        "avalara/avataxclient": "~2.17"
+        "avalara/avataxclient": "dev-master as 2.17"
     },
     "repositories": [
         {
             "type": "vcs",
-            "url":  "git@bitbucket.org:mediaopt/avalara-sdk.git"
+            "url":  "git@github.com:bubnov-mikhail/AvaTax-REST-V2-PHP-SDK.git"
         }
     ]
 }
