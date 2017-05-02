@@ -40,9 +40,10 @@ class Shopware_Controllers_Backend_MoptAvalaraBackendProxy extends Shopware_Cont
      */
     private function getAvalaraSDKClient()
     {
-        /* @var $avalaraSdkAdapter \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface */
-        $avalaraSdkAdapter = Shopware()->Container()->get('AvalaraSdkAdapter');
+        $serviceName = \Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter::SERVICE_NAME;
+        /* @var $adapter \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface */
+        $adapter = Shopware()->Container()->get($serviceName);
         
-        return $avalaraSdkAdapter->getClient();
+        return $adapter->getClient();
     }
 }

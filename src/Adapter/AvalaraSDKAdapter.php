@@ -15,7 +15,7 @@ use Avalara\AvaTaxClient;
  */
 class AvalaraSDKAdapter implements AdapterInterface
 {
-    const NAME = 'MoptAvalaraShopware4';
+    const SERVICE_NAME = 'AvalaraSdkAdapter';
     
     const PRODUCTION_ENV = 'production';
     
@@ -117,26 +117,6 @@ class AvalaraSDKAdapter implements AdapterInterface
     }
     
     /**
-     * @return string
-     */
-    private function getSDKEnv()
-    {
-        if ($env = $this->getPluginConfig(FormCreator::IS_LIVE_MODE_FIELD)) {
-            return self::PRODUCTION_ENV;
-        }
-        
-        return self::SENDBOX_ENV;
-    }
-    
-    /**
-     * @return string
-     */
-    private function getMachineName()
-    {
-        return self::MACHINE_NAME;
-    }
-    
-    /**
      * lazy load logger
      * @return \Monolog\Logger
      */
@@ -157,6 +137,40 @@ class AvalaraSDKAdapter implements AdapterInterface
         $this->logger->pushHandler($streamHandler);
 
         return $this->logger;
+    }
+    
+    /**
+     * checks first, if module is available / installed
+     * @param string $key
+     * @return type
+     */
+    public function getPluginConfig($key)
+    {
+        if (Shopware()->Plugins()->Backend()->get(Shopware_Plugins_Backend_MoptAvalara_Bootstrap::PLUGIN_NAME) && isset(Shopware()->Plugins()->Backend()->MoptAvalara()->Config()->$key)) {
+            return Shopware()->Plugins()->Backend()->MoptAvalara()->Config()->$key;
+        }
+        
+        return null;
+    }
+    
+    /**
+     * @return string
+     */
+    private function getSDKEnv()
+    {
+        if ($env = $this->getPluginConfig(FormCreator::IS_LIVE_MODE_FIELD)) {
+            return self::PRODUCTION_ENV;
+        }
+        
+        return self::SENDBOX_ENV;
+    }
+    
+    /**
+     * @return string
+     */
+    private function getMachineName()
+    {
+        return self::MACHINE_NAME;
     }
 
     /**
@@ -234,19 +248,5 @@ class AvalaraSDKAdapter implements AdapterInterface
             default:
                 return Formatter::DEBUG;
         }
-    }
-    
-    /**
-     * checks first, if module is available / installed
-     * @param string $key
-     * @return type
-     */
-    protected function getPluginConfig($key)
-    {
-        if (Shopware()->Plugins()->Backend()->get(Shopware_Plugins_Backend_MoptAvalara_Bootstrap::PLUGIN_NAME) && isset(Shopware()->Plugins()->Backend()->MoptAvalara()->Config()->$key)) {
-            return Shopware()->Plugins()->Backend()->MoptAvalara()->Config()->$key;
-        }
-        
-        return null;
     }
 }

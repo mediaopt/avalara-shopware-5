@@ -24,14 +24,14 @@ try {
     $address1 = array();
     $address1['AddressCode'] = '01';
     $address1['City'] = 'Washingtooon';
-    $address1['Country'] = \Mediaopt\Avalara\Sdk\Model\Address::COUNTRY_CODE__US;
+    $address1['Country'] = \Shopware\Plugins\MoptAvalara\Model\Address::COUNTRY_CODE__US;
     $address1['Line1'] = 'White House';
     $address1['Line2'] = '1600 Pennsylvania Ave NW';
     $address1['PostalCode'] = 20500;
     $address1['Region'] = 'DC';
     $address2['AddressCode'] = '02';
     $address2['City'] = 'Washington';
-    $address2['Country'] = \Mediaopt\Avalara\Sdk\Model\Address::COUNTRY_CODE__US;
+    $address2['Country'] = \Shopware\Plugins\MoptAvalara\Model\Address::COUNTRY_CODE__US;
     $address2['Line1'] = 'White House';
     $address2['Line2'] = '1600 Pennsylvania Ave NW';
     $address2['PostalCode'] = 20500;

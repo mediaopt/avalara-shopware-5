@@ -117,7 +117,8 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
     {
         $this->Application()->Loader()->registerNamespace('Shopware\\Plugins\\MoptAvalara', $this->Path());
         require_once $this->Path() . 'vendor/autoload.php';
-        Shopware()->Container()->set('AvalaraSdkAdapter', $this->getAvalaraSdkAdapter());
+        $serviceName = \Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter::SERVICE_NAME;
+        Shopware()->Container()->set($serviceName, $this->createAvalaraSdkAdapter());
         
         //add snippets
         $this->get('Snippets')->addConfigDir($this->Path() . 'Snippets/');
@@ -127,7 +128,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
      * 
      * @return \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface
      */
-    private function getAvalaraSdkAdapter()
+    private function createAvalaraSdkAdapter()
     {
         return new \Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter($this->getName(), $this->getVersion());
     }
@@ -159,9 +160,8 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
      */
     public function onDispatchLoopStartup(Enlight_Event_EventArgs $args)
     {
-        $container = Shopware()->Container();
         $subscribers = array();
-        $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\AddressCheck($this, $container);
+        $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\AddressCheck($this);
         $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\Templating($this);
         $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\GetTax($this);
         $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\AdjustTax($this);

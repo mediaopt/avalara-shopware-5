@@ -21,7 +21,7 @@ interface AdapterInterface
     
     /**
      * @param string $type
-     * @return \Mediaopt\Avalara\Sdk\Service\AbstractService
+     * @return \Shopware\Plugins\MoptAvalara\Service\AbstractService
      */
     public function getService($type);
     
@@ -29,4 +29,10 @@ interface AdapterInterface
      * @return \Avalara\AvaTaxClient
      */
     public function getClient();
+    
+    /**
+     * @param string $key
+     * @return mixed
+     */
+    public function getPluginConfig($key);
 }

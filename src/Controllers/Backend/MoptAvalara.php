@@ -8,7 +8,7 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             return;
         }
         
-        if (!$this->cancelTax($order, Mediaopt\Avalara\Sdk\Model\CancelCode::DOC_VOIDED)) {
+        if (!$this->cancelTax($order, Shopware\Plugins\MoptAvalara\Model\CancelCode::DOC_VOIDED)) {
             return;
         }
         
@@ -24,11 +24,11 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             return;
         }
         
-        if (!$this->cancelTax($order, Mediaopt\Avalara\Sdk\Model\CancelCode::DOC_VOIDED)) {
+        if (!$this->cancelTax($order, Shopware\Plugins\MoptAvalara\Model\CancelCode::DOC_VOIDED)) {
             return;
         }
         
-        if (!$this->cancelTax($order, Mediaopt\Avalara\Sdk\Model\CancelCode::DOC_DELETED)) {
+        if (!$this->cancelTax($order, Shopware\Plugins\MoptAvalara\Model\CancelCode::DOC_DELETED)) {
             return;
         }
         
@@ -73,11 +73,11 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
     {
         $docCode = $order->getAttribute()->getMoptAvalaraDocCode();
 
-        /* @var $sdkMain \Mediaopt\Avalara\Sdk\Main */
+        /* @var $sdkMain \Shopware\Plugins\MoptAvalara\Main */
         $sdkMain = Shopware()->Container()->get('MediaoptAvalaraSdkMain');
 
         try {
-            /* @var $service \Mediaopt\Avalara\Sdk\Service\GetTax */
+            /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
             $service = $sdkMain->getService('CancelTax');
             $service->call($docCode, $cancelCode);
         } catch (\GuzzleHttp\Exception\TransferException $e) {
@@ -95,7 +95,7 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
     protected function updateOrder(\Shopware\Models\Order\Order $order)
     {
         //get tax call on current order state
-        /* @var $sdkMain \Mediaopt\Avalara\Sdk\Main */
+        /* @var $sdkMain \Shopware\Plugins\MoptAvalara\Main */
         $sdkMain = Shopware()->Container()->get('MediaoptAvalaraSdkMain');
         
         try {

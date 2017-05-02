@@ -1,6 +1,6 @@
 <?php
 
-namespace Mediaopt\Avalara\Adapter\Factory;
+namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
 /**
  * Description of Config
@@ -16,11 +16,11 @@ class Line extends AbstractFactory
      * build Line-model based on passed in lineData
      * 
      * @param mixed $lineData
-     * @return \Mediaopt\Avalara\Sdk\Model\Line
+     * @return \Shopware\Plugins\MoptAvalara\Model\Line
      */
     public function build($lineData, $voucher = null)
     {
-        $line = new \Mediaopt\Avalara\Sdk\Model\Line();
+        $line = new \Shopware\Plugins\MoptAvalara\Model\Line();
         $line->setLineNo($lineData['id']);
         $line->setItemCode($lineData['ean']);
         $line->setQty($lineData['quantity']);

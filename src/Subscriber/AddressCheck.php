@@ -2,30 +2,15 @@
 
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
+use Shopware\Plugins\MoptAvalara\Util\FormCreator;
+use Shopware\Plugins\MoptAvalara\Model\Address;
+
 /**
  * Description of Checkout
  *
  */
 class AddressCheck extends AbstractSubscriber
 {
-
-    /**
-     * DI-container
-     *
-     * @var \Shopware\Components\Form\Container\
-     */
-    protected $container;
-
-    /**
-     * @param \Shopware_Plugins_Core_MoptIngenico_Bootstrap $bootstrap
-     * @param \Enlight_Config $pluginConfig
-     */
-    public function __construct($bootstrap, $container)
-    {
-        parent::__construct($bootstrap);
-        $this->container = $container;
-    }
-
     /**
      * return array with all subsribed events
      * 
@@ -46,21 +31,20 @@ class AddressCheck extends AbstractSubscriber
     public function onBeforeCheckoutConfirm(\Enlight_Event_EventArgs $args)
     {
         /* @var $session Enlight_Components_Session_Namespace */
-        $session = $this->container->get('session');
-        /* @var $sdkMain \Mediaopt\Avalara\Sdk\Main */
-        $sdkMain = $this->container->get('MediaoptAvalaraSdkMain');
-
-        $address = $sdkMain->getAdapter()->getFactory('Address')->buildDeliveryAddress();
+        $session = $this->getContainer()->get('session');
+        /* @var $adapter \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface */
+        $adapter = $this->getAdapter();
+        $address = $adapter->getFactory('Address')->buildDeliveryAddress();
 
         if (!$this->isAddressToBeValidated($address) || empty($args->getSubject()->View()->sUserLoggedIn)) {
-            $sdkMain->getLogger()->info('address is not to be validated.');
+            $adapter->getLogger()->info('address is not to be validated.');
             return;
         }
         try {
             $userData = $args->getSubject()->View()->sUserData;
-            $sdkMain->getLogger()->info('validating address.');
-            /* @var $service \Mediaopt\Avalara\Sdk\Service\ValidateAddress */
-            $service = $sdkMain->getService('validateAddress');
+            $adapter->getLogger()->info('validating address.');
+            /* @var $service \Shopware\Plugins\MoptAvalara\Service\ValidateAddress */
+            $service = $adapter->getService('validateAddress');
             
             $response = $service->validate($address);
             $session->MoptAvalaraCheckedAddress = $this->getAddressHash($address);
@@ -69,47 +53,51 @@ class AddressCheck extends AbstractSubscriber
                 $activeShippingAddressId = $userData['additional']['user']['default_shipping_address_id'];
             }
             if ($changes = $service->getAddressChanges($address, $response)) {
-                $args->getSubject()->forward('edit', 'address', null, array('MoptAvalaraAddressChanges' => $changes,
-                    'sTarget' => 'checkout', 'id' => $activeShippingAddressId));
+                $args->getSubject()->forward('edit', 'address', null, array(
+                    'MoptAvalaraAddressChanges' => $changes,
+                    'sTarget' => 'checkout', 
+                    'id' => $activeShippingAddressId
+                ));
+                
                 return true;
             }
 
         } catch (\GuzzleHttp\Exception\TransferException $e) {
             //address check failed - nothing to do
-            $sdkMain->getLogger()->info('address check failed.');
+            $adapter->getLogger()->info('address check failed: ' . $e->getMessage());
         }
     }
 
     /**
      * check if address has aready been validated
-     * @param \Mediaopt\Avalara\Sdk\Model\Address $address
+     * @param Address $address
      * @return boolean
      */
-    protected function isAddressToBeValidated(\Mediaopt\Avalara\Sdk\Model\Address $address)
+    protected function isAddressToBeValidated(Address $address)
     {
         /*@var $session Enlight_Components_Session_Namespace */
-        $session = $this->container->get('session');
+        $session = $this->getContainer()->get('session');
         
         //country check
-        $pluginConfig = Shopware()->Plugins()->Backend()->MoptAvalara()->Config();
-        
-        switch ($pluginConfig->mopt_avalara_addressvalidation_countries) {
+        $configKey = FormCreator::ADDRESS_VALIDATION_COUNTRIES_FIELD;
+        $countries = $this->getAdapter()->getPluginConfig($configKey);
+        switch ($countries) {
             case 1: //no validation
                 return false;
             case 2: //US
-                if($address->getCountry() != \Mediaopt\Avalara\Sdk\Model\Address::COUNTRY_CODE__US) {
+                if($address->getCountry() != Address::COUNTRY_CODE__US) {
                     return false;
                 }
                 break;
             case 3: //CA
-                if($address->getCountry() != \Mediaopt\Avalara\Sdk\Model\Address::COUNTRY_CODE__CA) {
+                if($address->getCountry() != Address::COUNTRY_CODE__CA) {
                     return false;
                 }
                 break;
             case 4: //US & CA
                 if(!in_array($address->getCountry(), array(
-                    \Mediaopt\Avalara\Sdk\Model\Address::COUNTRY_CODE__CA,
-                    \Mediaopt\Avalara\Sdk\Model\Address::COUNTRY_CODE__US))) {
+                    Address::COUNTRY_CODE__CA,
+                    Address::COUNTRY_CODE__US))) {
                     return false;
                 }
                 break;
@@ -128,9 +116,9 @@ class AddressCheck extends AbstractSubscriber
     
     /**
      * get hash of given address
-     * @param \Mediaopt\Avalara\Sdk\Model\Address $address
+     * @param Address $address
      */
-    protected function getAddressHash(\Mediaopt\Avalara\Sdk\Model\Address $address) {
+    protected function getAddressHash(Address $address) {
         return md5(serialize($address));
     }
 
@@ -182,7 +170,7 @@ class AddressCheck extends AbstractSubscriber
      */
     protected function addErrorMessage(\Enlight_View_Default $view)
     {
-        $snippets = $this->container->get('snippets')->getNamespace('frontend/MoptAvalara/messages');
+        $snippets = $this->getContainer()->get('snippets')->getNamespace('frontend/MoptAvalara/messages');
 
 
         $errorMessages = $view->getAssign('sErrorMessages');

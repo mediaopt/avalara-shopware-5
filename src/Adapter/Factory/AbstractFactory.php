@@ -1,5 +1,5 @@
 <?php
-namespace Mediaopt\Avalara\Adapter\Factory;
+namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
 use Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface;
 
@@ -70,11 +70,8 @@ abstract class AbstractFactory
      * 
      * @return array
      */
-    protected function getPluginConfig()
+    protected function getPluginConfig($key)
     {
-        if ($this->pluginConfig !== null) {
-            return $this->pluginConfig;
-        }
-        return $this->pluginConfig = Shopware()->Plugins()->Backend()->MoptAvalara()->Config();
+        return $this->getAdapter()->getPluginConfig($key);
     }
 }

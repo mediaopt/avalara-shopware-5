@@ -1,6 +1,6 @@
 <?php
 
-namespace Mediaopt\Avalara\Adapter\Factory;
+namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
 /**
  * Description of GetTaxRequest
@@ -16,7 +16,7 @@ class GetTaxRequest extends AbstractFactory
         $user = $this->getUserData();
         $pluginConfig = $this->getPluginConfig();
 
-        $getTaxRequest = new \Mediaopt\Avalara\Sdk\Model\GetTaxRequest();
+        $getTaxRequest = new \Shopware\Plugins\MoptAvalara\Model\GetTaxRequest();
         $address = $this->getAdapterMain()->getFactory('Address')->buildDeliveryAddress();
         $getTaxRequest->setAddresses(array($address));
         $getTaxRequest->setCustomerCode($user['additional']['user']['id']);
@@ -42,15 +42,15 @@ class GetTaxRequest extends AbstractFactory
         /* @var $addressFactory Address */
         $addressFactory = $this->getAdapterMain()->getFactory('Address');
 
-        /* @var $originAddress \Mediaopt\Avalara\Sdk\Model\Address */
+        /* @var $originAddress \Shopware\Plugins\MoptAvalara\Model\Address */
         $originAddress = $addressFactory->buildOriginAddress();
         $originAddress->setAddressCode('01');
 
-        /* @var $billingAddress \Mediaopt\Avalara\Sdk\Model\Address */
+        /* @var $billingAddress \Shopware\Plugins\MoptAvalara\Model\Address */
         $billingAddress = $addressFactory->buildBillingAddress();
         $billingAddress->setAddressCode('02');
 
-        /* @var $deliveryAddress \Mediaopt\Avalara\Sdk\Model\Address */
+        /* @var $deliveryAddress \Shopware\Plugins\MoptAvalara\Model\Address */
         $deliveryAddress = $addressFactory->buildDeliveryAddress();
         $deliveryAddress->setAddressCode('03');
 

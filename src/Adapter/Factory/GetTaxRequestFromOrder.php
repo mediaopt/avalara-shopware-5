@@ -1,6 +1,6 @@
 <?php
 
-namespace Mediaopt\Avalara\Adapter\Factory;
+namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
 /**
  * Description of GetTaxRequest
@@ -19,12 +19,12 @@ class GetTaxRequestFromOrder extends AbstractFactory
         /* @var $customer \Shopware\Models\Customer\Customer */
         $customer = $order->getCustomer();
 
-        $getTaxRequest = new \Mediaopt\Avalara\Sdk\Model\GetTaxRequest();
+        $getTaxRequest = new \Shopware\Plugins\MoptAvalara\Model\GetTaxRequest();
         $getTaxRequest->setCustomerCode($customer->getId());
         $getTaxRequest->setDocDate(date('Y-m-d', time()));
         $getTaxRequest->setCompanyCode($pluginConfig->mopt_avalara__company_code);
         $getTaxRequest->setClient(\Mediaopt\Avalara\Adapter\Main::NAME);
-        $getTaxRequest->setDocType(\Mediaopt\Avalara\Sdk\Model\DocumentType::SALES_INVOICE);
+        $getTaxRequest->setDocType(\Shopware\Plugins\MoptAvalara\Model\DocumentType::SALES_INVOICE);
         $getTaxRequest->setCommit(true);
         $getTaxRequest->setCurrencyCode($order->getCurrency());
         $getTaxRequest->setBusinessIdentificationNo($customer->getBilling()->getVatId());
@@ -46,15 +46,15 @@ class GetTaxRequestFromOrder extends AbstractFactory
         /* @var $addressFactory Address */
         $addressFactory = $this->getAdapterMain()->getFactory('Address');
 
-        /* @var $originAddress \Mediaopt\Avalara\Sdk\Model\Address */
+        /* @var $originAddress \Shopware\Plugins\MoptAvalara\Model\Address */
         $originAddress = $addressFactory->buildOriginAddress();
         $originAddress->setAddressCode('01');
 
-        /* @var $billingAddress \Mediaopt\Avalara\Sdk\Model\Address */
+        /* @var $billingAddress \Shopware\Plugins\MoptAvalara\Model\Address */
         $billingAddress = $addressFactory->buildBillingAddressFromOrder($this->order);
         $billingAddress->setAddressCode('02');
 
-        /* @var $deliveryAddress \Mediaopt\Avalara\Sdk\Model\Address */
+        /* @var $deliveryAddress \Shopware\Plugins\MoptAvalara\Model\Address */
         $deliveryAddress = $addressFactory->buildDeliveryAddressFromOrder($this->order);
         $deliveryAddress->setAddressCode('03');
 

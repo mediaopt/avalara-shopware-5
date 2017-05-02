@@ -1,6 +1,9 @@
 <?php
 
-namespace Mediaopt\Avalara\Adapter\Factory;
+namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
+
+use Shopware\Plugins\MoptAvalara\Model\Address as AddressModel;
+use Shopware\Plugins\MoptAvalara\Util\FormCreator;
 
 /**
  * Description of Config
@@ -12,12 +15,12 @@ class Address extends AbstractFactory
      * build Address-model based on delivery address
      * 
      * @param mixed $addressData
-     * @return \Mediaopt\Avalara\Sdk\Model\Address
+     * @return \Shopware\Plugins\MoptAvalara\Model\Address
      */
     public function buildDeliveryAddress()
     {
         $user = $this->getUserData();
-        $address = new \Mediaopt\Avalara\Sdk\Model\Address();
+        $address = new AddressModel();
         $address->setCity($user['shippingaddress']['city']);
         $address->setCountry($user['additional']['countryShipping']['countryiso']);
         $address->setLine1($user['shippingaddress']['street']);
@@ -31,12 +34,12 @@ class Address extends AbstractFactory
      * build Address-model based on delivery address
      * 
      * @param mixed $addressData
-     * @return \Mediaopt\Avalara\Sdk\Model\Address
+     * @return \Shopware\Plugins\MoptAvalara\Model\Address
      */
     public function buildBillingAddress()
     {
         $user = $this->getUserData();
-        $address = new \Mediaopt\Avalara\Sdk\Model\Address();
+        $address = new AddressModel();
         $address->setCity($user['billingaddress']['city']);
         $address->setCountry($user['additional']['country']['countryiso']);
         $address->setLine1($user['shippingaddress']['street']);
@@ -50,11 +53,11 @@ class Address extends AbstractFactory
      * build Address-model based on delivery address
      * 
      * @param \Shopware\Models\Order\Order $order
-     * @return \Mediaopt\Avalara\Sdk\Model\Address
+     * @return \Shopware\Plugins\MoptAvalara\Model\Address
      */
     public function buildDeliveryAddressFromOrder(\Shopware\Models\Order\Order $order)
     {
-        $address = new \Mediaopt\Avalara\Sdk\Model\Address();
+        $address = new AddressModel();
         $address->setCity($order->getShipping()->getCity());
         $address->setCountry($order->getShipping()->getCountry()->getIso());
         $address->setLine1($order->getShipping()->getStreet());
@@ -75,11 +78,11 @@ class Address extends AbstractFactory
      * build Address-model based on delivery address
      * 
      * @param \Shopware\Models\Order\Order $order
-     * @return \Mediaopt\Avalara\Sdk\Model\Address
+     * @return \Shopware\Plugins\MoptAvalara\Model\Address
      */
     public function buildBillingAddressFromOrder(\Shopware\Models\Order\Order $order)
     {
-        $address = new \Mediaopt\Avalara\Sdk\Model\Address();
+        $address = new AddressModel();
         $address->setCity($order->getBilling()->getCity());
         $address->setCountry($order->getBilling()->getCountry()->getIso());
         $address->setLine1($order->getBilling()->getStreet());
@@ -98,20 +101,19 @@ class Address extends AbstractFactory
     
     /**
      * Origination (ship-from) address
-     * @return \Mediaopt\Avalara\Sdk\Model\Address
+     * @return \Shopware\Plugins\MoptAvalara\Model\Address
      * @todo: build from module config
      */
     public function buildOriginAddress()
     {
-        $pluginConfig = $this->getPluginConfig();
-        $address = new \Mediaopt\Avalara\Sdk\Model\Address();
-        $address->setLine1($pluginConfig->mopt_avalara__origin_address__line1);
-        $address->setLine2($pluginConfig->mopt_avalara__origin_address__line2);
-        $address->setLine3($pluginConfig->mopt_avalara__origin_address__line3);
-        $address->setPostalCode($pluginConfig->mopt_avalara__origin_address__postal_code);
-        $address->setCity($pluginConfig->mopt_avalara__origin_address__city);
-        $address->setRegion($pluginConfig->mopt_avalara__origin_address__region);
-        $address->setCountry($pluginConfig->mopt_avalara__origin_address__country);
+        $address = new AddressModel();
+        $address->setLine1($this->getPluginConfig(FormCreator::ORIGIN_ADDRESS_LINE_1_FIELD));
+        $address->setLine2($this->getPluginConfig(FormCreator::ORIGIN_ADDRESS_LINE_2_FIELD));
+        $address->setLine3($this->getPluginConfig(FormCreator::ORIGIN_ADDRESS_LINE_3_FIELD));
+        $address->setPostalCode($this->getPluginConfig(FormCreator::ORIGIN_POSTAL_CODE_FIELD));
+        $address->setCity($this->getPluginConfig(FormCreator::ORIGIN_CITY_FIELD));
+        $address->setRegion($this->getPluginConfig(FormCreator::ORIGIN_REGION_FIELD));
+        $address->setCountry($this->getPluginConfig(FormCreator::ORIGIN_COUNTRY_FIELD));
         
         return $address;
     }
