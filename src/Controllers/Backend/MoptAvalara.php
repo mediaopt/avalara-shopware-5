@@ -76,9 +76,9 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
         $adapter = $this->getAvalaraSDKAdapter();
 
         try {
-            /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
+            /* @var $service \Shopware\Plugins\MoptAvalara\Service\CancelTax */
             $service = $adapter->getService('CancelTax');
-            $service->call($docCode, $cancelCode);
+            $service->cancel($docCode, $cancelCode);
         } catch (\GuzzleHttp\Exception\TransferException $e) {
             $adapter->getLogger()->error('CancelTax call failed.');
             $this->View()->assign(array(
