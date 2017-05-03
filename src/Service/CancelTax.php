@@ -9,10 +9,13 @@ namespace Shopware\Plugins\MoptAvalara\Service;
  */
 class CancelTax extends AbstractService
 {
-
-    protected $SERVICE_PATH = '/1.0/tax/cancel';
-
-    public function call($docCode, $cancelCode)
+    /**
+     * 
+     * @param string $docCode
+     * @param string $cancelCode
+     * @return \stdClass
+     */
+    public function cancel($docCode, $cancelCode)
     {
         $requestModel = $this->getAdapter()->getFactory('CancelTaxRequest')->build($docCode, $cancelCode);
         
@@ -21,6 +24,6 @@ class CancelTax extends AbstractService
             'body' => json_encode($requestModel->toArray()),
         ));
 
-        return $response->json();
+        return $response;
     }
 }
