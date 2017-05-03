@@ -45,10 +45,14 @@ class ValidateAddress extends AbstractService
 
         /* @var $suggestedAddress \Shopware\Plugins\MoptAvalara\Model\Address */
         $suggestedAddress = $response->validatedAddresses[0];
+
         foreach ($checkedAddress as $key => $value) {
-            $lcFirsKey = lcfirst($key);
-            if (isset($suggestedAddress->$lcFirsKey) && $suggestedAddress->$lcFirsKey != $value) {
-                $changes[$key] = $suggestedAddress->$lcFirsKey;
+            //Skip the region key
+            if ('region' === $key) {
+                continue;
+            }
+            if (isset($suggestedAddress->$key) && $suggestedAddress->$key != $value) {
+                $changes[$key] = $suggestedAddress->$key;
             }
         }
 
