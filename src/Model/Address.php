@@ -4,97 +4,118 @@ namespace Shopware\Plugins\MoptAvalara\Model;
 
 class Address extends AbstractModel
 {
-
     const COUNTRY_CODE__US = 'US';
     const COUNTRY_CODE__CA = 'CA';
 
-    public $AddressCode;
-    public $Line1;
-    public $Line2;
-    public $Line3;
-    public $City;
-    public $Region;
-    public $Country;
-    public $PostalCode;
+    /**
+     * @var string Line1
+     */
+    public $line1;
 
+    /**
+     * @var string Line2
+     */
+    public $line2;
+
+    /**
+     * @var string Line3
+     */
+    public $line3;
+
+    /**
+     * @var string City
+     */
+    public $city;
+
+    /**
+     * @var string State / Province / Region
+     */
+    public $region;
+
+    /**
+     * @var string Two character ISO 3166 Country Code
+     */
+    public $country;
+
+    /**
+     * @var string Postal Code / Zip Code
+     */
+    public $postalCode;
+    
     public function getLine1()
     {
-        return $this->Line1;
+        return $this->line1;
     }
 
     public function getLine2()
     {
-        return $this->Line2;
+        return $this->line2;
     }
 
     public function getLine3()
     {
-        return $this->Line3;
+        return $this->line3;
     }
 
     public function getCity()
     {
-        return $this->City;
+        return $this->city;
     }
 
     public function getRegion()
     {
-        return $this->Region;
+        return $this->region;
     }
 
     public function getPostalCode()
     {
-        return $this->PostalCode;
+        return $this->postalCode;
     }
 
     public function getCountry()
     {
-        return $this->Country;
+        return $this->country;
     }
 
-    public function setLine1($Line1)
+    public function setLine1($line1)
     {
-        $this->Line1 = $Line1;
+        $this->line1 = $line1;
+        return $this;
     }
 
-    public function setLine2($Line2)
+    public function setLine2($line2)
     {
-        $this->Line2 = $Line2;
+        $this->line2 = $line2;
+        return $this;
     }
 
-    public function setLine3($Line3)
+    public function setLine3($line3)
     {
-        $this->Line3 = $Line3;
+        $this->line3 = $line3;
+        return $this;
     }
 
-    public function setCity($City)
+    public function setCity($city)
     {
-        $this->City = $City;
+        $this->city = $city;
+        return $this;
     }
 
-    public function setRegion($Region)
+    public function setRegion($region)
     {
-        $this->Region = $Region;
+        $this->region = $region;
+        return $this;
     }
 
-    public function setPostalCode($PostalCode)
+    public function setPostalCode($postalCode)
     {
-        $this->PostalCode = $PostalCode;
+        $this->postalCode = $postalCode;
+        return $this;
     }
 
-    public function setCountry($Country)
+    public function setCountry($country)
     {
-        $this->Country = $Country;
+        $this->country = $country;
+        return $this;
     }
-
-    public function getAddressCode()
-    {
-        return $this->AddressCode;
-    }
-
-    public function setAddressCode($AddressCode)
-    {
-        $this->AddressCode = $AddressCode;
-    }
-
 }
