@@ -23,7 +23,7 @@ class Line extends AbstractFactory
         $line = new \Shopware\Plugins\MoptAvalara\Model\Line();
         $line
             ->setLineNo($lineData['id'])
-            ->setItemCode($lineData['ean'])
+            ->setItemCode($lineData['id'])
             ->setQty($lineData['quantity'])
             ->setAmount($this->getParamAmount($lineData))
             ->setOriginCode('01')
