@@ -15,23 +15,22 @@ class GetTaxRequestFromOrder extends AbstractFactory
     public function build(\Shopware\Models\Order\Order $order)
     {
         $this->order = $order;
-        $pluginConfig = $this->getPluginConfig();
         /* @var $customer \Shopware\Models\Customer\Customer */
         $customer = $order->getCustomer();
 
         $getTaxRequest = new \Shopware\Plugins\MoptAvalara\Model\GetTaxRequest();
-        $getTaxRequest->setCustomerCode($customer->getId());
-        $getTaxRequest->setDocDate(date('Y-m-d', time()));
-        $getTaxRequest->setCompanyCode($pluginConfig->mopt_avalara__company_code);
-        $getTaxRequest->setClient(\Mediaopt\Avalara\Adapter\Main::NAME);
-        $getTaxRequest->setDocType(\Shopware\Plugins\MoptAvalara\Model\DocumentType::SALES_INVOICE);
-        $getTaxRequest->setCommit(true);
-        $getTaxRequest->setCurrencyCode($order->getCurrency());
-        $getTaxRequest->setBusinessIdentificationNo($customer->getBilling()->getVatId());
-        $getTaxRequest->setAddresses($this->getParamAddresses());
-        $getTaxRequest->setLines($this->getParamLines());
-        $getTaxRequest->setDiscount($this->discount);
-        $getTaxRequest->setDocCode($order->getNumber());
+        $getTaxRequest
+            ->setCustomerCode($customer->getId())
+            ->setDocDate(date('Y-m-d', time()))
+            ->setDocType(\Shopware\Plugins\MoptAvalara\Model\DocumentType::SALES_INVOICE)
+            ->setCommit(true)
+            ->setCurrencyCode($order->getCurrency())
+            ->setBusinessIdentificationNo($customer->getBilling()->getVatId())
+            ->setAddresses($this->getParamAddresses())
+            ->setLines($this->getParamLines())
+            ->setDiscount($this->discount)
+            ->setDocCode($order->getNumber())
+        ;
 
 
         if ($exemptionCode = $order->getCustomer()->getAttribute()->getMoptAvalaraExemptionCode()) {
@@ -48,15 +47,15 @@ class GetTaxRequestFromOrder extends AbstractFactory
 
         /* @var $originAddress \Shopware\Plugins\MoptAvalara\Model\Address */
         $originAddress = $addressFactory->buildOriginAddress();
-        $originAddress->setAddressCode('01');
+        //$originAddress->locationCode('01');
 
         /* @var $billingAddress \Shopware\Plugins\MoptAvalara\Model\Address */
         $billingAddress = $addressFactory->buildBillingAddressFromOrder($this->order);
-        $billingAddress->setAddressCode('02');
+        //$billingAddress->locationCode('02');
 
         /* @var $deliveryAddress \Shopware\Plugins\MoptAvalara\Model\Address */
         $deliveryAddress = $addressFactory->buildDeliveryAddressFromOrder($this->order);
-        $deliveryAddress->setAddressCode('03');
+        //$deliveryAddress->locationCode('03');
 
         return array($originAddress, $billingAddress, $deliveryAddress);
     }
@@ -122,6 +121,7 @@ class GetTaxRequestFromOrder extends AbstractFactory
         $lineData['articlename'] = $detail->getArticleName();
         $lineData['articleID'] = $detail->getArticleId();
         $lineData['modus'] = $detail->getMode();
+        
         return $lineData;
     }
 

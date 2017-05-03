@@ -11,10 +11,11 @@ class CancelTaxRequest extends AbstractFactory
     public function build($docCode, $cancelCode)
     {
         $model = new \Shopware\Plugins\MoptAvalara\Model\CancelTaxRequest();
-        $model->setCancelCode($cancelCode);
-        //$model->setCompanyCode($this->getPluginConfig()->mopt_avalara__company_code);
-        $model->setDocCode($docCode);
-        $model->setDocType(\Shopware\Plugins\MoptAvalara\Model\DocumentType::SALES_INVOICE);
+        $model
+            ->setCancelCode($cancelCode)
+            ->setDocCode($docCode)
+            ->setDocType(\Shopware\Plugins\MoptAvalara\Model\DocumentType::SALES_INVOICE)
+        ;
         
         return $model;
     }

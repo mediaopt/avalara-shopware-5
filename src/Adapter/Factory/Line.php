@@ -21,16 +21,18 @@ class Line extends AbstractFactory
     public function build($lineData, $voucher = null)
     {
         $line = new \Shopware\Plugins\MoptAvalara\Model\Line();
-        $line->setLineNo($lineData['id']);
-        $line->setItemCode($lineData['ean']);
-        $line->setQty($lineData['quantity']);
-        $line->setAmount($this->getParamAmount($lineData));
-        $line->setOriginCode('01');
-        $line->setDestinationCode('03');
-        $line->setDescription($lineData['articlename']);
-        $line->setTaxCode($this->getParamTaxCode($lineData));
-        $line->setDiscounted($this->isNotVoucherOrShipping($lineData));
-        $line->setTaxIncluded($this->getParamIsTaxIncluded($lineData, $line));
+        $line
+            ->setLineNo($lineData['id'])
+            ->setItemCode($lineData['ean'])
+            ->setQty($lineData['quantity'])
+            ->setAmount($this->getParamAmount($lineData))
+            ->setOriginCode('01')
+            ->setDestinationCode('03')
+            ->setDescription($lineData['articlename'])
+            ->setTaxCode($this->getParamTaxCode($lineData))
+            ->setDiscounted($this->isNotVoucherOrShipping($lineData))
+            ->setTaxIncluded($this->getParamIsTaxIncluded($lineData, $line))
+        ;
 
         return $line;
     }

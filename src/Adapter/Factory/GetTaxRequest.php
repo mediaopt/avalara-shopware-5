@@ -11,25 +11,30 @@ class GetTaxRequest extends AbstractFactory
 
     var $discount = 0;
 
+    /**
+     * 
+     * @param string $docType
+     * @param bool $isCommit
+     * @return \Shopware\Plugins\MoptAvalara\Model\GetTaxRequest
+     */
     public function build($docType, $isCommit)
     {
         $user = $this->getUserData();
-        $pluginConfig = $this->getPluginConfig();
-
+        
+        $address = $this->getAdapter()->getFactory('Address')->buildDeliveryAddress();
         $getTaxRequest = new \Shopware\Plugins\MoptAvalara\Model\GetTaxRequest();
-        $address = $this->getAdapterMain()->getFactory('Address')->buildDeliveryAddress();
-        $getTaxRequest->setAddresses(array($address));
-        $getTaxRequest->setCustomerCode($user['additional']['user']['id']);
-        $getTaxRequest->setDocDate(date('Y-m-d', time()));
-        $getTaxRequest->setCompanyCode($pluginConfig->mopt_avalara__company_code);
-        $getTaxRequest->setClient(\Mediaopt\Avalara\Adapter\Main::NAME);
-        $getTaxRequest->setDocType($docType);
-        $getTaxRequest->setCommit($isCommit);
-        $getTaxRequest->setCurrencyCode(Shopware()->Shop()->getCurrency()->getCurrency());
-        $getTaxRequest->setBusinessIdentificationNo($user['billingaddress']['ustid']);
-        $getTaxRequest->setAddresses($this->getParamAddresses());
-        $getTaxRequest->setLines($this->getParamLines());
-        $getTaxRequest->setDiscount($this->discount);
+        $getTaxRequest
+            ->setAddresses(array($address))
+            ->setCustomerCode($user['additional']['user']['id'])
+            ->setDocDate(date('Y-m-d', time()))
+            ->setDocType($docType)
+            ->setCommit($isCommit)
+            ->setCurrencyCode(Shopware()->Shop()->getCurrency()->getCurrency())
+            ->setBusinessIdentificationNo($user['billingaddress']['ustid'])
+            ->setLines($this->getParamLines())
+            ->setDiscount($this->discount)
+        ;
+        
         if (!empty($user['additional']['user']['moptAvalaraExemptionCode'])) {
             $getTaxRequest->setExemptionNo($user['additional']['user']['moptAvalaraExemptionCode']);
         }
@@ -37,22 +42,26 @@ class GetTaxRequest extends AbstractFactory
         return $getTaxRequest;
     }
 
+    /**
+     * 
+     * @return array
+     */
     protected function getParamAddresses()
     {
         /* @var $addressFactory Address */
-        $addressFactory = $this->getAdapterMain()->getFactory('Address');
+        $addressFactory = $this->getAdapter()->getFactory('Address');
 
         /* @var $originAddress \Shopware\Plugins\MoptAvalara\Model\Address */
         $originAddress = $addressFactory->buildOriginAddress();
-        $originAddress->setAddressCode('01');
+        //$originAddress->locationCode('01');
 
         /* @var $billingAddress \Shopware\Plugins\MoptAvalara\Model\Address */
         $billingAddress = $addressFactory->buildBillingAddress();
-        $billingAddress->setAddressCode('02');
+        //$billingAddress->locationCode('02');
 
         /* @var $deliveryAddress \Shopware\Plugins\MoptAvalara\Model\Address */
         $deliveryAddress = $addressFactory->buildDeliveryAddress();
-        $deliveryAddress->setAddressCode('03');
+        //$deliveryAddress->locationCode('03');
 
         return array($originAddress, $billingAddress, $deliveryAddress);
     }
@@ -60,7 +69,7 @@ class GetTaxRequest extends AbstractFactory
     protected function getParamLines()
     {
         /* @var $lineFactory Line */
-        $lineFactory = $this->getAdapterMain()->getFactory('Line');
+        $lineFactory = $this->getAdapter()->getFactory('Line');
         $lines = array();
         $positions = Shopware()->Modules()->Basket()->sGetBasket();
         foreach ($positions['content'] as $position) {
