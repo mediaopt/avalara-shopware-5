@@ -46,8 +46,8 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
     
     protected function getAvalaraOrder()
     {
-        $order = Shopware()->Models()->getRepository('\Shopware\Models\Order\Order')->find(
-                $this->Request()->getParam('id'));
+        $repository = Shopware()->Models()->getRepository('\Shopware\Models\Order\Order');
+        $order = $repository->find($this->Request()->getParam('id'));
         if (!$order) {
             $this->View()->assign(array(
                 'success' => false,
@@ -73,15 +73,14 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
     {
         $docCode = $order->getAttribute()->getMoptAvalaraDocCode();
 
-        /* @var $sdkMain \Shopware\Plugins\MoptAvalara\Main */
-        $sdkMain = Shopware()->Container()->get('MediaoptAvalaraSdkMain');
+        $adapter = $this->getAvalaraSDKAdapter();
 
         try {
             /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
-            $service = $sdkMain->getService('CancelTax');
+            $service = $adapter->getService('CancelTax');
             $service->call($docCode, $cancelCode);
         } catch (\GuzzleHttp\Exception\TransferException $e) {
-            $sdkMain->getLogger()->error('CancelTax call failed.');
+            $adapter->getLogger()->error('CancelTax call failed.');
             $this->View()->assign(array(
                 'success' => false,
                 'message' => 'Avalara: Cancel Tax call failed.')
@@ -94,13 +93,11 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
     
     protected function updateOrder(\Shopware\Models\Order\Order $order)
     {
-        //get tax call on current order state
-        /* @var $sdkMain \Shopware\Plugins\MoptAvalara\Main */
-        $sdkMain = Shopware()->Container()->get('MediaoptAvalaraSdkMain');
+        $adapter = $this->getAvalaraSDKAdapter();
         
         try {
-            $getTaxFromOrderRequest = $sdkMain->getAdapter()->getFactory('GetTaxRequestFromOrder')->build($order);
-            $response = $sdkMain->getService('GetTax')->call($getTaxFromOrderRequest);
+            $getTaxFromOrderRequest = $adapter->getFactory('GetTaxRequestFromOrder')->build($order);
+            $response = $adapter->getService('GetTax')->calculate($getTaxFromOrderRequest);
             
             /*@var $detail Shopware\Models\Order\Detail */
             foreach ($order->getDetails() as $detail) {
@@ -112,7 +109,7 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             Shopware()->Models()->flush();
             $order->calculateInvoiceAmount();
         } catch (\GuzzleHttp\Exception\TransferException $e) {
-            $sdkMain->getLogger()->error('GetTax call from order failed.');
+            $adapter->getLogger()->error('GetTax call from order failed.');
             $this->View()->assign(array(
                 'success' => false,
                 'message' => 'Avalara: Update order call failed.')
@@ -155,5 +152,14 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             'success' => true,
             'message' => 'Avalara: order has been unflagged.')
         );
+    }
+    
+    /**
+     * 
+     * @return \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface
+     */
+    protected function getAvalaraSDKAdapter() {
+        $service = \Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter::SERVICE_NAME;
+        return Shopware()->Container()->get($service);
     }
 }
