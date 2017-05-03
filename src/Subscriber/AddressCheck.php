@@ -4,6 +4,7 @@ namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
 use Shopware\Plugins\MoptAvalara\Util\FormCreator;
 use Shopware\Plugins\MoptAvalara\Model\Address;
+use Shopware\Plugins\MoptAvalara\Model\CountryCodes;
 
 /**
  * Description of Checkout
@@ -32,7 +33,6 @@ class AddressCheck extends AbstractSubscriber
     {
         /* @var $session Enlight_Components_Session_Namespace */
         $session = $this->getContainer()->get('session');
-        /* @var $adapter \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface */
         $adapter = $this->getAdapter();
         $address = $adapter->getFactory('Address')->buildDeliveryAddress();
 
@@ -48,7 +48,6 @@ class AddressCheck extends AbstractSubscriber
             
             $response = $service->validate($address);
             $session->MoptAvalaraCheckedAddress = $this->getAddressHash($address);
-
             if (empty($activeShippingAddressId = $session->offsetGet('checkoutShippingAddressId', null))) {
                 $activeShippingAddressId = $userData['additional']['user']['default_shipping_address_id'];
             }
@@ -61,7 +60,6 @@ class AddressCheck extends AbstractSubscriber
                 
                 return true;
             }
-
         } catch (\GuzzleHttp\Exception\TransferException $e) {
             //address check failed - nothing to do
             $adapter->getLogger()->info('address check failed: ' . $e->getMessage());
@@ -70,7 +68,7 @@ class AddressCheck extends AbstractSubscriber
 
     /**
      * check if address has aready been validated
-     * @param Address $address
+     * @param \Shopware\Plugins\MoptAvalara\Model\Address $address
      * @return boolean
      */
     protected function isAddressToBeValidated(Address $address)
@@ -79,8 +77,10 @@ class AddressCheck extends AbstractSubscriber
         $session = $this->getContainer()->get('session');
         
         //country check
-        $configKey = FormCreator::ADDRESS_VALIDATION_COUNTRIES_FIELD;
-        $countries = $this->getAdapter()->getPluginConfig($configKey);
+        $countries = $this
+            ->getAdapter()
+            ->getPluginConfig(FormCreator::ADDRESS_VALIDATION_COUNTRIES_FIELD)
+        ;
         switch ($countries) {
             case 1: //no validation
                 return false;
@@ -116,7 +116,7 @@ class AddressCheck extends AbstractSubscriber
     
     /**
      * get hash of given address
-     * @param Address $address
+     * @param \Shopware\Plugins\MoptAvalara\Model\Address $address
      */
     protected function getAddressHash(Address $address) {
         return md5(serialize($address));
@@ -146,13 +146,13 @@ class AddressCheck extends AbstractSubscriber
         foreach ($changes as $key => $value) {
 
             switch ($key) {
-                case 'City':
+                case 'city':
                     $formData['city'] = $value;
                     break;
-                case 'Line1':
+                case 'line1':
                     $formData['street'] = $value;
                     break;
-                case 'PostalCode':
+                case 'postalCode':
                     $formData['zipcode'] = $value;
                     break;
             }

@@ -10,24 +10,21 @@ use Shopware\Plugins\MoptAvalara\Model\Address;
  */
 class ValidateAddress extends AbstractService
 {
-
-    protected $SERVICE_PATH = '/1.0/address/validate';
-
     /**
      * 
-     * @param Address $address
+     * @param \Shopware\Plugins\MoptAvalara\Model\Address $address
      * @return \stdClass
      */
     public function validate(Address $address)
     {
         $response = $this->getAdapter()->getClient()->resolveAddress(
-            $address->getLine1(),
-            $address->getLine2(),
-            $address->getLine3(),
-            $address->getCity(),
-            $address->getRegion(),
-            $address->getPostalCode(),
-            $address->getCountry()
+            $address->line1,
+            $address->line2,
+            $address->line3,
+            $address->city,
+            $address->region,
+            $address->postalCode,
+            $address->country
         );
         
         return $response;
@@ -35,18 +32,18 @@ class ValidateAddress extends AbstractService
 
     /**
      * 
-     * @param Address $checkedAddress
+     * @param \Shopware\Plugins\MoptAvalara\Model\Address $checkedAddress
      * @param \stdClass $response
      * @return array
      */
     public function getAddressChanges(Address $checkedAddress, $response)
     {
         $changes = array();
-
         if (empty($response) || !is_object($response) || empty($response->validatedAddresses)) {
             return $changes;
         }
 
+        /* @var $suggestedAddress \Shopware\Plugins\MoptAvalara\Model\Address */
         $suggestedAddress = $response->validatedAddresses[0];
         foreach ($checkedAddress as $key => $value) {
             $lcFirsKey = lcfirst($key);
