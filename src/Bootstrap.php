@@ -117,6 +117,8 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
     {
         $this->Application()->Loader()->registerNamespace('Shopware\\Plugins\\MoptAvalara', $this->Path());
         require_once $this->Path() . 'vendor/autoload.php';
+        // @TODO remove this require after avalara will fix autoloading
+        require_once $this->Path() . 'vendor/avalara/avataxclient/src/AvaTaxClient.php';
         $serviceName = \Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter::SERVICE_NAME;
         Shopware()->Container()->set($serviceName, $this->createAvalaraSdkAdapter());
         
