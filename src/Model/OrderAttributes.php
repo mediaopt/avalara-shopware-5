@@ -35,32 +35,59 @@ class OrderAttributes extends AbstractModel
         return $this->PurchaseOrderNo;
     }
 
+    /**
+     * 
+     * @param string $DocDate
+     * @return OrderAttributes
+     */
     function setDocDate($DocDate)
     {
         $this->DocDate = $DocDate;
+        return $this;
     }
 
+    /**
+     * 
+     * @param string $CurrencyCode
+     * @return OrderAttributes
+     */
     function setCurrencyCode($CurrencyCode)
     {
         $this->CurrencyCode = $CurrencyCode;
+        return $this;
     }
 
+    /**
+     * 
+     * @param string $Discount
+     * @return OrderAttributes
+     */
     function setDiscount($Discount)
     {
         $this->Discount = $Discount;
+        return $this;
     }
 
+    /**
+     * 
+     * @param string $DocCode
+     * @return OrderAttributes
+     */
     function setDocCode($DocCode)
     {
         $this->DocCode = $DocCode;
+        return $this;
     }
 
+    /**
+     * 
+     * @param string $PurchaseOrderNo
+     * @return OrderAttributes
+     */
     function setPurchaseOrderNo($PurchaseOrderNo)
     {
         $this->PurchaseOrderNo = $PurchaseOrderNo;
+        return $this;
     }
-
-
-    
 }
 

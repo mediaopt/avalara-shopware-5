@@ -33,23 +33,47 @@ class CancelTaxRequest extends AbstractModel
         return $this->CancelCode;
     }
 
+    /**
+     * 
+     * @param string $CompanyCode
+     * @return CancelTaxRequest
+     */
     public function setCompanyCode($CompanyCode)
     {
         $this->CompanyCode = $CompanyCode;
+        return $this;
     }
 
+    /**
+     * 
+     * @param string $DocType
+     * @return CancelTaxRequest
+     */
     public function setDocType($DocType)
     {
         $this->DocType = $DocType;
+        return $this;
     }
 
+    /**
+     * 
+     * @param string $DocCode
+     * @return CancelTaxRequest
+     */
     public function setDocCode($DocCode)
     {
         $this->DocCode = $DocCode;
+        return $this;
     }
 
+    /**
+     * 
+     * @param string $CancelCode
+     * @return CancelTaxRequest
+     */
     public function setCancelCode($CancelCode)
     {
         $this->CancelCode = $CancelCode;
+        return $this;
     }
 }
