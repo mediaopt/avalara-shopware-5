@@ -10,8 +10,6 @@ use Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface;
  */
 abstract class AbstractService
 {
-    protected $config;
-    
     /**
      *
      * @var \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface
@@ -27,18 +25,6 @@ abstract class AbstractService
         $this->adapter = $adapter;
     }
     
-    /**
-     * 
-     * @return \Shopware\Plugins\MoptAvalara\Model\Config
-     */
-    protected function getConfig()
-    {
-        if ($this->config !== null) {
-            return $this->config;
-        }
-        return $this->config = $this->adapter->getFactory('Config')->build();
-    }
-
     /**
      * get adapter
      * 
