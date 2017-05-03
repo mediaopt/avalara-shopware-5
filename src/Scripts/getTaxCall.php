@@ -18,8 +18,8 @@ if (version_compare(\Shopware::VERSION, '4.3.0', '>=')) {
 
 //init plugin (for autoloading)
 Shopware()->Plugins()->Backend()->MoptAvalara();
-
-$sdkMain = Shopware()->Container()->get('MediaoptAvalaraSdkMain');
+$service = \Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter::SERVICE_NAME;
+$adapter = Shopware()->Container()->get($service);
 try {
     $address1 = array();
     $address1['AddressCode'] = '01';
@@ -73,7 +73,7 @@ try {
     $orderData['DocCode'] = 'DOC33333';
     $avalaraData['DocType'] = 'SalesInvoice';
     $avalaraData['Commit'] = 'true';
-    $response = $sdkMain->getService('getTax')->getTax($userData,$addressData,$lineData,$orderData,$avalaraData);
+    $response = $adapter->getService('getTax')->getTax($userData,$addressData,$lineData,$orderData,$avalaraData);
     if(empty($response['ResultCode']) || $response['ResultCode'] != 'Success') {
         echo 'Validation failed !';
         exit;

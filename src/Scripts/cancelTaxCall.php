@@ -18,12 +18,12 @@ if (version_compare(\Shopware::VERSION, '4.3.0', '>=')) {
 
 //init plugin (for autoloading)
 Shopware()->Plugins()->Backend()->MoptAvalara();
-
-$sdkMain = Shopware()->Container()->get('MediaoptAvalaraSdkMain');
+$service = \Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter::SERVICE_NAME;
+$adapter = Shopware()->Container()->get($service);
 try {
     $orderData['DocCode'] = 'DOC21345';
     $avalaraData['DocType'] = 'SalesInvoice';
-    $response = $sdkMain->getService('cancelTax')->cancelTax($orderData, $avalaraData);
+    $response = $adapter->getService('cancelTax')->cancelTax($orderData, $avalaraData);
     //compare address fields
     
 } catch (Exception $e) {
