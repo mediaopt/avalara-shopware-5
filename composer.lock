@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/bubnov-mikhail/AvaTax-REST-V2-PHP-SDK.git",
-                "reference": "4a42a7823feaff95602104614195e43caabf6850"
+                "reference": "36af04f7940e30a32c06a8fca07f76f97eb3830d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bubnov-mikhail/AvaTax-REST-V2-PHP-SDK/zipball/4a42a7823feaff95602104614195e43caabf6850",
-                "reference": "4a42a7823feaff95602104614195e43caabf6850",
+                "url": "https://api.github.com/repos/bubnov-mikhail/AvaTax-REST-V2-PHP-SDK/zipball/36af04f7940e30a32c06a8fca07f76f97eb3830d",
+                "reference": "36af04f7940e30a32c06a8fca07f76f97eb3830d",
                 "shasum": ""
             },
             "require": {
@@ -71,7 +71,7 @@
                 "source": "https://github.com/avadev/AvaTax-REST-V2-PHP-SDK",
                 "issues": "https://github.com/avadev/AvaTax-REST-V2-PHP-SDK/issues"
             },
-            "time": "2017-05-03 11:11:40"
+            "time": "2017-05-04 10:56:40"
         },
         {
             "name": "guzzlehttp/guzzle",
