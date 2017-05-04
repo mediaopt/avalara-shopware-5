@@ -135,7 +135,7 @@ class GetTax extends AbstractSubscriber
         $newPrice = $args->getReturn();
         $newPrice['taxID'] = 'mopt_avalara__' . $taxRate;
         $newPrice['tax_rate'] = $taxRate;
-        $newPrice['tax'] = $taxRate;
+        $newPrice['tax'] = $this->getTaxForOrderBasketId($args->get('id'), $session->MoptAvalaraGetTaxResult);
 
         return $newPrice;
     }
