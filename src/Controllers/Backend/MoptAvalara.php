@@ -8,7 +8,7 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             return;
         }
         
-        if (!$this->cancelTax($order, Shopware\Plugins\MoptAvalara\Model\CancelCode::DOC_VOIDED)) {
+        if (!$this->cancelTax($order, \Avalara\VoidReasonCode::C_DOCVOIDED)) {
             return;
         }
         
@@ -24,11 +24,11 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             return;
         }
         
-        if (!$this->cancelTax($order, Shopware\Plugins\MoptAvalara\Model\CancelCode::DOC_VOIDED)) {
+        if (!$this->cancelTax($order, \Avalara\VoidReasonCode::C_DOCVOIDED)) {
             return;
         }
         
-        if (!$this->cancelTax($order, Shopware\Plugins\MoptAvalara\Model\CancelCode::DOC_DELETED)) {
+        if (!$this->cancelTax($order, \Avalara\VoidReasonCode::C_DOCDELETED)) {
             return;
         }
         
@@ -72,7 +72,6 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
     protected function cancelTax(\Shopware\Models\Order\Order $order, $cancelCode) 
     {
         $docCode = $order->getAttribute()->getMoptAvalaraDocCode();
-
         $adapter = $this->getAvalaraSDKAdapter();
 
         try {
