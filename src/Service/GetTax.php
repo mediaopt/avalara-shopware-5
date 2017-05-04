@@ -51,11 +51,28 @@ class GetTax extends AbstractService
             )
         ;
         
+        $tb
+            ->withCurrencyCode($taxRequest->getCurrencyCode())
+            ->withDiscountAmount($taxRequest->getDiscount())
+        ;
+        
+        if ($taxRequest->getCommit()) {
+            $tb->withCommit();
+        }
+        if ($exemptionNo = $taxRequest->getExemptionNo()) {
+            $tb->withExemptionNo($exemptionNo);
+        }
+        
         foreach($taxRequest->getLines() as $line) {
             /* @var $line \Shopware\Plugins\MoptAvalara\Model\Line */
             $tb
-                ->withLine($line->getAmount(), $line->getQty(), $line->getTaxCode(), $line->getItemCode())
-                ->withLineParameter('itemCode', $line->getItemCode())
+                ->withLine(
+                    $line->getAmount(), 
+                    $line->getQty(), 
+                    $line->getTaxCode(), 
+                    $line->getItemCode()
+                )
+                ->withLineParameter('description', $line->getItemCode())
             ;
         }
         
