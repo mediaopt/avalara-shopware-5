@@ -3,7 +3,7 @@
 namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
 use Shopware\Plugins\MoptAvalara\Model\Address as AddressModel;
-use Shopware\Plugins\MoptAvalara\Util\FormCreator;
+use Shopware\Plugins\MoptAvalara\Form\FormCreator;
 
 /**
  * Description of Config

@@ -1,8 +1,6 @@
 <?php
 
-namespace Shopware\Plugins\MoptAvalara\Util;
-
-use Shopware_Plugins_Backend_MoptAvalara_Bootstrap;
+namespace Shopware\Plugins\MoptAvalara\Form;
 
 /**
  * Description of formCreator

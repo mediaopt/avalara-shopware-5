@@ -241,7 +241,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
      */
     public function createForm()
     {
-        $formCreator = new \Shopware\Plugins\MoptAvalara\Util\FormCreator($this);
+        $formCreator = new \Shopware\Plugins\MoptAvalara\Form\FormCreator($this);
         $formCreator->createForms();
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
-use Shopware\Plugins\MoptAvalara\Util\FormCreator;
+use Shopware\Plugins\MoptAvalara\Form\FormCreator;
 use Avalara\DocumentType;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\Line;
 use Shopware\Plugins\MoptAvalara\Model\GetTaxRequest;

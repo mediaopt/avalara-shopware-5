@@ -6,6 +6,7 @@ use Avalara\TransactionBuilder;
 use Avalara\TransactionAddressType;
 use Avalara\DocumentType;
 use Shopware\Plugins\MoptAvalara\Model\GetTaxRequest;
+use Shopware\Plugins\MoptAvalara\Form\FormCreator;
 
 /**
  * Description of GetTax
@@ -21,11 +22,12 @@ class GetTax extends AbstractService
     public function calculate(GetTaxRequest $taxRequest)
     {
         $client = $this->getAdapter()->getClient();
+        $companyCode = $this->getAdapter()->getPluginConfig(FormCreator::COMPANY_CODE_FIELD);
         /* @var $originAddress \Shopware\Plugins\MoptAvalara\Model\Address */
         $originAddress = $this->getAdapter()->getFactory('Address')->buildOriginAddress();
         /* @var $address \Shopware\Plugins\MoptAvalara\Model\Address */
         $address = $taxRequest->getAddresses()[0];
-        $tb = new TransactionBuilder($client, null, $taxRequest->getDocType(), $taxRequest->getCustomerCode());
+        $tb = new TransactionBuilder($client, $companyCode, $taxRequest->getDocType(), $taxRequest->getCustomerCode());
         $tb
             ->withAddress(
                 TransactionAddressType::C_SHIPFROM, 

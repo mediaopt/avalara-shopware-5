@@ -2,7 +2,7 @@
 
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
-use Shopware\Plugins\MoptAvalara\Util\FormCreator;
+use Shopware\Plugins\MoptAvalara\Form\FormCreator;
 use Shopware\Plugins\MoptAvalara\Model\Address;
 use Shopware\Plugins\MoptAvalara\Model\CountryCodes;
 

@@ -6,7 +6,7 @@ use Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface;
 use Shopware_Plugins_Backend_MoptAvalara_Bootstrap;
 use Shopware\Plugins\MoptAvalara\Logger\Formatter;
 use Shopware\Plugins\MoptAvalara\Logger\LogSubscriber;
-use Shopware\Plugins\MoptAvalara\Util\FormCreator;
+use Shopware\Plugins\MoptAvalara\Form\FormCreator;
 use Avalara\AvaTaxClient;
 
 /**
