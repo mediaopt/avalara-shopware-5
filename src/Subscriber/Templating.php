@@ -16,10 +16,10 @@ class Templating extends AbstractSubscriber
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             'Enlight_Controller_Action_PostDispatch_Frontend' => 'onPostDispatchFrontend',
             'Enlight_Controller_Action_PostDispatch_Backend_Order' => 'onPostDispatchBackendOrder',
-        );
+        ];
     }
     
     /**

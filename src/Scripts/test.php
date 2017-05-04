@@ -24,7 +24,7 @@ $adapter = Shopware()->Container()->get($serviceName);
 try {
     $addressData = array();
     $addressData['City'] = 'Washingtooon';
-    $addressData['Country'] = \Shopware\Plugins\MoptAvalara\Model\Address::COUNTRY_CODE__US;
+    $addressData['Country'] = \Shopware\Plugins\MoptAvalara\Adapter\Factory\AddressFactory::COUNTRY_CODE__US;
     $addressData['Line1'] = 'White House';
     $addressData['Line2'] = '1600 Pennsylvania Ave NW';
     $addressData['PostalCode'] = 20500;

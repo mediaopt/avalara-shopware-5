@@ -2,24 +2,27 @@
 
 namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
-use Shopware\Plugins\MoptAvalara\Model\Address as AddressModel;
+use Avalara\AddressLocationInfo;
 use Shopware\Plugins\MoptAvalara\Form\FormCreator;
 
 /**
  * Description of Config
  *
  */
-class Address extends AbstractFactory
+class AddressFactory extends AbstractFactory
 {
+    const COUNTRY_CODE__US = 'US';
+    const COUNTRY_CODE__CA = 'CA';
+    
     /**
      * build Address-model based on delivery address
      * 
-     * @return \Shopware\Plugins\MoptAvalara\Model\Address
+     * @return \Avalara\AddressLocationInfo
      */
     public function buildDeliveryAddress()
     {
         $user = $this->getUserData();
-        $address = new AddressModel();
+        $address = new AddressLocationInfo();
         $address->city = $user['shippingaddress']['city'];
         $address->country = $user['additional']['countryShipping']['countryiso'];
         $address->line1 = $user['shippingaddress']['street'];
@@ -32,12 +35,12 @@ class Address extends AbstractFactory
     /**
      * build Address-model based on delivery address
      * 
-     * @return \Shopware\Plugins\MoptAvalara\Model\Address
+     * @return \Avalara\AddressLocationInfo
      */
     public function buildBillingAddress()
     {
         $user = $this->getUserData();
-        $address = new AddressModel();
+        $address = new AddressLocationInfo();
         $address->city = $user['billingaddress']['city'];
         $address->country = $user['additional']['country']['countryiso'];
         $address->line1 = $user['shippingaddress']['street'];
@@ -51,11 +54,11 @@ class Address extends AbstractFactory
      * build Address-model based on delivery address
      * 
      * @param \Shopware\Models\Order\Order $order
-     * @return \Shopware\Plugins\MoptAvalara\Model\Address
+     * @return \Avalara\AddressLocationInfo
      */
     public function buildDeliveryAddressFromOrder(\Shopware\Models\Order\Order $order)
     {
-        $address = new AddressModel();
+        $address = new AddressLocationInfo();
         $address->city = $order->getShipping()->getCity();
         $address->country = $order->getShipping()->getCountry()->getIso();
         $address->line1 = $order->getShipping()->getStreet();
@@ -76,11 +79,11 @@ class Address extends AbstractFactory
      * build Address-model based on delivery address
      * 
      * @param \Shopware\Models\Order\Order $order
-     * @return \Shopware\Plugins\MoptAvalara\Model\Address
+     * @return \Avalara\AddressLocationInfo
      */
     public function buildBillingAddressFromOrder(\Shopware\Models\Order\Order $order)
     {
-        $address = new AddressModel();
+        $address = new AddressLocationInfo();
         $address->city = $order->getBilling()->getCity();
         $address->country = $order->getBilling()->getCountry()->getIso();
         $address->line1 = $order->getBilling()->getStreet();
@@ -99,11 +102,11 @@ class Address extends AbstractFactory
     
     /**
      * Origination (ship-from) address
-     * @return \Shopware\Plugins\MoptAvalara\Model\Address
+     * @return \Avalara\AddressLocationInfo
      */
     public function buildOriginAddress()
     {
-        $address = new AddressModel();
+        $address = new AddressLocationInfo();
         $address->line1 = $this->getPluginConfig(FormCreator::ORIGIN_ADDRESS_LINE_1_FIELD);
         $address->line2 = $this->getPluginConfig(FormCreator::ORIGIN_ADDRESS_LINE_2_FIELD);
         $address->line3 = $this->getPluginConfig(FormCreator::ORIGIN_ADDRESS_LINE_3_FIELD);

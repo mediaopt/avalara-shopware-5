@@ -25,11 +25,11 @@ class Shopware_Controllers_Backend_MoptAvalaraLog extends Shopware_Controllers_B
           $file = $logDirectory . $logFileName;
 
           if (!file_exists($file)) {
-              $this->View()->assign(array(
+              $this->View()->assign([
                   'success' => false,
                   'data' => $logFileName,
                   'message' => 'File not exist'
-              ));
+              ]);
           }
 
           $response = $this->Response();
@@ -45,11 +45,11 @@ class Shopware_Controllers_Backend_MoptAvalaraLog extends Shopware_Controllers_B
       }
       catch (Exception $e) {
           echo("Exception");
-          $this->View()->assign(array(
+          $this->View()->assign([
              'success' => false,
              'data' => $this->Request()->getParams(),
              'message' => $e->getMessage()
-          ));
+          ]);
           return;
       }
 

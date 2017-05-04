@@ -2,11 +2,13 @@
 
 namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
+use Avalara\LineItemModel;
+
 /**
- * Description of Config
+ * Factory to create \Avalara\LineItemModel
  *
  */
-class Line extends AbstractFactory
+class LineFactory extends AbstractFactory
 {
 
     const ARTICLEID__SHIPPING = 'shipping';
@@ -16,23 +18,19 @@ class Line extends AbstractFactory
      * build Line-model based on passed in lineData
      * 
      * @param mixed $lineData
-     * @return \Shopware\Plugins\MoptAvalara\Model\Line
+     * @return \Avalara\LineItemModel
      */
-    public function build($lineData, $voucher = null)
+    public function build($lineData)
     {
-        $line = new \Shopware\Plugins\MoptAvalara\Model\Line();
-        $line
-            ->setLineNo($lineData['id'])
-            ->setItemCode($lineData['id'])
-            ->setQty($lineData['quantity'])
-            ->setAmount($this->getParamAmount($lineData))
-            ->setOriginCode('01')
-            ->setDestinationCode('03')
-            ->setDescription($lineData['articlename'])
-            ->setTaxCode($this->getParamTaxCode($lineData))
-            ->setDiscounted($this->isNotVoucherOrShipping($lineData))
-            ->setTaxIncluded($this->getParamIsTaxIncluded($lineData, $line))
-        ;
+        $line = new LineItemModel();
+        $line->number = $lineData['id'];
+        $line->itemCode = $lineData['id'];
+        $line->amount = $this->getParamAmount($lineData);
+        $line->quantity = $lineData['quantity'];
+        $line->description = $lineData['articlename'];
+        $line->taxCode = $this->getParamTaxCode($lineData);
+        $line->discounted = $this->isNotVoucherOrShipping($lineData);
+        $line->taxIncluded = $this->getParamIsTaxIncluded($lineData, $line);
 
         return $line;
     }
@@ -49,12 +47,16 @@ class Line extends AbstractFactory
 
     protected function getParamTaxCode($lineData)
     {
-        
+        $articleId = $lineData['articleID'];
         if ($lineData['modus'] == 2){
-            $voucher = Shopware()->Models()->getRepository('\Shopware\Models\Voucher\Voucher')->find($lineData['articleID']);
+            $voucherRepository = Shopware()
+                ->Models()
+                ->getRepository('\Shopware\Models\Voucher\Voucher')
+            ;
+            $voucher = $voucherRepository->find($articleId);
             return $voucher->getAttribute()->getMoptAvalaraTaxcode();
         }
-        $articleId = $lineData['articleID'];
+        
         //shipping could have his own TaxCode
         if ($this->isShipping($lineData)) {
             $dispatchobject = Shopware()->Models()->getRepository('Shopware\Models\Dispatch\Dispatch')->find($lineData['dispatchID']);

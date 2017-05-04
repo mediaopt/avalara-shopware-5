@@ -2,69 +2,80 @@
 
 namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
+use Avalara\CreateTransactionModel;
+use Shopware\Plugins\MoptAvalara\Form\FormCreator;
+use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
+
 /**
- * Description of GetTaxRequest
+ * actory to create CreateTransactionModel from the order
  *
  */
-class GetTaxRequestFromOrder extends AbstractFactory
+class TransactionModelFactoryFromOrder extends AbstractFactory
 {
-
     protected $order;
-    var $discount = 0;
+    protected $discount = 0;
 
+    /**
+     * 
+     * @param \Shopware\Models\Order\Order $order
+     * @return \Avalara\CreateTransactionModel
+     */
     public function build(\Shopware\Models\Order\Order $order)
     {
         $this->order = $order;
         /* @var $customer \Shopware\Models\Customer\Customer */
         $customer = $order->getCustomer();
 
-        $getTaxRequest = new \Shopware\Plugins\MoptAvalara\Model\GetTaxRequest();
-        $getTaxRequest
-            ->setCustomerCode($customer->getId())
-            ->setDocDate(date('Y-m-d', time()))
-            ->setDocType(\Avalara\DocumentType::C_SALESINVOICE)
-            ->setCommit(true)
-            ->setCurrencyCode($order->getCurrency())
-            ->setBusinessIdentificationNo($customer->getBilling()->getVatId())
-            ->setAddresses($this->getParamAddresses())
-            ->setLines($this->getParamLines())
-            ->setDiscount($this->discount)
-            ->setDocCode($order->getNumber())
+        $address = $this->getAdapter()->getFactory('AddressFactory')->buildDeliveryAddress();
+        $model = new CreateTransactionModel();
+        $model->code = $order->getNumber();
+        $model->businessIdentificationNo = $customer->getBilling()->getVatId();
+        $model->commit = true;
+        $model->customerCode = $customer->getId();
+        $model->date = date('Y-m-d', time());
+        $model->discount = $this->discount;
+        $model->type = \Avalara\DocumentType::C_SALESINVOICE;
+        $model->currencyCode = $order->getCurrency();
+        $model->addresses = $this->getAddressesModel();
+        $model->lines = $this->getLinesModel();
+        $model->companyCode = $this
+            ->getAdapter()
+            ->getPluginConfig(FormCreator::COMPANY_CODE_FIELD)
         ;
-
-
-        if ($exemptionCode = $order->getCustomer()->getAttribute()->getMoptAvalaraExemptionCode()) {
-            $getTaxRequest->setExemptionNo($exemptionCode);
+        
+        $exemptionCode = $order->getCustomer()->getAttribute()->getMoptAvalaraExemptionCode();
+        if ($exemptionCode) {
+            $model->exemptionNo = $exemptionCode;
         }
-
-        return $getTaxRequest;
+        
+        return $model;
     }
 
-    protected function getParamAddresses()
+    /**
+     * 
+     * @return \Avalara\AddressesModel
+     */
+    protected function getAddressesModel()
     {
-        /* @var $addressFactory Address */
-        $addressFactory = $this->getAdapterMain()->getFactory('Address');
+        /* @var $addressFactory AddressFactory */
+        $addressFactory = $this->getAdapter()->getFactory('AddressFactory');
 
-        /* @var $originAddress \Shopware\Plugins\MoptAvalara\Model\Address */
-        $originAddress = $addressFactory->buildOriginAddress();
-        //$originAddress->locationCode('01');
-
-        /* @var $billingAddress \Shopware\Plugins\MoptAvalara\Model\Address */
-        $billingAddress = $addressFactory->buildBillingAddressFromOrder($this->order);
-        //$billingAddress->locationCode('02');
-
-        /* @var $deliveryAddress \Shopware\Plugins\MoptAvalara\Model\Address */
-        $deliveryAddress = $addressFactory->buildDeliveryAddressFromOrder($this->order);
-        //$deliveryAddress->locationCode('03');
-
-        return array($originAddress, $billingAddress, $deliveryAddress);
+        $addressesModel = new AddressesModel();
+        $addressesModel->shipFrom = $addressFactory->buildOriginAddress();
+        $addressesModel->shipTo = $addressFactory->buildDeliveryAddressFromOrder($this->order);
+        
+        return $addressesModel;
     }
-
-    protected function getParamLines()
+    
+    /**
+     * 
+     * @return LineItemModel[]
+     */
+    protected function getLineModels()
     {
         /* @var $lineFactory Line */
-        $lineFactory = $this->getAdapterMain()->getFactory('Line');
-        $lines = array();
+        $lineFactory = $this->getAdapterMain()->getFactory('LineFactory');
+        $lines = [];
 
         foreach ($this->order->getDetails() as $position) {
             $position = $this->convertOrderDetailToLineData($position);
@@ -72,7 +83,7 @@ class GetTaxRequestFromOrder extends AbstractFactory
                 if ($this->isDiscountGlobal($position)) {
                     $this->discount -= floatval($position['netprice']);
                 } else {
-                    $position['id'] = Line::ARTICLEID__VOUCHER;
+                    $position['id'] = LineFactory::ARTICLEID__VOUCHER;
                     $lines[] = $lineFactory->build($position);
                 }
             } else {
@@ -96,8 +107,8 @@ class GetTaxRequestFromOrder extends AbstractFactory
     {
         if ($this->order->getInvoiceShipping()) {
             //create shipping item for compatibility reasons with line data
-            $shippingItem = array();
-            $shippingItem['id'] = Line::ARTICLEID__SHIPPING;
+            $shippingItem = [];
+            $shippingItem['id'] = LineFactory::ARTICLEID__SHIPPING;
             $shippingItem['ean'] = '';
             $shippingItem['quantity'] = 1;
             $shippingItem['netprice'] = $this->order->getInvoiceShippingNet();
@@ -113,7 +124,7 @@ class GetTaxRequestFromOrder extends AbstractFactory
 
     protected function convertOrderDetailToLineData(\Shopware\Models\Order\Detail $detail)
     {
-        $lineData = array();
+        $lineData = [];
         $lineData['id'] = $detail->getId();
         $lineData['ean'] = $detail->getEan();
         $lineData['quantity'] = $detail->getQuantity();

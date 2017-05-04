@@ -4,8 +4,8 @@ namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
 use Shopware\Plugins\MoptAvalara\Form\FormCreator;
 use Avalara\DocumentType;
-use Shopware\Plugins\MoptAvalara\Adapter\Factory\Line;
-use Shopware\Plugins\MoptAvalara\Model\GetTaxRequest;
+use Avalara\CreateTransactionModel;
+use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
 
 /**
  * Description of Checkout
@@ -20,7 +20,7 @@ class GetTax extends AbstractSubscriber
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             'Shopware_Modules_Basket_getPriceForUpdateArticle_FilterPrice' => 'onGetPriceForUpdateArticle',
             'sArticles::getTaxRateByConditions::after' => 'afterGetTaxRateByConditions',
             'Enlight_Controller_Action_Frontend_Checkout_Confirm' => 'onBeforeCheckoutConfirm',
@@ -29,7 +29,7 @@ class GetTax extends AbstractSubscriber
             'sAdmin::sGetPremiumDispatch::after' => 'onAfterAdminGetPremiumDispatch',
             'sBasket::sGetBasket::before' => 'onBeforeSBasketSGetBasket',
             'sBasket::sAddVoucher::before' => 'onBeforeBasketSAddVoucher',
-        );
+        ];
     }
 
     /**
@@ -42,13 +42,13 @@ class GetTax extends AbstractSubscriber
         $session = Shopware()->Session();
         $adapter = $this->getAdapter();
         
-        /* @var $getTaxRequest \Shopware\Plugins\MoptAvalara\Adapter\Factory\GetTaxRequest */
-        $getTaxRequest = $adapter->getFactory('GetTaxRequest')->build(
+        /* @var $model \Avalara\CreateTransactionModel */
+        $model = $adapter->getFactory('TransactionModelFactory')->build(
             DocumentType::C_SALESORDER,
             false
         );
 
-        if (!$this->isGetTaxCall($getTaxRequest) || empty($args->getSubject()->View()->sUserLoggedIn)) {
+        if (!$this->isGetTaxCall($model) || empty($args->getSubject()->View()->sUserLoggedIn)) {
             $adapter->getLogger()->info('GetTax call for current basket already done / not enabled.');
             
             return;
@@ -59,10 +59,10 @@ class GetTax extends AbstractSubscriber
 
             /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
             $service = $adapter->getService('GetTax');
-            $response = $service->calculate($getTaxRequest);
+            $response = $service->calculate($model);
 
             $session->MoptAvalaraGetTaxResult = $response;
-            $session->MoptAvalaraGetTaxRequestHash = $this->getHashFromRequest($getTaxRequest);
+            $session->MoptAvalaraGetTaxRequestHash = $this->getHashFromRequest($model);
         } catch (\GuzzleHttp\Exception\TransferException $e) {
             $adapter->getLogger()->error('GetTax call failed: ' . $e->getMessage());
             $args->getSubject()->forward('checkout', 'index');
@@ -73,10 +73,11 @@ class GetTax extends AbstractSubscriber
 
     /**
      * check if getTax call has to be made
+     * @param \Avalara\CreateTransactionModel $model
      * @return boolean
      * @todo: check country (?)
      */
-    protected function isGetTaxCall(GetTaxRequest $getTaxRequest)
+    protected function isGetTaxCall(CreateTransactionModel $model)
     {
         $taxEnabled = $this
             ->getAdapter()
@@ -94,7 +95,7 @@ class GetTax extends AbstractSubscriber
             return true;
         }
 
-        if ($session->MoptAvalaraGetTaxRequestHash != $this->getHashFromRequest($getTaxRequest)) {
+        if ($session->MoptAvalaraGetTaxRequestHash != $this->getHashFromRequest($model)) {
             return true;
         }
 
@@ -113,6 +114,7 @@ class GetTax extends AbstractSubscriber
         if (empty($session->MoptAvalaraGetTaxResult)) {
             return;
         }
+        
         $adapter = $this->getAdapter();
         $taxRate = $this->getTaxRateForOrderBasketId($args->get('id'), $session->MoptAvalaraGetTaxResult);
         if ($taxRate === null) {
@@ -142,8 +144,8 @@ class GetTax extends AbstractSubscriber
 
     /**
      * get tax ammount from avalara response
-     * @param type $id
-     * @param type $taxInformation
+     * @param string|int $id
+     * @param \stdClass $taxInformation
      * @return float
      */
     protected function getTaxForOrderBasketId($id, $taxInformation)
@@ -157,8 +159,8 @@ class GetTax extends AbstractSubscriber
     
     /**
      * get tax rate from avalara response
-     * @param type $id
-     * @param type $taxInformation
+     * @param string|int $id
+     * @param \stdClass $taxInformation
      * @return float
      */
     protected function getTaxRateForOrderBasketId($id, $taxInformation)
@@ -172,14 +174,14 @@ class GetTax extends AbstractSubscriber
 
     /**
      * get tax line info from avalara response
-     * @param type $id
-     * @param type $taxInformation
+     * @param string|int $id
+     * @param \stdClass $taxInformation
      * @return \stdClass
      */
     private function getTaxLineForOrderBasketId($id, $taxInformation)
     {
         foreach ($taxInformation->lines as $taxLineInformation) {
-            if ($id == $taxLineInformation->itemCode && $taxLineInformation->tax) {
+            if ($id == $taxLineInformation->lineNumber && $taxLineInformation->tax) {
                 return $taxLineInformation;
             }
         }
@@ -210,8 +212,8 @@ class GetTax extends AbstractSubscriber
         if (!$getTaxCommitRequest = $this->validateCommitCall()) {
             //@todo error-message
             throw new \Exception('MoptAvalara: invalid call.');
-        } elseif (!$getTaxCommitRequest instanceof GetTaxRequest) {
-            //not in avalara context
+        } elseif (!($getTaxCommitRequest instanceof CreateTransactionModel)) {
+            $adapter->getLogger()->error('Not in avalara context');
             return;
         }
         Shopware()->Session()->MoptAvalaraGetTaxCommitRequest = $getTaxCommitRequest;
@@ -223,7 +225,7 @@ class GetTax extends AbstractSubscriber
 
     /**
      * validate commit call with previous getTax call
-     * @return boolean
+     * @return \Avalara\CreateTransactionModel | bool
      */
     protected function validateCommitCall()
     {
@@ -237,22 +239,22 @@ class GetTax extends AbstractSubscriber
             return true;
         }
 
-        /* @var $getTaxCommitRequest GetTaxRequest */
-        $getTaxCommitRequest = $adapter->getFactory('GetTaxRequest')->build(
+        /* @var $model \Avalara\CreateTransactionModel */
+        $model = $adapter->getFactory('TransactionModelFactory')->build(
             DocumentType::C_SALESINVOICE, 
             true
         );
         
+        $adapter->getLogger()->error('validateCommitCall...');
         //prevent parent execution on request mismatch
-        if ($session->MoptAvalaraGetTaxRequestHash != $this->getHashFromRequest($getTaxCommitRequest)) {
+        if ($session->MoptAvalaraGetTaxRequestHash != $this->getHashFromRequest($model)) {
             $adapter->getLogger()->error('Mismatching requests, do not proceed.');
-            
             return false;
         }
 
-        $adapter->getLogger()->debug('Matching requests, proceed...', array($getTaxCommitRequest));
+        $adapter->getLogger()->debug('Matching requests, proceed...', [$model]);
         
-        return $getTaxCommitRequest;
+        return $model;
     }
 
     /**
@@ -269,25 +271,24 @@ class GetTax extends AbstractSubscriber
             return;
         }
 
-        /*@var $getTaxRequest GetTaxRequest */
-        if (!$getTaxRequest = Shopware()->Session()->MoptAvalaraGetTaxCommitRequest) {
+        /*@var \Avalara\CreateTransactionModel $model */
+        if (!$model = Shopware()->Session()->MoptAvalaraGetTaxCommitRequest) {
             $adapter->getLogger()->debug('MoptAvalaragetTaxCommitrequest is empty');
             return;
         }
 
-        $adapter->getLogger()->info('setDocCode');
-        $getTaxRequest->setDocCode($orderNumber);
-        if ($result = $this->commitTransaction($getTaxRequest)) {
+        $adapter->getLogger()->info('setDocCode: ' . $orderNumber);
+        if ($result = $this->commitTransaction($model)) {
             //update order attributes
             $adapter->getLogger()->debug('UpdateOrderAttributes');
-            $order = Shopware()->Models()->getRepository('\Shopware\Models\Order\Order')->findOneBy(array(
-                'number' => $orderNumber));
-            $adapter->getLogger()->debug('FoundOrder:', array($order));
+            $order = Shopware()->Models()->getRepository('\Shopware\Models\Order\Order')->findOneBy([
+                'number' => $orderNumber]);
+            $adapter->getLogger()->debug('FoundOrder:', [$order]);
             $sql = "UPDATE s_order_attributes SET " .
                     "mopt_avalara_doc_code = ? " .
                     "WHERE orderID = ?";
-            Shopware()->Db()->query($sql, array($result->code, $order->getId()));
-            $adapter->getLogger()->info('Save DocCode:');
+            Shopware()->Db()->query($sql, [$result->code, $order->getId()]);
+            $adapter->getLogger()->info('Save DocCode: ' . $result->code);
         } else {
             $adapter->getLogger()->debug('No Result (Else)');
             //@todo: mark order as uncommitted (?)
@@ -299,9 +300,10 @@ class GetTax extends AbstractSubscriber
 
     /**
      * commit transaction
+     * @param \Avalara\CreateTransactionModel $model
      * @return mixed
      */
-    protected function commitTransaction(GetTaxRequest $getTaxRequest)
+    protected function commitTransaction(CreateTransactionModel $model)
     {
         $adapter = $this->getAdapter();
         $docCommitEnabled = $this
@@ -317,7 +319,7 @@ class GetTax extends AbstractSubscriber
         try {
             /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
             $service = $adapter->getService('GetTax');
-            $response = $service->calculate($getTaxRequest);
+            $response = $service->calculate($model);
         } catch (\GuzzleHttp\Exception\TransferException $e) {
             $adapter->getLogger()->error('GetTax commit call failed.');
             
@@ -330,25 +332,43 @@ class GetTax extends AbstractSubscriber
      * get hash from request to compare calculate & commit call
      * unset changing fields during both calls
      * 
-     * @param GetTaxRequest $getTaxRequest
+     * @param \Avalara\CreateTransactionModel $model
      * @return string
      */
-    protected function getHashFromRequest(GetTaxRequest $getTaxRequest)
+    protected function getHashFromRequest(CreateTransactionModel $model)
     {
-        $data = $getTaxRequest->toArray();
-        unset($data['DocType']);
-        unset($data['Commit']);
+        $data = $this->objectToArray($model);
 
-        foreach ($data['Lines'] as $key => $line) {
-            unset($data['Lines'][$key]['LineNo']);
-            unset($data['Lines'][$key]['Amount']);
+        unset($data['type']);
+        unset($data['commit']);
+
+        foreach ($data['lines'] as $key => $line) {
+            unset($data['lines'][$key]['itemCode']);
+            unset($data['lines'][$key]['amount']);
 
             //remove shipping costs (shipping information is not in session on first getTax call)
-            if ($line['LineNo'] == 'shipping') {
-                unset($data['Lines'][$key]);
+            if ($line['itemCode'] == 'shipping') {
+                unset($data['lines'][$key]);
             }
         }
+        $this->getAdapter()->getLogger()->debug(json_encode($data));
         return md5(json_encode($data));
+    }
+    
+    /**
+     * 
+     * @param \stdClass $object
+     * @return array
+     */
+    private function objectToArray($object) {
+        $data = (array)$object;
+        foreach ($data as $key => $value) {
+            if (is_object($value) || is_array($value)) {
+                $data[$key] = $this->objectToArray($value);
+            }
+        }
+        
+        return $data;
     }
 
     public function onAfterAdminGetPremiumDispatch(\Enlight_Hook_HookArgs $args)
@@ -362,7 +382,7 @@ class GetTax extends AbstractSubscriber
             return;
         }
 
-        $taxRate = $this->getTaxRateForOrderBasketId(Line::ARTICLEID__SHIPPING, $session->MoptAvalaraGetTaxResult);
+        $taxRate = $this->getTaxRateForOrderBasketId(LineFactory::ARTICLEID__SHIPPING, $session->MoptAvalaraGetTaxResult);
         
         if(!$taxRate) {
             return;
@@ -417,15 +437,15 @@ class GetTax extends AbstractSubscriber
               AND (
                 (valid_to >= now() AND valid_from <= now())
                 OR valid_to IS NULL
-              )', array($voucherCode)
-                ) ? : array();
+              )', [$voucherCode]
+                ) ? : [];
 
         if (empty($voucherDetails['strict'])) {
             return;
         }
         
         //get tax rate for voucher
-        $taxRate = $this->getTaxRateForOrderBasketId(Line::ARTICLEID__VOUCHER, $session->MoptAvalaraGetTaxResult);
+        $taxRate = $this->getTaxRateForOrderBasketId(LineFactory::ARTICLEID__VOUCHER, $session->MoptAvalaraGetTaxResult);
         
         $config = Shopware()->Config();
         $config['sVOUCHERTAX'] = $taxRate;

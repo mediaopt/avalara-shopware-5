@@ -3,8 +3,8 @@
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
 use Shopware\Plugins\MoptAvalara\Form\FormCreator;
-use Shopware\Plugins\MoptAvalara\Model\Address;
-use Shopware\Plugins\MoptAvalara\Model\CountryCodes;
+use Avalara\AddressLocationInfo;
+use Shopware\Plugins\MoptAvalara\Adapter\Factory\AddressFactory;
 
 /**
  * Description of Checkout
@@ -19,10 +19,10 @@ class AddressCheck extends AbstractSubscriber
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             'Enlight_Controller_Action_Frontend_Checkout_Confirm' => 'onBeforeCheckoutConfirm',
             'Enlight_Controller_Action_PostDispatch_Frontend_Address' => 'onPostDispatchFrontendAddress',
-        );
+        ];
     }
 
     /**
@@ -34,7 +34,7 @@ class AddressCheck extends AbstractSubscriber
         /* @var $session Enlight_Components_Session_Namespace */
         $session = $this->getContainer()->get('session');
         $adapter = $this->getAdapter();
-        $address = $adapter->getFactory('Address')->buildDeliveryAddress();
+        $address = $adapter->getFactory('AddressFactory')->buildDeliveryAddress();
 
         if (!$this->isAddressToBeValidated($address) || empty($args->getSubject()->View()->sUserLoggedIn)) {
             $adapter->getLogger()->info('address is not to be validated.');
@@ -45,18 +45,17 @@ class AddressCheck extends AbstractSubscriber
             $adapter->getLogger()->info('validating address.');
             /* @var $service \Shopware\Plugins\MoptAvalara\Service\ValidateAddress */
             $service = $adapter->getService('validateAddress');
-            
             $response = $service->validate($address);
             $session->MoptAvalaraCheckedAddress = $this->getAddressHash($address);
             if (empty($activeShippingAddressId = $session->offsetGet('checkoutShippingAddressId', null))) {
                 $activeShippingAddressId = $userData['additional']['user']['default_shipping_address_id'];
             }
             if ($changes = $service->getAddressChanges($address, $response)) {
-                $args->getSubject()->forward('edit', 'address', null, array(
+                $args->getSubject()->forward('edit', 'address', null, [
                     'MoptAvalaraAddressChanges' => $changes,
                     'sTarget' => 'checkout', 
                     'id' => $activeShippingAddressId
-                ));
+                ]);
                 
                 return true;
             }
@@ -68,10 +67,10 @@ class AddressCheck extends AbstractSubscriber
 
     /**
      * check if address has aready been validated
-     * @param \Shopware\Plugins\MoptAvalara\Model\Address $address
+     * @param \Avalara\AddressLocationInfo $address
      * @return boolean
      */
-    protected function isAddressToBeValidated(Address $address)
+    protected function isAddressToBeValidated(AddressLocationInfo $address)
     {
         /*@var $session Enlight_Components_Session_Namespace */
         $session = $this->getContainer()->get('session');
@@ -85,19 +84,19 @@ class AddressCheck extends AbstractSubscriber
             case 1: //no validation
                 return false;
             case 2: //US
-                if($address->getCountry() != Address::COUNTRY_CODE__US) {
+                if($address->country != AddressFactory::COUNTRY_CODE__US) {
                     return false;
                 }
                 break;
             case 3: //CA
-                if($address->getCountry() != Address::COUNTRY_CODE__CA) {
+                if($address->country != AddressFactory::COUNTRY_CODE__CA) {
                     return false;
                 }
                 break;
             case 4: //US & CA
-                if(!in_array($address->getCountry(), array(
-                    Address::COUNTRY_CODE__CA,
-                    Address::COUNTRY_CODE__US))) {
+                if(!in_array($address->country, [
+                    AddressFactory::COUNTRY_CODE__CA,
+                    AddressFactory::COUNTRY_CODE__US])) {
                     return false;
                 }
                 break;
@@ -116,9 +115,9 @@ class AddressCheck extends AbstractSubscriber
     
     /**
      * get hash of given address
-     * @param \Shopware\Plugins\MoptAvalara\Model\Address $address
+     * @param \Avalara\AddressLocationInfo $address
      */
-    protected function getAddressHash(Address $address) {
+    protected function getAddressHash(AddressLocationInfo $address) {
         return md5(serialize($address));
     }
 
@@ -175,7 +174,7 @@ class AddressCheck extends AbstractSubscriber
 
         $errorMessages = $view->getAssign('sErrorMessages');
         if (!is_array($errorMessages)) {
-            $errorMessages = array();
+            $errorMessages = [];
         }
 
         $errorMessages[] = $snippets->get('shippingAddressChangesFound');

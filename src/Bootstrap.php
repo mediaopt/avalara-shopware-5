@@ -17,11 +17,11 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
      */
     public function getCapabilities()
     {
-        return array(
+        return [
             'install' => true,
             'update' => true,
             'enable' => true,
-        );
+        ];
     }
 
     /**
@@ -62,7 +62,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
         $this->addAttributes();
         $this->createForm();
 
-        return array('success' => true, 'invalidateCache' => array('backend', 'proxy'));
+        return ['success' => true, 'invalidateCache' => ['backend', 'proxy']];
     }
 
     /**
@@ -162,7 +162,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
      */
     public function onDispatchLoopStartup(Enlight_Event_EventArgs $args)
     {
-        $subscribers = array();
+        $subscribers = [];
         $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\AddressCheck($this);
         $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\Templating($this);
         $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\GetTax($this);

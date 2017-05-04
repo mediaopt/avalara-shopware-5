@@ -67,172 +67,172 @@ class FormCreator {
     public function createForms()
     {
         $form = $this->bootstrap->Form();
-        $parent = $this->bootstrap->Forms()->findOneBy(array('name' => 'Frontend'));
+        $parent = $this->bootstrap->Forms()->findOneBy(['name' => 'Frontend']);
         $form->setParent($parent);
 
-        $form->setElement('base', 'mopt_avalara__fieldset__credentials', array(
+        $form->setElement('base', 'mopt_avalara__fieldset__credentials', [
             'xtype' => 'component',
-            'autoEl' => array(
+            'autoEl' => [
                 'tag' => 'h2',
                 'html' => 'Credentials',
-            ),
-            'style' => array(
+            ],
+            'style' => [
                 'marginBottom' => '5px',
                 'padding' => '5px',
-            ),
+            ],
             'baseCls' => 'x-panel-header-default-top x-panel-header-default x-window-header-text-default',
-        ));
+        ]);
 
-        $form->setElement('boolean', self::IS_LIVE_MODE_FIELD, array(
+        $form->setElement('boolean', self::IS_LIVE_MODE_FIELD, [
             'label' => 'Live Modus',
-        ));
+        ]);
 
-        $form->setElement('text', self::ACCOUNT_NUMBER_FIELD, array(
+        $form->setElement('text', self::ACCOUNT_NUMBER_FIELD, [
             'label' => 'Account number',
             'required' => true,
-        ));
+        ]);
 
-        $form->setElement('text', self::LICENSE_KEY_FIELD, array(
+        $form->setElement('text', self::LICENSE_KEY_FIELD, [
             'label' => 'License key',
             'required' => true,
-        ));
+        ]);
         
-        $form->setElement('text', self::COMPANY_CODE_FIELD, array(
+        $form->setElement('text', self::COMPANY_CODE_FIELD, [
             'label' => 'Company code',
             'required' => true,
-        ));
+        ]);
 
-        $form->setElement('base', 'mopt_avalara__fieldset__configuration', array(
+        $form->setElement('base', 'mopt_avalara__fieldset__configuration', [
             'xtype' => 'component',
-            'autoEl' => array(
+            'autoEl' => [
                 'tag' => 'h2',
                 'html' => 'Configuration',
-            ),
-            'style' => array(
+            ],
+            'style' => [
                 'marginTop' => '20px',
                 'marginBottom' => '5px',
                 'padding' => '5px',
-            ),
+            ],
             'baseCls' => 'x-panel-header-default-top x-panel-header-default x-window-header-text-default',
-        ));
+        ]);
 
-        $form->setElement('boolean', self::TAX_ENABLED_FIELD, array(
+        $form->setElement('boolean', self::TAX_ENABLED_FIELD, [
             'label' => 'Enable Avalara SalesTax calculation',
             'description' => 'Choose, if you want to use the Avalara SalesTax Calculation.',
-        ));
+        ]);
 
-        $form->setElement('boolean', self::DOC_COMMIT_ENABLED_FIELD, array(
+        $form->setElement('boolean', self::DOC_COMMIT_ENABLED_FIELD, [
             'label' => 'Enable document committing',
             'description' => 'Disable document committing will result that all calls will be done with DocType=SalesOrder and suppress any non-getTax calls(i.e.canceltax,postTax)',
-        ));
+        ]);
 
-        $form->setElement('select', self::ADDRESS_VALIDATION_COUNTRIES_FIELD, array('label' => 'Address-validation for following countries',
+        $form->setElement('select', self::ADDRESS_VALIDATION_COUNTRIES_FIELD, ['label' => 'Address-validation for following countries',
             'description' => 'Choose the delivery countries, which should be covered by the Avalara Tax Calculation',
             'value' => 4,
-            'store' => array(
-                array(1, 'No Validation'),
-                array(2, 'USA only'),
-                array(3, 'Canada only'),
-                array(4, 'USA & Canada')
-            ),
-        ));
+            'store' => [
+                [1, 'No Validation'],
+                [2, 'USA only'],
+                [3, 'Canada only'],
+                [4, 'USA & Canada']
+            ],
+        ]);
 
-        $form->setElement('select', self::LOG_LEVEL_FIELD, array(
+        $form->setElement('select', self::LOG_LEVEL_FIELD, [
             'label' => 'Log level',
             'description' => 'Choose the loglevel of Avalara, which will be logged ',
             'value' => 'ERROR',
-            'store' => array(
-                array('DEBUG', 'DEBUG'),
-                array('ERROR', 'ERROR'),
-                array('INFO', 'INFO'),
-            ),
-        ));
+            'store' => [
+                ['DEBUG', 'DEBUG'],
+                ['ERROR', 'ERROR'],
+                ['INFO', 'INFO'],
+            ],
+        ]);
 
-        $form->setElement('number', self::LOG_ROTATION_DAYS_FIELD, array(
+        $form->setElement('number', self::LOG_ROTATION_DAYS_FIELD, [
             'label' => 'Log rotation days',
             'description' => 'How many days log files to be stored. 0 means unlimited.',
             'value' => self::LOGGER_DEFAULT_ROTATING_DAYS,
             'minValue' => 0,
             'maxValue' => 365,
             'required' => true,
-        ));
+        ]);
 
-        $form->setElement('base', 'mopt_avalara__fieldset__origin_address', array(
+        $form->setElement('base', 'mopt_avalara__fieldset__origin_address', [
             'xtype' => 'component',
-            'autoEl' => array(
+            'autoEl' => [
                 'tag' => 'h2',
                 'html' => 'Origin address',
-            ),
-            'style' => array(
+            ],
+            'style' => [
                 'marginTop' => '20px',
                 'marginBottom' => '5px',
                 'padding' => '5px',
-            ),
+            ],
             'baseCls' => 'x-panel-header-default-top x-panel-header-default x-window-header-text-default',
-        ));
+        ]);
 
-        $form->setElement('text', self::ORIGIN_ADDRESS_LINE_1_FIELD, array(
+        $form->setElement('text', self::ORIGIN_ADDRESS_LINE_1_FIELD, [
             'label' => 'line1',
             'required' => true,
-        ));
+        ]);
 
-        $form->setElement('text', self::ORIGIN_ADDRESS_LINE_2_FIELD, array(
+        $form->setElement('text', self::ORIGIN_ADDRESS_LINE_2_FIELD, [
             'label' => 'line2',
             'required' => true,
-        ));
+        ]);
 
-        $form->setElement('text', self::ORIGIN_ADDRESS_LINE_3_FIELD, array(
+        $form->setElement('text', self::ORIGIN_ADDRESS_LINE_3_FIELD, [
             'label' => 'line3',
             'required' => true,
-        ));
+        ]);
 
-        $form->setElement('text', self::ORIGIN_POSTAL_CODE_FIELD, array(
+        $form->setElement('text', self::ORIGIN_POSTAL_CODE_FIELD, [
             'label' => 'postal_code',
             'required' => true,
-        ));
+        ]);
 
-        $form->setElement('text', self::ORIGIN_CITY_FIELD, array(
+        $form->setElement('text', self::ORIGIN_CITY_FIELD, [
             'label' => 'city',
             'required' => true,
-        ));
+        ]);
 
-        $form->setElement('text', self::ORIGIN_REGION_FIELD, array(
+        $form->setElement('text', self::ORIGIN_REGION_FIELD, [
             'label' => 'region',
             'required' => true,
-        ));
+        ]);
 
-        $form->setElement('text', self::ORIGIN_COUNTRY_FIELD, array(
+        $form->setElement('text', self::ORIGIN_COUNTRY_FIELD, [
             'label' => 'country',
             'required' => true,
-        ));
+        ]);
 
-        $form->setElement('base', 'mopt_avalara__fieldset__test', array(
+        $form->setElement('base', 'mopt_avalara__fieldset__test', [
             'xtype' => 'component',
-            'autoEl' => array(
+            'autoEl' => [
                 'tag' => 'h2',
                 'html' => 'Actions',
-            ),
-            'style' => array(
+            ],
+            'style' => [
                 'marginTop' => '20px',
                 'marginBottom' => '5px',
                 'padding' => '5px',
-            ),
+            ],
             'baseCls' => 'x-panel-header-default-top x-panel-header-default x-window-header-text-default',
-        ));
+        ]);
 
         $context = $this->getContext();
 
         $remoteUrlConnectionTest = Shopware()->Front()->Router()->assemble(
-            array("module" => "backend", "controller" => "MoptAvalaraBackendProxy", "action" => "getConnectionTest"),
+            ["module" => "backend", "controller" => "MoptAvalaraBackendProxy", "action" => "getConnectionTest"],
             $context
         );
 
         $downloadUrlCall = Shopware()->Front()->Router()->assemble(
-            array("module" => "backend", "controller" => "MoptAvalaraLog", "action" => "downloadLogfile"),
+            ["module" => "backend", "controller" => "MoptAvalaraLog", "action" => "downloadLogfile"],
             $context
         );
 
-        $form->setElement('button', 'mopt_avalara__license_check', array(
+        $form->setElement('button', 'mopt_avalara__license_check', [
             'label' => 'Connection-Test',
             'maxWidth' => '150',
             'handler' => 'function (){
@@ -274,9 +274,9 @@ class FormCreator {
                      }
                   });
             }'
-        ));
+        ]);
 
-        $form->setElement('button', 'mopt_avalara__log', array(
+        $form->setElement('button', 'mopt_avalara__log', [
             'label' => 'Download logfile',
             'maxWidth' => '150',
             'handler' => 'function (){
@@ -302,12 +302,12 @@ class FormCreator {
                 });
                 manualDownloadForm.show();
             }',
-        ));
+        ]);
 
 
 
         //set positions
-        $elements = array(
+        $elements = [
             'mopt_avalara__fieldset__credentials',
             self::IS_LIVE_MODE_FIELD,
             self::ACCOUNT_NUMBER_FIELD,
@@ -330,7 +330,7 @@ class FormCreator {
             'mopt_avalara__fieldset__test',
             'mopt_avalara__license_check',
             'mopt_avalara__log',
-        );
+        ];
 
         /* @var $element \Shopware\Models\Config\Element */
         foreach ($form->getElements() as $element) {

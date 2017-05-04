@@ -16,16 +16,16 @@ class Shipping extends AbstractSubscriber
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             'Enlight_Controller_Action_PostDispatch_Backend_Shipping' => 'onPostDispatchBackendShipping',
-        );
+        ];
     
     }
     
     public function onPostDispatchBackendShipping(\Enlight_Event_EventArgs $args)
     {
         $request = $args->getSubject()->Request();
-        $observedActions = array('updateDispatch', 'createDispatch');
+        $observedActions = ['updateDispatch', 'createDispatch'];
         $action = $request->getActionName();
         
         if (!in_array($action, $observedActions)) {
