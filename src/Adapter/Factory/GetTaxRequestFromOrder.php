@@ -22,7 +22,7 @@ class GetTaxRequestFromOrder extends AbstractFactory
         $getTaxRequest
             ->setCustomerCode($customer->getId())
             ->setDocDate(date('Y-m-d', time()))
-            ->setDocType(\Shopware\Plugins\MoptAvalara\Model\DocumentType::SALES_INVOICE)
+            ->setDocType(\Avalara\DocumentType::C_SALESINVOICE)
             ->setCommit(true)
             ->setCurrencyCode($order->getCurrency())
             ->setBusinessIdentificationNo($customer->getBilling()->getVatId())
