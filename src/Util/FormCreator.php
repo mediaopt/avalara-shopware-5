@@ -23,6 +23,8 @@ class FormCreator {
     
     const LICENSE_KEY_FIELD = 'mopt_avalara__license_key';
     
+    const COMPANY_CODE_FIELD = 'mopt_avalara__company_code';
+    
     const TAX_ENABLED_FIELD = 'mopt_avalara__tax_enabled';
     
     const DOC_COMMIT_ENABLED_FIELD = 'mopt_avalara__doc_commit_enabled';
@@ -94,6 +96,11 @@ class FormCreator {
 
         $form->setElement('text', self::LICENSE_KEY_FIELD, array(
             'label' => 'License key',
+            'required' => true,
+        ));
+        
+        $form->setElement('text', self::COMPANY_CODE_FIELD, array(
+            'label' => 'Company code',
             'required' => true,
         ));
 
@@ -307,6 +314,7 @@ class FormCreator {
             self::IS_LIVE_MODE_FIELD,
             self::ACCOUNT_NUMBER_FIELD,
             self::LICENSE_KEY_FIELD,
+            self::COMPANY_CODE_FIELD,
             'mopt_avalara__fieldset__configuration',
             self::TAX_ENABLED_FIELD,
             self::DOC_COMMIT_ENABLED_FIELD,
