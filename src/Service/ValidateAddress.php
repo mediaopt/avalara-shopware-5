@@ -2,7 +2,7 @@
 
 namespace Shopware\Plugins\MoptAvalara\Service;
 
-use Shopware\Plugins\MoptAvalara\Model\Address;
+use Avalara\AddressLocationInfo;
 
 /**
  * Description of ValidateAddress
@@ -11,44 +11,46 @@ use Shopware\Plugins\MoptAvalara\Model\Address;
 class ValidateAddress extends AbstractService
 {
     /**
+     * Ignore any difference in this address parts
+     * @var array 
+     */
+    private static $ignoreAddressParts = [
+        'region',
+        'latitude',
+        'longitude',
+    ];
+    
+    /**
      * 
-     * @param \Shopware\Plugins\MoptAvalara\Model\Address $address
+     * @param \Avalara\AddressLocationInfo $address
      * @return \stdClass
      */
-    public function validate(Address $address)
+    public function validate(AddressLocationInfo $address)
     {
-        $response = $this->getAdapter()->getClient()->resolveAddress(
-            $address->line1,
-            $address->line2,
-            $address->line3,
-            $address->city,
-            $address->region,
-            $address->postalCode,
-            $address->country
-        );
+        $response = $this->getAdapter()->getClient()->resolveAddressPost($address);
         
         return $response;
     }
 
     /**
      * 
-     * @param \Shopware\Plugins\MoptAvalara\Model\Address $checkedAddress
+     * @param \Avalara\AddressLocationInfo $checkedAddress
      * @param \stdClass $response
      * @return array
      */
-    public function getAddressChanges(Address $checkedAddress, $response)
+    public function getAddressChanges(AddressLocationInfo $checkedAddress, $response)
     {
-        $changes = array();
+        $changes = [];
         if (empty($response) || !is_object($response) || empty($response->validatedAddresses)) {
             return $changes;
         }
 
-        /* @var $suggestedAddress \Shopware\Plugins\MoptAvalara\Model\Address */
+        /* @var $suggestedAddress \Avalara\AddressLocationInfo */
         $suggestedAddress = $response->validatedAddresses[0];
 
         foreach ($checkedAddress as $key => $value) {
             //Skip the region key
-            if ('region' === $key) {
+            if (in_array($key, self::$ignoreAddressParts)) {
                 continue;
             }
             if (isset($suggestedAddress->$key) && $suggestedAddress->$key != $value) {
