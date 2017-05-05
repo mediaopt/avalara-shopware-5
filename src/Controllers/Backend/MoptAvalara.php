@@ -31,19 +31,11 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
         if (!$order = $this->getAvalaraOrder()) {
             return;
         }
-        
-        if (!$this->cancelTax($order, \Avalara\VoidReasonCode::C_DOCVOIDED)) {
-            return;
-        }
-        
-        if (!$this->cancelTax($order, \Avalara\VoidReasonCode::C_DOCDELETED)) {
-            return;
-        }
-        
+
         if (!$this->updateOrder($order)) {
             return;
         }
-        
+
         $this->resetUpdateFlag($order);
         
         $this->View()->assign([
@@ -115,10 +107,10 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             $service = $adapter->getService('CancelTax');
             $service->cancel($docCode, $cancelCode);
         } catch (\Exception $e) {
-            $adapter->getLogger()->error('CancelTax call failed.');
+            $adapter->getLogger()->error('CancelTax call failed: ' . $e->getMessage());
             $this->View()->assign([
                 'success' => false,
-                'message' => 'Avalara: Cancel Tax call failed.']
+                'message' => 'Avalara: Cancel Tax call failed: ' . $e->getMessage()]
             );
             return false;
         }
@@ -134,10 +126,16 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
     protected function updateOrder(\Shopware\Models\Order\Order $order)
     {
         $adapter = $this->getAvalaraSDKAdapter();
-        
         try {
-            $getTaxFromOrderRequest = $adapter->getFactory('TransactionModelFactoryFromOrder')->build($order);
-            $response = $adapter->getService('GetTax')->calculate($getTaxFromOrderRequest);
+            $model = $adapter
+                ->getFactory('TransactionModelFactoryFromOrder')
+                ->build($order)
+            ;
+            $docCode = $order->getAttribute()->getMoptAvalaraDocCode();
+            $response = $adapter
+                ->getService('AdjustTransaction')
+                ->adjustTransaction($model, $docCode)
+            ;
             
             /*@var $detail Shopware\Models\Order\Detail */
             foreach ($order->getDetails() as $detail) {
@@ -148,11 +146,11 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             Shopware()->Models()->persist($order);
             Shopware()->Models()->flush();
             $order->calculateInvoiceAmount();
-        } catch (\GuzzleHttp\Exception\TransferException $e) {
-            $adapter->getLogger()->error('GetTax call from order failed.');
+        } catch (\Exception $e) {
+            $adapter->getLogger()->error('GetTax call from order failed: '. $e->getMessage());
             $this->View()->assign([
                 'success' => false,
-                'message' => 'Avalara: Update order call failed.']
+                'message' => 'Avalara: Update order call failed: ' . $e->getMessage()]
             );
             return false;
         }
@@ -161,22 +159,19 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
     
     /**
      * 
-     * @param Shopware\Models\Order\Detail $detail
-     * @param \stdClass $getTaxResponse
+     * @param \Shopware\Models\Order\Detail $detail
+     * @param \stdClass $taxInformation
      * @return int
      * @throws \Exception
      */
-    protected function getTaxRateForOrderDetail(Shopware\Models\Order\Detail $detail, $getTaxResponse)
+    protected function getTaxRateForOrderDetail(\Shopware\Models\Order\Detail $detail, $taxInformation)
     {
-        foreach ($getTaxResponse['TaxLines'] as $taxLineInformation) {
-            if ($detail->getId() == $taxLineInformation['LineNo']) {
-                //exemption ?
-                if (!$taxLineInformation['Tax']) {
-                    return 0;
-                }
-                return ((float)$taxLineInformation['Tax'] / (float)$taxLineInformation['Taxable']) * 100;
-            }
+        /* @var $service \Shopware\Plugins\MoptAvalara\Subscriber\GetTax */
+        $service = $this->getAvalaraSDKAdapter()->getService('GetTax');
+        if ($taxRate = $service->getTaxRateForOrderBasketId($detail->getId(), $taxInformation)) {
+            return $taxRate;
         }
+
         throw new \Exception('Avalara: no tax information found.');
     }
     
