@@ -3,6 +3,7 @@
 namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
 use Avalara\CreateTransactionModel;
+use Avalara\AddressesModel;
 use Shopware\Plugins\MoptAvalara\Form\FormCreator;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
 
@@ -36,7 +37,7 @@ class TransactionModelFactoryFromOrder extends AbstractFactory
         $model->type = \Avalara\DocumentType::C_SALESINVOICE;
         $model->currencyCode = $order->getCurrency();
         $model->addresses = $this->getAddressesModel();
-        $model->lines = $this->getLinesModel();
+        $model->lines = $this->getLineModels();
         $model->companyCode = $this
             ->getAdapter()
             ->getPluginConfig(FormCreator::COMPANY_CODE_FIELD)
@@ -73,7 +74,7 @@ class TransactionModelFactoryFromOrder extends AbstractFactory
     protected function getLineModels()
     {
         /* @var $lineFactory Line */
-        $lineFactory = $this->getAdapterMain()->getFactory('LineFactory');
+        $lineFactory = $this->getAdapter()->getFactory('LineFactory');
         $lines = [];
 
         foreach ($this->order->getDetails() as $position) {
