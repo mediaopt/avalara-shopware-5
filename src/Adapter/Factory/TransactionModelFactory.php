@@ -39,9 +39,9 @@ class TransactionModelFactory extends AbstractFactory
             ->getAdapter()
             ->getPluginConfig(FormCreator::COMPANY_CODE_FIELD)
         ;
-        
-        if (!empty($user['additional']['user']['moptAvalaraExemptionCode'])) {
-            $model->exemptionNo = $user['additional']['user']['moptAvalaraExemptionCode'];
+
+        if (!empty($user['additional']['user']['mopt_avalara_exemption_code'])) {
+            $model->exemptionNo = $user['additional']['user']['mopt_avalara_exemption_code'];
         }
 
         return $model;
