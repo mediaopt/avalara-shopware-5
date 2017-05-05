@@ -42,7 +42,7 @@ class TransactionModelFactoryFromOrder extends AbstractFactory
             ->getPluginConfig(FormCreator::COMPANY_CODE_FIELD)
         ;
         
-        $exemptionCode = $order->getCustomer()->getAttribute()->getMoptAvalaraExemptionCode();
+        $exemptionCode = $customer->getAttribute()->getMoptAvalaraExemptionCode();
         if ($exemptionCode) {
             $model->exemptionNo = $exemptionCode;
         }
