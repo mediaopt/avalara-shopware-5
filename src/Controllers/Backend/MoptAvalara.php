@@ -161,12 +161,12 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
      * 
      * @param \Shopware\Models\Order\Detail $detail
      * @param \stdClass $taxInformation
-     * @return int
+     * @return float
      * @throws \Exception
      */
     protected function getTaxRateForOrderDetail(\Shopware\Models\Order\Detail $detail, $taxInformation)
     {
-        /* @var $service \Shopware\Plugins\MoptAvalara\Subscriber\GetTax */
+        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
         $service = $this->getAvalaraSDKAdapter()->getService('GetTax');
         if ($taxRate = $service->getTaxRateForOrderBasketId($detail->getId(), $taxInformation)) {
             return $taxRate;
