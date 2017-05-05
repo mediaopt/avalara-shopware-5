@@ -116,7 +116,9 @@ class GetTax extends AbstractSubscriber
         }
         
         $adapter = $this->getAdapter();
-        $taxRate = $this->getTaxRateForOrderBasketId($args->get('id'), $session->MoptAvalaraGetTaxResult);
+        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
+        $service = $adapter->getService('GetTax');
+        $taxRate = $service->getTaxRateForOrderBasketId($args->get('id'), $session->MoptAvalaraGetTaxResult);
         if ($taxRate === null) {
             //tax has to be present for all positions on checkout confirm
             $action = Shopware()->Front()->Request()->getActionName();
@@ -137,56 +139,9 @@ class GetTax extends AbstractSubscriber
         $newPrice = $args->getReturn();
         $newPrice['taxID'] = 'mopt_avalara__' . $taxRate;
         $newPrice['tax_rate'] = $taxRate;
-        $newPrice['tax'] = $this->getTaxForOrderBasketId($args->get('id'), $session->MoptAvalaraGetTaxResult);
+        $newPrice['tax'] = $service->getTaxForOrderBasketId($args->get('id'), $session->MoptAvalaraGetTaxResult);
 
         return $newPrice;
-    }
-
-    /**
-     * get tax ammount from avalara response
-     * @param string|int $id
-     * @param \stdClass $taxInformation
-     * @return float
-     */
-    protected function getTaxForOrderBasketId($id, $taxInformation)
-    {
-        if (!$taxLineInformation = $this->getTaxLineForOrderBasketId($id, $taxInformation)) {
-            return 0;
-        }
-
-        return (float)$taxLineInformation->tax;
-    }
-    
-    /**
-     * get tax rate from avalara response
-     * @param string|int $id
-     * @param \stdClass $taxInformation
-     * @return float
-     */
-    protected function getTaxRateForOrderBasketId($id, $taxInformation)
-    {
-        if (!$taxLineInformation = $this->getTaxLineForOrderBasketId($id, $taxInformation)) {
-            return 0;
-        }
-
-        return ((float)$taxLineInformation->tax / (float)$taxLineInformation->taxableAmount) * 100;
-    }
-
-    /**
-     * get tax line info from avalara response
-     * @param string|int $id
-     * @param \stdClass $taxInformation
-     * @return \stdClass
-     */
-    private function getTaxLineForOrderBasketId($id, $taxInformation)
-    {
-        foreach ($taxInformation->lines as $taxLineInformation) {
-            if ($id == $taxLineInformation->lineNumber && $taxLineInformation->tax) {
-                return $taxLineInformation;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -320,7 +275,7 @@ class GetTax extends AbstractSubscriber
             /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
             $service = $adapter->getService('GetTax');
             $response = $service->calculate($model);
-        } catch (\GuzzleHttp\Exception\TransferException $e) {
+        } catch (\Exception $e) {
             $adapter->getLogger()->error('GetTax commit call failed.');
             
             return false;
@@ -382,7 +337,9 @@ class GetTax extends AbstractSubscriber
             return;
         }
 
-        $taxRate = $this->getTaxRateForOrderBasketId(LineFactory::ARTICLEID__SHIPPING, $session->MoptAvalaraGetTaxResult);
+        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
+        $service = $this->getAdapter()->getService('GetTax');
+        $taxRate = $service->getTaxRateForOrderBasketId(LineFactory::ARTICLEID__SHIPPING, $session->MoptAvalaraGetTaxResult);
         
         if(!$taxRate) {
             return;
@@ -445,7 +402,9 @@ class GetTax extends AbstractSubscriber
         }
         
         //get tax rate for voucher
-        $taxRate = $this->getTaxRateForOrderBasketId(LineFactory::ARTICLEID__VOUCHER, $session->MoptAvalaraGetTaxResult);
+        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
+        $service = $this->getAdapter()->getService('GetTax');
+        $taxRate = $service->getTaxRateForOrderBasketId(LineFactory::ARTICLEID__VOUCHER, $session->MoptAvalaraGetTaxResult);
         
         $config = Shopware()->Config();
         $config['sVOUCHERTAX'] = $taxRate;
