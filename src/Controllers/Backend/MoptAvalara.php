@@ -2,6 +2,10 @@
 
 class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Backend_ExtJs
 {
+    /**
+     * Will cancel a transaction for an order
+     * @return void
+     */
     public function cancelOrderAction()
     {
         if (!$order = $this->getAvalaraOrder()) {
@@ -18,6 +22,10 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
         );
     }
     
+    /**
+     * Will void, delete and recreate a transaction for an order
+     * @return void
+     */
     public function updateOrderAction()
     {
         if (!$order = $this->getAvalaraOrder()) {
@@ -44,6 +52,28 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
         );
     }
     
+    /**
+     * 
+     * @return void
+     */
+    public function resetUpdateFlagAction()
+    {
+        if (!$order = $this->getAvalaraOrder()) {
+            return;
+        }
+
+        $this->resetUpdateFlag($order);
+
+        $this->View()->assign([
+            'success' => true,
+            'message' => 'Avalara: order has been unflagged.']
+        );
+    }
+    
+    /**
+     * 
+     * @return \Shopware\Models\Order\Order
+     */
     protected function getAvalaraOrder()
     {
         $repository = Shopware()->Models()->getRepository('\Shopware\Models\Order\Order');
@@ -69,6 +99,12 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
         return $order;
     }
     
+    /**
+     * 
+     * @param \Shopware\Models\Order\Order $order
+     * @param string $cancelCode
+     * @return boolean
+     */
     protected function cancelTax(\Shopware\Models\Order\Order $order, $cancelCode) 
     {
         $docCode = $order->getAttribute()->getMoptAvalaraDocCode();
@@ -78,7 +114,7 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             /* @var $service \Shopware\Plugins\MoptAvalara\Service\CancelTax */
             $service = $adapter->getService('CancelTax');
             $service->cancel($docCode, $cancelCode);
-        } catch (\GuzzleHttp\Exception\TransferException $e) {
+        } catch (\Exception $e) {
             $adapter->getLogger()->error('CancelTax call failed.');
             $this->View()->assign([
                 'success' => false,
@@ -90,6 +126,11 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
         return true;
     }
     
+    /**
+     * 
+     * @param \Shopware\Models\Order\Order $order
+     * @return boolean
+     */
     protected function updateOrder(\Shopware\Models\Order\Order $order)
     {
         $adapter = $this->getAvalaraSDKAdapter();
@@ -118,6 +159,13 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
         return true;
     }
     
+    /**
+     * 
+     * @param Shopware\Models\Order\Detail $detail
+     * @param \stdClass $getTaxResponse
+     * @return int
+     * @throws \Exception
+     */
     protected function getTaxRateForOrderDetail(Shopware\Models\Order\Detail $detail, $getTaxResponse)
     {
         foreach ($getTaxResponse['TaxLines'] as $taxLineInformation) {
@@ -129,30 +177,20 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
                 return ((float)$taxLineInformation['Tax'] / (float)$taxLineInformation['Taxable']) * 100;
             }
         }
-        throw new Exception('Avalara: no tax information found.');
+        throw new \Exception('Avalara: no tax information found.');
     }
     
+    /**
+     * 
+     * @param \Shopware\Models\Order\Order $order
+     */
     protected function resetUpdateFlag(\Shopware\Models\Order\Order $order)
     {
         $order->getAttribute()->setMoptAvalaraOrderChanged(0);
         Shopware()->Models()->persist($order);
         Shopware()->Models()->flush();
     }
-    
-    public function resetUpdateFlagAction()
-    {
-        if (!$order = $this->getAvalaraOrder()) {
-            return;
-        }
 
-        $this->resetUpdateFlag($order);
-
-        $this->View()->assign([
-            'success' => true,
-            'message' => 'Avalara: order has been unflagged.']
-        );
-    }
-    
     /**
      * 
      * @return \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface
