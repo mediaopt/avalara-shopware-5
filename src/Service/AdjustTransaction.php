@@ -3,6 +3,8 @@
 namespace Shopware\Plugins\MoptAvalara\Service;
 
 use Avalara\CreateTransactionModel;
+use Avalara\AdjustTransactionModel;
+use Avalara\AdjustmentReason;
 use Shopware\Plugins\MoptAvalara\Form\FormCreator;
 
 /**
@@ -11,6 +13,8 @@ use Shopware\Plugins\MoptAvalara\Form\FormCreator;
  */
 class AdjustTransaction extends AbstractService
 {
+    const UPDATE_DESCRIPTION = 'Order updated.';
+    
     /**
      * 
      * @param \Avalara\CreateTransactionModel $model
@@ -21,7 +25,12 @@ class AdjustTransaction extends AbstractService
     {
         $companyCode = $this->getAdapter()->getPluginConfig(FormCreator::COMPANY_CODE_FIELD);
         $client = $this->getAdapter()->getClient();
-        $response = $client->adjustTransaction($companyCode, $docCode, $model);
+        
+        $adjustModel = new AdjustTransactionModel();
+        $adjustModel->adjustmentReason = AdjustmentReason::C_OTHER;
+        $adjustModel->adjustmentDescription = self::UPDATE_DESCRIPTION;
+        $adjustModel->newTransaction = $model;
+        $response = $client->adjustTransaction($companyCode, $docCode, $adjustModel);
 
         return $response;
     }
