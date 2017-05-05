@@ -26,7 +26,6 @@ class TransactionModelFactoryFromOrder extends AbstractFactory
         /* @var $customer \Shopware\Models\Customer\Customer */
         $customer = $order->getCustomer();
 
-        $address = $this->getAdapter()->getFactory('AddressFactory')->buildDeliveryAddress();
         $model = new CreateTransactionModel();
         $model->code = $order->getNumber();
         $model->businessIdentificationNo = $customer->getBilling()->getVatId();

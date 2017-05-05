@@ -24,8 +24,7 @@ class TransactionModelFactory extends AbstractFactory
     public function build($docType, $isCommit = false)
     {
         $user = $this->getUserData();
-        
-        $address = $this->getAdapter()->getFactory('AddressFactory')->buildDeliveryAddress();
+
         $model = new CreateTransactionModel();
         $model->businessIdentificationNo = $user['billingaddress']['ustid'];
         $model->commit = $isCommit;
