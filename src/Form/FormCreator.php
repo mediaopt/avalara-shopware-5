@@ -9,6 +9,9 @@ namespace Shopware\Plugins\MoptAvalara\Form;
  */
 class FormCreator {
     
+    /**
+     * Field names
+     */
     const LOGGER_DEFAULT_ROTATING_DAYS = 7;
     
     const LOG_FILE_NAME = 'mo_avalara';
@@ -26,6 +29,8 @@ class FormCreator {
     const TAX_ENABLED_FIELD = 'mopt_avalara__tax_enabled';
     
     const DOC_COMMIT_ENABLED_FIELD = 'mopt_avalara__doc_commit_enabled';
+    
+    const INCOTERMS_FIELD = 'mopt_avalara__incoterms';
     
     const ADDRESS_VALIDATION_COUNTRIES_FIELD = 'mopt_avalara_addressvalidation_countries';
     
@@ -47,6 +52,10 @@ class FormCreator {
     
     const ORIGIN_COUNTRY_FIELD = 'mopt_avalara__origin_address__country';
     
+    
+    /**
+     * Values and options
+     */
     const DELIVERY_COUNTRY_NO_VALIDATION = 1;
     
     const DELIVERY_COUNTRY_USA = 2;
@@ -54,6 +63,9 @@ class FormCreator {
     const DELIVERY_COUNTRY_CANADA = 3;
     
     const DELIVERY_COUNTRY_USA_AND_CANADA = 4;
+    
+    const INCOTERMS_DAP = 1;
+    const INCOTERMS_DDP = 2;
     
     /**
      *
@@ -190,6 +202,16 @@ class FormCreator {
             'description' => 'Disable document committing will result that all calls will be done with DocType=SalesOrder and suppress any non-getTax calls(i.e.canceltax,postTax)',
         ]);
 
+        $form->setElement('select', self::INCOTERMS_FIELD, [
+            'label' => 'Incoterms for Landed cost',
+            'description' => 'Terms of sale. Used to determine buyer obligations for a landed cost.',
+            'value' => self::INCOTERMS_DAP,
+            'store' => [
+                [self::INCOTERMS_DAP, 'Delivered at Place (DAP)'],
+                [self::INCOTERMS_DDP, 'Delivered Duty Paid (DDP)'],
+            ],
+        ]);
+        
         $form->setElement('select', self::ADDRESS_VALIDATION_COUNTRIES_FIELD, [
             'label' => 'Address-validation for following countries',
             'description' => 'Choose the delivery countries, which should be covered by the Avalara Tax Calculation',
@@ -382,6 +404,7 @@ class FormCreator {
             'mopt_avalara__fieldset__configuration',
             self::TAX_ENABLED_FIELD,
             self::DOC_COMMIT_ENABLED_FIELD,
+            self::INCOTERMS_FIELD,
             self::ADDRESS_VALIDATION_COUNTRIES_FIELD,
             self::LOG_LEVEL_FIELD,
             self::LOG_ROTATION_DAYS_FIELD,
