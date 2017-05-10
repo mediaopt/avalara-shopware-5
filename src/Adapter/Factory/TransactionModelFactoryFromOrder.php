@@ -95,7 +95,7 @@ class TransactionModelFactoryFromOrder extends AbstractFactory
 
         foreach ($order->getDetails() as $position) {
             $position = $this->convertOrderDetailToLineData($position);
-            if ($this->isDiscount($position['modus'])) {
+            if (LineFactory::isDiscount($position['modus'])) {
                 if ($this->isDiscountGlobal($position)) {
                     $this->discount -= floatval($position['netprice']);
                 } else {
@@ -152,24 +152,9 @@ class TransactionModelFactoryFromOrder extends AbstractFactory
         return $lineData;
     }
 
-    /*
-     * Modus
-     * 2 = voucher
-     * 3 = special basket discount
-     * 4 = discount
-     */
-
-    protected function isDiscount($modus)
-    {
-        if (($modus == 2) || ($modus == 4) || ($modus == 3)) {
-            return true;
-        }
-        return false;
-    }
-
     protected function isDiscountGlobal($position)
     {
-        if ($position['modus'] != 2) {
+        if ($position['modus'] != LineFactory::MODUS_VOUCHER) {
             return true;
         }
 

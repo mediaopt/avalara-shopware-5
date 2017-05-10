@@ -3,6 +3,7 @@
 namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
 use Avalara\LineItemModel;
+use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
 
 /**
  * Factory to create \Avalara\LineItemModel
@@ -10,7 +11,10 @@ use Avalara\LineItemModel;
  */
 class LineFactory extends AbstractFactory
 {
-
+    const MODUS_VOUCHER = 2;
+    const MODUS_BASKET_DISCOUNT = 3;
+    const MODUS_DISCOUNT = 4;
+    
     const ARTICLEID__SHIPPING = 'shipping';
     const ARTICLEID__VOUCHER = 'voucher';
 
@@ -48,7 +52,7 @@ class LineFactory extends AbstractFactory
     protected function getParamTaxCode($lineData)
     {
         $articleId = $lineData['articleID'];
-        if ($lineData['modus'] == 2){
+        if ($lineData['modus'] == self::MODUS_VOUCHER){
             $voucherRepository = Shopware()
                 ->Models()
                 ->getRepository('\Shopware\Models\Voucher\Voucher')
@@ -102,6 +106,20 @@ class LineFactory extends AbstractFactory
     protected function isNeitherVoucherNorShipping($lineData)
     {
         //voucher has modus 2
-        return $lineData['modus'] !== 2 && !$this->isShipping($lineData);
+        return $lineData['modus'] !== self::MODUS_VOUCHER && !$this->isShipping($lineData);
+    }
+    
+    /**
+     * 
+     * @param int $modus
+     * @return bool
+     */
+    public static function isDiscount($modus)
+    {
+        return in_array($modus, [
+            self::MODUS_VOUCHER, 
+            self::MODUS_BASKET_DISCOUNT, 
+            self::MODUS_DISCOUNT,
+        ]);
     }
 }

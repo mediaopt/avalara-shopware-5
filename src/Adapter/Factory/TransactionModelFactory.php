@@ -13,9 +13,11 @@ use Shopware\Plugins\MoptAvalara\Form\FormCreator;
  */
 class TransactionModelFactory extends AbstractFactory
 {
-    private static $isDiscountModuses = [2, 3, 4];
-    
-    protected $discount = 0;
+    /**
+     * Total discount
+     * @var float
+     */
+    protected $discount = 0.0;
 
     /**
      * 
@@ -77,7 +79,7 @@ class TransactionModelFactory extends AbstractFactory
         $positions = Shopware()->Modules()->Basket()->sGetBasket();
         
         foreach ($positions['content'] as $position) {
-            if ($this->isDiscount($position['modus'])) {
+            if (LineFactory::isDiscount($position['modus'])) {
                 if ($this->isDiscountGlobal($position)) {
                     $this->discount -= floatval($position['netprice']);
                 }
@@ -95,17 +97,6 @@ class TransactionModelFactory extends AbstractFactory
         }
         
         return $lines;
-    }
-
-    /*
-     * Modus
-     * 2 = voucher
-     * 3 = special basket discount
-     * 4 = discount
-     */
-    protected function isDiscount($modus)
-    {
-        return in_array($modus, self::$isDiscountModuses);
     }
 
     /**
@@ -135,7 +126,7 @@ class TransactionModelFactory extends AbstractFactory
     
     protected function isDiscountGlobal($position)
     {
-        if ($position['modus'] != 2) {
+        if ($position['modus'] != LineFactory::MODUS_VOUCHER) {
            return true; 
         }
         
