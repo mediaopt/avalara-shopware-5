@@ -5,6 +5,7 @@ namespace Shopware\Plugins\MoptAvalara\Subscriber;
 use Shopware\Plugins\MoptAvalara\Form\FormCreator;
 use Avalara\AddressLocationInfo;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\AddressFactory;
+use Shopware\Plugins\MoptAvalara\Form\FormCreator;
 
 /**
  * Description of Checkout
@@ -75,31 +76,8 @@ class AddressCheck extends AbstractSubscriber
         /*@var $session Enlight_Components_Session_Namespace */
         $session = $this->getContainer()->get('session');
         
-        //country check
-        $countries = $this
-            ->getAdapter()
-            ->getPluginConfig(FormCreator::ADDRESS_VALIDATION_COUNTRIES_FIELD)
-        ;
-        switch ($countries) {
-            case 1: //no validation
-                return false;
-            case 2: //US
-                if($address->country != AddressFactory::COUNTRY_CODE__US) {
-                    return false;
-                }
-                break;
-            case 3: //CA
-                if($address->country != AddressFactory::COUNTRY_CODE__CA) {
-                    return false;
-                }
-                break;
-            case 4: //US & CA
-                if(!in_array($address->country, [
-                    AddressFactory::COUNTRY_CODE__CA,
-                    AddressFactory::COUNTRY_CODE__US])) {
-                    return false;
-                }
-                break;
+        if (!$this->isCountryForDelivery($address->country)) {
+            return false;
         }
         
         if(!$session->MoptAvalaraCheckedAddress) {
@@ -110,6 +88,46 @@ class AddressCheck extends AbstractSubscriber
             return true;
         }
 
+        return false;
+    }
+    
+    /**
+     * 
+     * @param string $country
+     * @return bool
+     */
+    private function isCountryForDelivery($country)
+    {
+        $countriesForDelivery = $this
+            ->getAdapter()
+            ->getPluginConfig(FormCreator::ADDRESS_VALIDATION_COUNTRIES_FIELD)
+        ;
+
+        switch ($countriesForDelivery) {
+            case FormCreator::DELIVERY_COUNTRY_NO_VALIDATION:
+                return false;
+            case FormCreator::DELIVERY_COUNTRY_USA:
+                if($country == AddressFactory::COUNTRY_CODE__US) {
+                    return true;
+                }
+                break;
+            case FormCreator::DELIVERY_COUNTRY_CANADA:
+                if($country == AddressFactory::COUNTRY_CODE__CA) {
+                    return true;
+                }
+                break;
+            case FormCreator::DELIVERY_COUNTRY_USA_AND_CANADA:
+                $usaAndCanada = [
+                    AddressFactory::COUNTRY_CODE__CA,
+                    AddressFactory::COUNTRY_CODE__US
+                ];
+                
+                if(in_array($country, $usaAndCanada)) {
+                    return true;
+                }
+                break;
+        }
+        
         return false;
     }
     
