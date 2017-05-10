@@ -29,7 +29,7 @@ class LineFactory extends AbstractFactory
         $line->quantity = $lineData['quantity'];
         $line->description = $lineData['articlename'];
         $line->taxCode = $this->getParamTaxCode($lineData);
-        $line->discounted = $this->isNotVoucherOrShipping($lineData);
+        $line->discounted = $this->isNeitherVoucherNorShipping($lineData);
         $line->taxIncluded = $this->getParamIsTaxIncluded($lineData, $line);
 
         return $line;
@@ -99,13 +99,9 @@ class LineFactory extends AbstractFactory
         return $lineData['id'] == self::ARTICLEID__SHIPPING;
     }
 
-    protected function isNotVoucherOrShipping($lineData)
+    protected function isNeitherVoucherNorShipping($lineData)
     {
         //voucher has modus 2
-        if (($lineData['modus'] == 2) || ($this->isShipping($lineData)))
-        {
-            return false;
-        }
-        return true;
+        return $lineData['modus'] !== 2 && !$this->isShipping($lineData);
     }
 }
