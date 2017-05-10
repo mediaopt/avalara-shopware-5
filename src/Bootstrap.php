@@ -203,8 +203,8 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
      */
     private function addAttributes_1_1_0()
     {
-        /** @var \Shopware\Bundle\AttributeBundle\Service\CrudService $attributeCrudService */
-        $attributeCrudService = $this->get('shopware_attribute.crud_service');
+        $attributeCrudService = $this->getCrudService();
+        
         $attributeCrudService->update('s_categories_attributes', 'mopt_avalara_taxcode', 'string', [
             'label' => 'Avalara Tax Code',
             'supportText' => 'Hier wird der Avalara Tax-Code der Kategorie angegeben, der an Avalara übersendet wird.',
@@ -245,15 +245,6 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
             'position' => 10,
             'custom' => true,
         ]);
-        $attributeCrudService->update('s_premium_dispatch_attributes', 'mopt_avalara_express_shipping', 'boolean', [
-            'label' => 'Express',
-            'supportText' => 'Shipping method. Can be used to determine applicable tax types',
-            'helpText' => '',
-            'translatable' => false,
-            'displayInBackend' => true,
-            'position' => 10,
-            'custom' => true,
-        ]);
         $attributeCrudService->update('s_emarketing_vouchers_attributes', 'mopt_avalara_taxcode', 'string', [
             'label' => 'Avalara Tax Code',
             'supportText' => 'Hier wird der Avalara Tax-Code für Gutscheine angegeben, der an Avalara übersendet wird.',
@@ -278,8 +269,8 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
      */
     private function addAttributes_2_0_0()
     {
-         /** @var \Shopware\Bundle\AttributeBundle\Service\CrudService $attributeCrudService */
-        $attributeCrudService = $this->get('shopware_attribute.crud_service');
+        $attributeCrudService = $this->getCrudService();
+        
         $attributeCrudService->update('s_categories_attributes', 'mopt_avalara_hccode', 'string', [
             'label' => 'Avalara Harmonized Classification Code (hcCode)',
             'supportText' => 'Hier wird der Avalara Harmonized Classification Code (hcCode) der Kategorie angegeben, der an Avalara übersendet wird.',
@@ -289,6 +280,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
             'position' => 10,
             'custom' => true,
         ]);
+        
         $attributeCrudService->update('s_articles_attributes', 'mopt_avalara_hccode', 'string', [
             'label' => 'Avalara Harmonized Classification Code (hcCode)',
             'supportText' => 'Hier wird der Avalara Harmonized Classification Code (hcCode) des Artikel angegeben, der an Avalara übersendet wird.',
@@ -299,7 +291,35 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
             'custom' => true,
         ]);
         
+        $attributeCrudService->update('s_premium_dispatch_attributes', 'mopt_avalara_express_shipping', 'boolean', [
+            'label' => 'Express delivery',
+            'supportText' => 'You can designate this delivery set an express delivery.',
+            'helpText' => '',
+            'translatable' => false,
+            'displayInBackend' => true,
+            'position' => 10,
+            'custom' => true,
+        ]);
+        
+        $attributeCrudService->update('s_premium_dispatch_attributes', 'mopt_avalara_insured', 'boolean', [
+            'label' => 'Insurance 100%',
+            'supportText' => 'You can set if a delivery is completely insured.',
+            'helpText' => '',
+            'translatable' => false,
+            'displayInBackend' => true,
+            'position' => 10,
+            'custom' => true,
+        ]);
+        
         return $this;
+    }
+    
+    /**
+     * @return \Shopware\Bundle\AttributeBundle\Service\CrudService
+     */
+    private function getCrudService()
+    {
+        return $this->get('shopware_attribute.crud_service');
     }
 
     /**

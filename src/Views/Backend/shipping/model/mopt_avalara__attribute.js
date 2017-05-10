@@ -2,4 +2,5 @@
     { name:'moptAvalaraTaxcode', type:'string'},
     { name:'moptAvalaraHccode', type:'string'},
     { name:'moptAvalaraExpressShipping', type:'checkbox'},
+    { name:'moptAvalaraInsured', type:'checkbox'},
 //{/block}

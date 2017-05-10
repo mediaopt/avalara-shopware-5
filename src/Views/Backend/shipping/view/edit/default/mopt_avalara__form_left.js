@@ -28,6 +28,11 @@ Ext.define('Shopware.apps.moptAvalara.Shipping.view.edit.default.FormLeft', {
                     xtype: 'checkbox',
                     fieldLabel: 'Express',
                     name: 'attribute[moptAvalaraExpressShipping]'
+                },
+                {
+                    xtype: 'checkbox',
+                    fieldLabel: 'Insured 100%',
+                    name: 'attribute[moptAvalaraInsured]'
                 }
             ]
         });
