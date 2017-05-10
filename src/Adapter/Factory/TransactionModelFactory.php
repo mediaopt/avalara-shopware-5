@@ -130,14 +130,8 @@ class TransactionModelFactory extends AbstractFactory
         if ($position['modus'] != LineFactory::MODUS_VOUCHER) {
            return true; 
         }
+        $voucher = Shopware()->Models()->getRepository('\Shopware\Models\Voucher\Voucher')->find($position['articleID']);
         
-        if (!$voucher = Shopware()->Models()->getRepository('\Shopware\Models\Voucher\Voucher')->find($position['articleID'])) {
-            return true;
-        }
-        
-        if (!$voucher->getStrict()) {
-            return true;
-        }
-        return false;
+        return !$voucher || !$voucher->getStrict();
     }
 }
