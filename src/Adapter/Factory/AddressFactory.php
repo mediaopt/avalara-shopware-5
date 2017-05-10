@@ -115,6 +115,29 @@ class AddressFactory extends AbstractFactory
         $address->region = $this->getPluginConfig(FormCreator::ORIGIN_REGION_FIELD);
         $address->country = $this->getPluginConfig(FormCreator::ORIGIN_COUNTRY_FIELD);
         
+        if (strlen($address->country) > 2) {
+            $this->fixCountryCode($address);
+        }
+        
         return $address;
+    }
+    
+    /**
+     * Change country name to ISO code
+     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
+     */
+    private function fixCountryCode(AddressLocationInfo $address)
+    {
+        $country = strtolower($address->country);
+
+        $formCreator = new FormCreator($this->getAdapter()->getBootstrap());
+        foreach ($formCreator->getCountriesISO() as $iso => $name) {
+            if ($country === strtolower($name)) {
+                $address->country = $iso;
+                break;
+            }
+        }
+        
+        return $this;
     }
 }
