@@ -146,6 +146,8 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             Shopware()->Models()->persist($order);
             Shopware()->Models()->flush();
             $order->calculateInvoiceAmount();
+            
+            return true;
         } catch (\Exception $e) {
             $adapter->getLogger()->error('GetTax call from order failed: '. $e->getMessage());
             $this->View()->assign([
@@ -154,7 +156,6 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             );
             return false;
         }
-        return true;
     }
     
     /**
