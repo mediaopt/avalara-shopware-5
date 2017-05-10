@@ -121,21 +121,22 @@ class TransactionModelFactoryFromOrder extends AbstractFactory
      */
     protected function getShippingCharges(Order $order)
     {
-        if ($order->getInvoiceShipping()) {
-            //create shipping item for compatibility reasons with line data
-            $shippingItem = [];
-            $shippingItem['id'] = LineFactory::ARTICLEID__SHIPPING;
-            $shippingItem['ean'] = '';
-            $shippingItem['quantity'] = 1;
-            $shippingItem['netprice'] = $order->getInvoiceShippingNet();
-            $shippingItem['brutprice'] = $order->getInvoiceShipping();
-            $shippingItem['articlename'] = 'Shipping';
-            $shippingItem['articleID'] = 0;
-            $shippingItem['dispatchID'] = $order->getDispatch()->getId();
-            return $shippingItem;
-        } else {
+        if (!$order->getInvoiceShipping()) {
             return null;
         }
+        
+        //create shipping item for compatibility reasons with line data
+        $shippingItem = [];
+        $shippingItem['id'] = LineFactory::ARTICLEID__SHIPPING;
+        $shippingItem['ean'] = '';
+        $shippingItem['quantity'] = 1;
+        $shippingItem['netprice'] = $order->getInvoiceShippingNet();
+        $shippingItem['brutprice'] = $order->getInvoiceShipping();
+        $shippingItem['articlename'] = 'Shipping';
+        $shippingItem['articleID'] = 0;
+        $shippingItem['dispatchID'] = $order->getDispatch()->getId();
+        
+        return $shippingItem;
     }
 
     protected function convertOrderDetailToLineData(\Shopware\Models\Order\Detail $detail)
