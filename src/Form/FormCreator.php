@@ -70,7 +70,7 @@ class FormCreator {
     }
 
     /**
-     * 
+     * Will return array of arrays ['iso', 'Country name']
      * @return array
      */
     public function getCountriesISO()
@@ -83,8 +83,15 @@ class FormCreator {
         
         foreach ($json as $line) {
             $iso = $line['code'];
-            $countries[$iso] = ucfirst($line['name']);
+            $countries[] = [$iso, ucfirst(strtolower($line['name']))];
         }
+        
+        usort($countries, function($a, $b) {
+            return ($a[1] > $b[1])
+                ? 1
+                : -1
+            ;
+        });
         
         return $countries;
     }
@@ -207,12 +214,12 @@ class FormCreator {
 
         $form->setElement('text', self::ORIGIN_ADDRESS_LINE_2_FIELD, [
             'label' => 'Line2',
-            'required' => true,
+            'required' => false,
         ]);
 
         $form->setElement('text', self::ORIGIN_ADDRESS_LINE_3_FIELD, [
             'label' => 'Line3',
-            'required' => true,
+            'required' => false,
         ]);
 
         $form->setElement('text', self::ORIGIN_POSTAL_CODE_FIELD, [

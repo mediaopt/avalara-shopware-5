@@ -131,9 +131,9 @@ class AddressFactory extends AbstractFactory
         $country = strtolower($address->country);
 
         $formCreator = new FormCreator($this->getAdapter()->getBootstrap());
-        foreach ($formCreator->getCountriesISO() as $iso => $name) {
-            if ($country === strtolower($name)) {
-                $address->country = $iso;
+        foreach ($formCreator->getCountriesISO() as $item) {
+            if ($country === strtolower($item[1])) {
+                $address->country = $item[0];
                 break;
             }
         }
