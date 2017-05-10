@@ -47,6 +47,14 @@ class FormCreator {
     
     const ORIGIN_COUNTRY_FIELD = 'mopt_avalara__origin_address__country';
     
+    const DELIVERY_COUNTRY_NO_VALIDATION = 1;
+    
+    const DELIVERY_COUNTRY_USA = 2;
+    
+    const DELIVERY_COUNTRY_CANADA = 3;
+    
+    const DELIVERY_COUNTRY_USA_AND_CANADA = 4;
+    
     /**
      *
      * @var \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
@@ -149,12 +157,12 @@ class FormCreator {
         $form->setElement('select', self::ADDRESS_VALIDATION_COUNTRIES_FIELD, [
             'label' => 'Address-validation for following countries',
             'description' => 'Choose the delivery countries, which should be covered by the Avalara Tax Calculation',
-            'value' => 4,
+            'value' => self::DELIVERY_COUNTRY_USA_AND_CANADA,
             'store' => [
-                [1, 'No Validation'],
-                [2, 'USA only'],
-                [3, 'Canada only'],
-                [4, 'USA & Canada']
+                [self::DELIVERY_COUNTRY_NO_VALIDATION, 'No Validation'],
+                [self::DELIVERY_COUNTRY_USA, 'USA only'],
+                [self::DELIVERY_COUNTRY_CANADA, 'Canada only'],
+                [self::DELIVERY_COUNTRY_USA_AND_CANADA, 'USA & Canada']
             ],
         ]);
 
