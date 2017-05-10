@@ -106,6 +106,8 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             /* @var $service \Shopware\Plugins\MoptAvalara\Service\CancelTax */
             $service = $adapter->getService('CancelTax');
             $service->cancel($docCode, $cancelCode);
+            
+            return true;
         } catch (\Exception $e) {
             $adapter->getLogger()->error('CancelTax call failed: ' . $e->getMessage());
             $this->View()->assign([
@@ -114,8 +116,6 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             );
             return false;
         }
-        
-        return true;
     }
     
     /**
