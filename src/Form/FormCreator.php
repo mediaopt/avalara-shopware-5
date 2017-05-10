@@ -241,8 +241,8 @@ class FormCreator {
             'description' => 'Type of sale. Can be used to determine applicable tax types',
             'value' => self::TRANSACTION_TYPE_B2C,
             'store' => [
-                [self::TRANSACTION_TYPE_B2C, 'B2C'],
-                [self::TRANSACTION_TYPE_B2B, 'B2B'],
+                [self::TRANSACTION_TYPE_B2C, 'Business-to-Consumer (B2C)'],
+                [self::TRANSACTION_TYPE_B2B, 'Business-to-Business (B2B)'],
             ],
         ]);
 
