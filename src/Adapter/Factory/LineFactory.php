@@ -91,10 +91,7 @@ class LineFactory extends AbstractFactory
 
     protected function getParamIsTaxIncluded($lineData)
     {
-        if ($this->isShipping($lineData) && !$this->getParamTaxCode($lineData)) {
-            return true;
-        }
-        return false;
+        return $this->isShipping($lineData) && !$this->getParamTaxCode($lineData);
     }
 
     protected function isShipping($lineData)
