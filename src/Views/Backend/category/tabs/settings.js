@@ -21,8 +21,14 @@ Ext.define('Shopware.apps.moptAvalara.Category.view.category.tabs.settings', {
             items: [{
                     xtype: 'textfield',
                     fieldLabel: 'Taxcode',
-                    name: 'attribute[moptAvalaraTaxcode]',
-                }]
+                    name: 'attribute[moptAvalaraTaxcode]'
+                },
+                {
+                    xtype: 'textfield',
+                    fieldLabel: 'Harmonized Classification Code (hcCode)',
+                    name: 'attribute[moptAvalaraHccode]'
+                }
+            ]
         });
     }
 });

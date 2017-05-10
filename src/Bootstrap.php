@@ -56,11 +56,13 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
      * @throws \Exception
      */
     public function install()
-    {
-        $this->registerControllers();
-        $this->registerEvents();
-        $this->addAttributes();
-        $this->createForm();
+    {  
+        $this
+            ->registerControllers()
+            ->registerEvents()
+            ->addAttributes()
+            ->createForm()
+        ;
 
         return ['success' => true, 'invalidateCache' => ['backend', 'proxy']];
     }
@@ -87,16 +89,16 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
      */
     protected function update_1_1_0()
     {
-        $this->addAttributes();
+        $this->addAttributes_1_1_0();
     }
 
     /**
-     * @TODO Add new fields to categories and articles
+     * @TODO Add new fields to orders, shipping methods, categories and articles
      *  New fields
      */
     protected function update_2_0_0()
     {
-        
+        $this->addAttributes_2_0_0();
     }
 
     /**
@@ -138,21 +140,27 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
     /**
      * register controllers
      * @throws \Exception
+     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap;
      */
     protected function registerControllers()
     {
         $this->registerController('Backend', 'MoptAvalaraBackendProxy');
         $this->registerController('Backend', 'MoptAvalara');
         $this->registerController('Backend', 'MoptAvalaraLog');
+        
+        return $this;
     }
     
     /**
      * register for several events to extend shop functions
      * @throws \Exception
+     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
      */
     protected function registerEvents()
     {
         $this->subscribeEvent('Enlight_Controller_Front_DispatchLoopStartup', 'onDispatchLoopStartup');
+        
+        return $this;
     }
 
     /**
@@ -175,9 +183,25 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
 
     /**
      * extend attributes with avalara properties
+     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
      * @throws \Exception
      */
-    public function addAttributes()
+    private function addAttributes()
+    {
+        $this
+            ->addAttributes_1_1_0()
+            ->addAttributes_2_0_0()
+        ;
+        
+        return $this;
+    }
+
+    /**
+     * extend attributes with avalara properties
+     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
+     * @throws \Exception
+     */
+    private function addAttributes_1_1_0()
     {
         /** @var \Shopware\Bundle\AttributeBundle\Service\CrudService $attributeCrudService */
         $attributeCrudService = $this->get('shopware_attribute.crud_service');
@@ -234,14 +258,50 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
             'displayInBackend' => false,
             'custom' => true,
         ]);
+        
+        return $this;
+    }
+    
+    /**
+     * add new attributes with avalara landed cost properties
+     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
+     * @throws \Exception
+     */
+    private function addAttributes_2_0_0()
+    {
+         /** @var \Shopware\Bundle\AttributeBundle\Service\CrudService $attributeCrudService */
+        $attributeCrudService = $this->get('shopware_attribute.crud_service');
+        $attributeCrudService->update('s_categories_attributes', 'mopt_avalara_hccode', 'string', [
+            'label' => 'Avalara Harmonized Classification Code (hcCode)',
+            'supportText' => 'Hier wird der Avalara Harmonized Classification Code (hcCode) der Kategorie angegeben, der an Avalara übersendet wird.',
+            'helpText' => '',
+            'translatable' => false,
+            'displayInBackend' => true,
+            'position' => 10,
+            'custom' => true,
+        ]);
+        $attributeCrudService->update('s_articles_attributes', 'mopt_avalara_hccode', 'string', [
+            'label' => 'Avalara Harmonized Classification Code (hcCode)',
+            'supportText' => 'Hier wird der Avalara Harmonized Classification Code (hcCode) des Artikel angegeben, der an Avalara übersendet wird.',
+            'helpText' => '',
+            'translatable' => false,
+            'displayInBackend' => true,
+            'position' => 10,
+            'custom' => true,
+        ]);
+        
+        return $this;
     }
 
     /**
      * create config form
+     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
      */
-    public function createForm()
+    private function createForm()
     {
         $formCreator = new \Shopware\Plugins\MoptAvalara\Form\FormCreator($this);
         $formCreator->createForms();
+        
+        return $this;
     }
 }
