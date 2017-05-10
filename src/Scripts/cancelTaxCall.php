@@ -10,20 +10,20 @@ $kernel->boot();
 
 if (version_compare(\Shopware::VERSION, '4.3.0', '>=')) {
     //init http request object for sAdmin::sSaveRegister - see shopware.php & \Shopware\Kernel::handle()
-    $request = Symfony\Component\HttpFoundation\Request::createFromGlobals();
-    $request = $kernel->transformSymfonyRequestToEnlightRequest($request);
+    $requestFromGlobals = Symfony\Component\HttpFoundation\Request::createFromGlobals();
+    $request = $kernel->transformSymfonyRequestToEnlightRequest($requestFromGlobals);
     $front = $kernel->getContainer()->get('front');
     $front->setRequest($request);
 }
 
 //init plugin (for autoloading)
 Shopware()->Plugins()->Backend()->MoptAvalara();
-
-$sdkMain = Shopware()->Container()->get('MediaoptAvalaraSdkMain');
+$service = \Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter::SERVICE_NAME;
+$adapter = Shopware()->Container()->get($service);
 try {
-    $orderData['DocCode'] = 'DOC21345';
-    $avalaraData['DocType'] = 'SalesInvoice';
-    $response = $sdkMain->getService('cancelTax')->cancelTax($orderData, $avalaraData);
+    $orderData->code = 'DOC21345';
+    $avalaraData->type = 'SalesInvoice';
+    $response = $adapter->getService('cancelTax')->cancelTax($orderData, $avalaraData);
     //compare address fields
     
 } catch (Exception $e) {
