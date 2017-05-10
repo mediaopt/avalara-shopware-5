@@ -13,6 +13,8 @@ use Shopware\Plugins\MoptAvalara\Form\FormCreator;
  */
 class TransactionModelFactory extends AbstractFactory
 {
+    private static $isDiscountModuses = [2, 3, 4];
+    
     protected $discount = 0;
 
     /**
@@ -103,10 +105,7 @@ class TransactionModelFactory extends AbstractFactory
      */
     protected function isDiscount($modus)
     {
-        if (($modus == 2) || ($modus == 4) || ($modus == 3)) {
-            return true;
-        }
-        return false;
+        return in_array($modus, self::$isDiscountModuses);
     }
 
     /**
