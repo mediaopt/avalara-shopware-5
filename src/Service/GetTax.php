@@ -3,7 +3,6 @@
 namespace Shopware\Plugins\MoptAvalara\Service;
 
 use Avalara\CreateTransactionModel;
-use Avalara\DocumentType;
 
 /**
  * Description of GetTax
