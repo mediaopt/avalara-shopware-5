@@ -14,14 +14,26 @@
                 table: 's_articles_attributes'
             });
             me.attributeForm.loadAttribute(me.get('moptAvalaraTaxcode'));
+            me.attributeForm.loadAttribute(me.get('moptAvalaraHccode'));
             return result;
         },
         getArticleMapping: function () {
-            return Ext.create('Ext.form.field.Text', {
-                fieldLabel: 'Avalara Taxcode',
-                name: 'attribute[moptAvalaraTaxcode]',
-                labelWidth: 155,
-                anchor: '100%'
+            var me = this;
+            return Ext.create('Ext.form.FieldSet', {
+                title: 'Avalara',
+                anchor: '100%',
+                defaults: me.defaults,
+                items: [{
+                        xtype: 'textfield',
+                        fieldLabel: 'Taxcode',
+                        name: 'attribute[moptAvalaraTaxcode]'
+                    },
+                    {
+                        xtype: 'textfield',
+                        fieldLabel: 'Harmonized Classification Code (hcCode)',
+                        name: 'attribute[moptAvalaraHccode]'
+                    }
+                ]
             });
         }
     });
