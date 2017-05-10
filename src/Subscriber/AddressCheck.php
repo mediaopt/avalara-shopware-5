@@ -5,7 +5,6 @@ namespace Shopware\Plugins\MoptAvalara\Subscriber;
 use Shopware\Plugins\MoptAvalara\Form\FormCreator;
 use Avalara\AddressLocationInfo;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\AddressFactory;
-use Shopware\Plugins\MoptAvalara\Form\FormCreator;
 
 /**
  * Description of Checkout
