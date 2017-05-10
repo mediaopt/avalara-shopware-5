@@ -27,6 +27,8 @@ class FormCreator {
     
     const DOC_COMMIT_ENABLED_FIELD = 'mopt_avalara__doc_commit_enabled';
     
+    const LANDEDCOST_ENABLED_FIELD = 'mopt_avalara__landedcost_enabled';
+    
     const ADDRESS_VALIDATION_COUNTRIES_FIELD = 'mopt_avalara_addressvalidation_countries';
     
     const LOG_LEVEL_FIELD = 'mopt_avalara_loglevel';
@@ -188,6 +190,11 @@ class FormCreator {
         $form->setElement('boolean', self::DOC_COMMIT_ENABLED_FIELD, [
             'label' => 'Enable document committing',
             'description' => 'Disable document committing will result that all calls will be done with DocType=SalesOrder and suppress any non-getTax calls(i.e.canceltax,postTax)',
+        ]);
+        
+        $form->setElement('boolean', self::LANDEDCOST_ENABLED_FIELD, [
+            'label' => 'Enable Avalara Landed cost calculation',
+            'description' => 'Choose, if you want to use the Avalara Landed cost calculation.',
         ]);
 
         $form->setElement('select', self::ADDRESS_VALIDATION_COUNTRIES_FIELD, [
@@ -382,6 +389,7 @@ class FormCreator {
             'mopt_avalara__fieldset__configuration',
             self::TAX_ENABLED_FIELD,
             self::DOC_COMMIT_ENABLED_FIELD,
+            self::LANDEDCOST_ENABLED_FIELD,
             self::ADDRESS_VALIDATION_COUNTRIES_FIELD,
             self::LOG_LEVEL_FIELD,
             self::LOG_ROTATION_DAYS_FIELD,
