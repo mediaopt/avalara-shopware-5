@@ -19,17 +19,7 @@ class TransactionModelFactoryFromOrder extends AbstractFactory
      *
      * @var float
      */
-    protected $discount;
-
-    /**
-     * 
-     * @param AdapterInterface $adapter
-     */
-    public function __construct(AdapterInterface $adapter)
-    {
-        parent::__construct($adapter);
-        $this->discount = 0.0;
-    }
+    protected $discount = 0.0;
     
     /**
      * 
