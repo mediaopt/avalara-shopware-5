@@ -79,17 +79,18 @@ class TransactionModelFactory extends AbstractFactory
         $positions = Shopware()->Modules()->Basket()->sGetBasket();
         
         foreach ($positions['content'] as $position) {
-            if (LineFactory::isDiscount($position['modus'])) {
-                if ($this->isDiscountGlobal($position)) {
-                    $this->discount -= floatval($position['netprice']);
-                }
-                else {
-                    $position['id'] = LineFactory::ARTICLEID__VOUCHER;
-                    $lines[] = $lineFactory->build($position);
-                }
-            } else {
+            if (!LineFactory::isDiscount($position['modus'])) {
                 $lines[] = $lineFactory->build($position);
+                continue;
             }
+            
+            if ($this->isDiscountGlobal($position)) {
+                $this->discount -= floatval($position['netprice']);
+                continue;
+            }
+            
+            $position['id'] = LineFactory::ARTICLEID__VOUCHER;
+            $lines[] = $lineFactory->build($position);
         }
 
         if ($shipment = $this->getShippingCharges()) {
