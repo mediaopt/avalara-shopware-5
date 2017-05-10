@@ -161,7 +161,6 @@ class AddressCheck extends AbstractSubscriber
         $formData = $args->getSubject()->View()->formData;
         $view->assign('sUserDataOld', $formData);
         foreach ($changes as $key => $value) {
-
             switch ($key) {
                 case 'city':
                     $formData['city'] = $value;
