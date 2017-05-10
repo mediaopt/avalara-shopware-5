@@ -44,6 +44,6 @@ class Shopware_Controllers_Backend_MoptAvalaraBackendProxy extends Shopware_Cont
         /* @var $adapter \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface */
         $adapter = Shopware()->Container()->get($serviceName);
         
-        return $adapter->getClient();
+        return $adapter->getAvaTaxClient();
     }
 }

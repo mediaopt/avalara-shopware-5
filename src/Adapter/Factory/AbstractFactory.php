@@ -42,7 +42,7 @@ abstract class AbstractFactory
      */
     public function getSdk()
     {
-        return $this->adapter->getClient();
+        return $this->adapter->getAvaTaxClient();
     }
 
     /**

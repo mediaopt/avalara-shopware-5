@@ -28,7 +28,7 @@ interface AdapterInterface
     /**
      * @return \Avalara\AvaTaxClient
      */
-    public function getClient();
+    public function getAvaTaxClient();
     
     /**
      * @param string $key

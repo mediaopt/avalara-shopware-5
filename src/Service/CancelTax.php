@@ -19,7 +19,7 @@ class CancelTax extends AbstractService
      */
     public function cancel($docCode, $cancelCode)
     {
-        $client = $this->getAdapter()->getClient();
+        $client = $this->getAdapter()->getAvaTaxClient();
         $companyCode = $this->getAdapter()->getPluginConfig(FormCreator::COMPANY_CODE_FIELD);
         
         $model = new VoidTransactionModel();

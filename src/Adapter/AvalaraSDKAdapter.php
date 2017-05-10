@@ -31,7 +31,7 @@ class AvalaraSDKAdapter implements AdapterInterface
      *
      * @var \Avalara\AvaTaxClient
      */
-    protected $client = null;
+    protected $avaTaxClient = null;
     
     /**
      *
@@ -90,10 +90,10 @@ class AvalaraSDKAdapter implements AdapterInterface
     /**
      * @return \Avalara\AvaTaxClient
      */
-    public function getClient()
+    public function getAvaTaxClient()
     {
-        if ($this->client !== null) {
-            return $this->client;
+        if ($this->avaTaxClient !== null) {
+            return $this->avaTaxClient;
         }
 
         $avaClient = new AvaTaxClient(
@@ -106,14 +106,14 @@ class AvalaraSDKAdapter implements AdapterInterface
         $accountNumber = $this->getPluginConfig(FormCreator::ACCOUNT_NUMBER_FIELD);
         $licenseKey = $this->getPluginConfig(FormCreator::LICENSE_KEY_FIELD);
         $avaClient->withSecurity($accountNumber, $licenseKey);
-        $this->client = $avaClient;
+        $this->avaTaxClient = $avaClient;
         
         // Attach a handler to log all requests
         $formatter = new Formatter($this->getFormatterTemplate());
         $subscriber = new LogSubscriber($this->getLogger(), $formatter);
         $avaClient->getHttpClient()->getEmitter()->attach($subscriber);
         
-        return $this->client;
+        return $this->avaTaxClient;
     }
     
     /**

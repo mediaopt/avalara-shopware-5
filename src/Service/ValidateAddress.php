@@ -27,7 +27,7 @@ class ValidateAddress extends AbstractService
      */
     public function validate(AddressLocationInfo $address)
     {
-        return $this->getAdapter()->getClient()->resolveAddressPost($address);
+        return $this->getAdapter()->getAvaTaxClient()->resolveAddressPost($address);
     }
 
     /**

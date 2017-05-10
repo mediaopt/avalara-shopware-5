@@ -24,7 +24,7 @@ class AdjustTransaction extends AbstractService
     public function adjustTransaction(CreateTransactionModel $model, $docCode)
     {
         $companyCode = $this->getAdapter()->getPluginConfig(FormCreator::COMPANY_CODE_FIELD);
-        $client = $this->getAdapter()->getClient();
+        $client = $this->getAdapter()->getAvaTaxClient();
         
         $adjustModel = new AdjustTransactionModel();
         $adjustModel->adjustmentReason = AdjustmentReason::C_OTHER;
