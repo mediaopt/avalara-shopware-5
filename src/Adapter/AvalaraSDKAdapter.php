@@ -19,7 +19,7 @@ class AvalaraSDKAdapter implements AdapterInterface
     
     const PRODUCTION_ENV = 'production';
     
-    const SENDBOX_ENV = 'sandbox';
+    const SANDBOX_ENV = 'sandbox';
     
     const MACHINE_NAME = 'localhost';
     
@@ -140,6 +140,19 @@ class AvalaraSDKAdapter implements AdapterInterface
     }
     
     /**
+     * 
+     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
+     */
+    public function getBootstrap()
+    {
+        if (!$bootstrap = Shopware()->Plugins()->Backend()->get(Shopware_Plugins_Backend_MoptAvalara_Bootstrap::PLUGIN_NAME)) {
+            throw new \Exception(Shopware_Plugins_Backend_MoptAvalara_Bootstrap::PLUGIN_NAME . ' is not enabled or installed.');
+        }
+        
+        return $bootstrap;
+    }
+    
+    /**
      * checks first, if module is available / installed
      * @param string $key
      * @return type
@@ -152,17 +165,17 @@ class AvalaraSDKAdapter implements AdapterInterface
         
         return null;
     }
-    
+
     /**
      * @return string
      */
     private function getSDKEnv()
     {
-        if ($env = $this->getPluginConfig(FormCreator::IS_LIVE_MODE_FIELD)) {
+        if ($this->getPluginConfig(FormCreator::IS_LIVE_MODE_FIELD)) {
             return self::PRODUCTION_ENV;
         }
         
-        return self::SENDBOX_ENV;
+        return self::SANDBOX_ENV;
     }
     
     /**
