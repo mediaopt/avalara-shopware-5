@@ -82,8 +82,7 @@ class FormCreator {
         }
         
         foreach ($json as $line) {
-            $iso = $line['code'];
-            $countries[] = [$iso, ucfirst(strtolower($line['name']))];
+            $countries[] = [$line['code'], ucfirst(strtolower($line['name']))];
         }
         
         usort($countries, function($a, $b) {
@@ -94,6 +93,36 @@ class FormCreator {
         });
         
         return $countries;
+    }
+    
+    /**
+     * Will return array of arrays ['iso', 'Region name']
+     * @param string $countryIso
+     * @return array
+     */
+    public function getRegionsISO($countryIso = null)
+    {
+        $regions = [];
+        $filePath = $this->bootstrap->Path() . 'Data/regions.json';
+        if (!$json = json_decode(file_get_contents($filePath), true)) {
+            return $regions;
+        }
+        
+        foreach ($json as $line) {
+            if ($countryIso && $line['countryCode'] != $countryIso) {
+                continue;
+            }
+            $regions[] = [$line['code'], ucfirst(strtolower($line['name']))];
+        }
+        
+        usort($regions, function($a, $b) {
+            return ($a[1] > $b[1])
+                ? 1
+                : -1
+            ;
+        });
+        
+        return $regions;
     }
     
     /**
