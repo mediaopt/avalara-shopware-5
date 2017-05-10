@@ -14,11 +14,22 @@ Ext.define('Shopware.apps.moptAvalara.Shipping.view.edit.default.FormLeft', {
     },
     getShippingMapping: function ()
     {
-        return Ext.create('Ext.form.field.Text', {
-            fieldLabel : 'Avalara Taxcode',
-            name : 'attribute[moptAvalaraTaxcode]',
-            labelWidth: 155,
-            anchor: '100%'
+        var me = this;
+        return Ext.create('Ext.form.FieldSet', {
+            title: 'Avalara',
+            anchor: '100%',
+            defaults: me.defaults,
+            items: [{
+                    xtype: 'textfield',
+                    fieldLabel: 'Taxcode',
+                    name: 'attribute[moptAvalaraTaxcode]'
+                },
+                {
+                    xtype: 'checkbox',
+                    fieldLabel: 'Express',
+                    name: 'attribute[moptAvalaraExpressShipping]'
+                }
+            ]
         });
     }
 });

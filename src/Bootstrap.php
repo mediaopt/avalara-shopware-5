@@ -245,6 +245,15 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
             'position' => 10,
             'custom' => true,
         ]);
+        $attributeCrudService->update('s_premium_dispatch_attributes', 'mopt_avalara_express_shipping', 'boolean', [
+            'label' => 'Express',
+            'supportText' => 'Shipping method. Can be used to determine applicable tax types',
+            'helpText' => '',
+            'translatable' => false,
+            'displayInBackend' => true,
+            'position' => 10,
+            'custom' => true,
+        ]);
         $attributeCrudService->update('s_emarketing_vouchers_attributes', 'mopt_avalara_taxcode', 'string', [
             'label' => 'Avalara Tax Code',
             'supportText' => 'Hier wird der Avalara Tax-Code für Gutscheine angegeben, der an Avalara übersendet wird.',
