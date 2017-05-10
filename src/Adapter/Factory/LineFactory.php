@@ -122,4 +122,19 @@ class LineFactory extends AbstractFactory
             self::MODUS_DISCOUNT,
         ]);
     }
+    
+    /**
+     * 
+     * @param array $position
+     * @return bool
+     */
+    protected static function isDiscountGlobal($position)
+    {
+        if ($position['modus'] != LineFactory::MODUS_VOUCHER) {
+           return true; 
+        }
+        $voucher = Shopware()->Models()->getRepository('\Shopware\Models\Voucher\Voucher')->find($position['articleID']);
+        
+        return !$voucher || !$voucher->getStrict();
+    }
 }

@@ -84,7 +84,7 @@ class TransactionModelFactory extends AbstractFactory
                 continue;
             }
             
-            if ($this->isDiscountGlobal($position)) {
+            if (LineFactory::isDiscountGlobal($position)) {
                 $this->discount -= floatval($position['netprice']);
                 continue;
             }
@@ -124,15 +124,5 @@ class TransactionModelFactory extends AbstractFactory
         $shippingItem['dispatchID'] = Shopware()->Session()->sOrderVariables['sDispatch']['id'];
         
         return $shippingItem;
-    }
-    
-    protected function isDiscountGlobal($position)
-    {
-        if ($position['modus'] != LineFactory::MODUS_VOUCHER) {
-           return true; 
-        }
-        $voucher = Shopware()->Models()->getRepository('\Shopware\Models\Voucher\Voucher')->find($position['articleID']);
-        
-        return !$voucher || !$voucher->getStrict();
     }
 }
