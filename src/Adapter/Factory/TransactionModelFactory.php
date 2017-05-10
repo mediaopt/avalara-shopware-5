@@ -106,22 +106,23 @@ class TransactionModelFactory extends AbstractFactory
      */
     protected function getShippingCharges()
     {
-        if (!empty(Shopware()->Session()->sOrderVariables['sBasket']['sShippingcostsWithTax'])) {
-            //create shipping item for compatibility reasons with line data
-            $shippingItem = [];
-            $shippingItem['id'] = LineFactory::ARTICLEID__SHIPPING;
-            $shippingItem['ean'] = '';
-            $shippingItem['quantity'] = 1;
-            //set grossprice as net => shipping will be transmitted as taxincluded = yes
-            $shippingItem['netprice'] = Shopware()->Session()->sOrderVariables['sBasket']['sShippingcostsNet'];
-            $shippingItem['brutprice'] = Shopware()->Session()->sOrderVariables['sBasket']['sShippingcostsWithTax'];
-            $shippingItem['articlename'] = 'Shipping';
-            $shippingItem['articleID'] = 0;
-            $shippingItem['dispatchID'] = Shopware()->Session()->sOrderVariables['sDispatch']['id'];
-            return $shippingItem;
-        } else {
+        if (empty(Shopware()->Session()->sOrderVariables['sBasket']['sShippingcostsWithTax'])) {
             return null;
         }
+        
+        //create shipping item for compatibility reasons with line data
+        $shippingItem = [];
+        $shippingItem['id'] = LineFactory::ARTICLEID__SHIPPING;
+        $shippingItem['ean'] = '';
+        $shippingItem['quantity'] = 1;
+        //set grossprice as net => shipping will be transmitted as taxincluded = yes
+        $shippingItem['netprice'] = Shopware()->Session()->sOrderVariables['sBasket']['sShippingcostsNet'];
+        $shippingItem['brutprice'] = Shopware()->Session()->sOrderVariables['sBasket']['sShippingcostsWithTax'];
+        $shippingItem['articlename'] = 'Shipping';
+        $shippingItem['articleID'] = 0;
+        $shippingItem['dispatchID'] = Shopware()->Session()->sOrderVariables['sDispatch']['id'];
+        
+        return $shippingItem;
     }
     
     protected function isDiscountGlobal($position)
