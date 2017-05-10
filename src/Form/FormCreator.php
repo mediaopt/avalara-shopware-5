@@ -60,6 +60,26 @@ class FormCreator {
     public function __construct(\Shopware_Plugins_Backend_MoptAvalara_Bootstrap $bootstrap) {
         $this->bootstrap = $bootstrap;
     }
+
+    /**
+     * 
+     * @return array
+     */
+    public function getCountriesISO()
+    {
+        $countries = [];
+        $filePath = $this->bootstrap->Path() . 'Data/countries.json';
+        if (!$json = json_decode(file_get_contents($filePath), true)) {
+            return $countries;
+        }
+        
+        foreach ($json as $line) {
+            $iso = $line['code'];
+            $countries[$iso] = ucfirst($line['name']);
+        }
+        
+        return $countries;
+    }
     
     /**
      * Will create all plugin config forms and fields
@@ -126,7 +146,8 @@ class FormCreator {
             'description' => 'Disable document committing will result that all calls will be done with DocType=SalesOrder and suppress any non-getTax calls(i.e.canceltax,postTax)',
         ]);
 
-        $form->setElement('select', self::ADDRESS_VALIDATION_COUNTRIES_FIELD, ['label' => 'Address-validation for following countries',
+        $form->setElement('select', self::ADDRESS_VALIDATION_COUNTRIES_FIELD, [
+            'label' => 'Address-validation for following countries',
             'description' => 'Choose the delivery countries, which should be covered by the Avalara Tax Calculation',
             'value' => 4,
             'store' => [
@@ -172,37 +193,38 @@ class FormCreator {
         ]);
 
         $form->setElement('text', self::ORIGIN_ADDRESS_LINE_1_FIELD, [
-            'label' => 'line1',
+            'label' => 'Line1',
             'required' => true,
         ]);
 
         $form->setElement('text', self::ORIGIN_ADDRESS_LINE_2_FIELD, [
-            'label' => 'line2',
+            'label' => 'Line2',
             'required' => true,
         ]);
 
         $form->setElement('text', self::ORIGIN_ADDRESS_LINE_3_FIELD, [
-            'label' => 'line3',
+            'label' => 'Line3',
             'required' => true,
         ]);
 
         $form->setElement('text', self::ORIGIN_POSTAL_CODE_FIELD, [
-            'label' => 'postal_code',
+            'label' => 'Postal code (zipcode)',
             'required' => true,
         ]);
 
-        $form->setElement('text', self::ORIGIN_CITY_FIELD, [
-            'label' => 'city',
+        $form->setElement('select', self::ORIGIN_COUNTRY_FIELD, [
+            'label' => 'Country (ISO 3166 country code)',
             'required' => true,
+            'store' => $this->getCountriesISO(),
         ]);
 
         $form->setElement('text', self::ORIGIN_REGION_FIELD, [
-            'label' => 'region',
+            'label' => 'Region (ISO 3166 region code)',
             'required' => true,
         ]);
-
-        $form->setElement('text', self::ORIGIN_COUNTRY_FIELD, [
-            'label' => 'country',
+        
+        $form->setElement('text', self::ORIGIN_CITY_FIELD, [
+            'label' => 'City',
             'required' => true,
         ]);
 
@@ -324,9 +346,9 @@ class FormCreator {
             self::ORIGIN_ADDRESS_LINE_2_FIELD,
             self::ORIGIN_ADDRESS_LINE_3_FIELD,
             self::ORIGIN_POSTAL_CODE_FIELD,
-            self::ORIGIN_CITY_FIELD,
-            self::ORIGIN_REGION_FIELD,
             self::ORIGIN_COUNTRY_FIELD,
+            self::ORIGIN_REGION_FIELD,
+            self::ORIGIN_CITY_FIELD,
             'mopt_avalara__fieldset__test',
             'mopt_avalara__license_check',
             'mopt_avalara__log',
