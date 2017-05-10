@@ -35,4 +35,10 @@ interface AdapterInterface
      * @return mixed
      */
     public function getPluginConfig($key);
+    
+    /**
+     * 
+     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
+     */
+    public function getBootstrap();
 }
