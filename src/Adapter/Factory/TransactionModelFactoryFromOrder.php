@@ -4,7 +4,6 @@ namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
 use Avalara\CreateTransactionModel;
 use Avalara\AddressesModel;
-use Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface;
 use Shopware\Models\Order\Order;
 use Shopware\Plugins\MoptAvalara\Form\FormCreator;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
@@ -131,6 +130,11 @@ class TransactionModelFactoryFromOrder extends AbstractFactory
         return $shippingItem;
     }
 
+    /**
+     * 
+     * @param \Shopware\Models\Order\Detail $detail
+     * @return array
+     */
     protected function convertOrderDetailToLineData(\Shopware\Models\Order\Detail $detail)
     {
         $lineData = [];

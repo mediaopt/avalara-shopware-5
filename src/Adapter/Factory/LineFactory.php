@@ -52,7 +52,7 @@ class LineFactory extends AbstractFactory
     protected function getParamTaxCode($lineData)
     {
         $articleId = $lineData['articleID'];
-        if ($lineData['modus'] == self::MODUS_VOUCHER){
+        if (self::MODUS_VOUCHER == $lineData['modus']){
             $voucherRepository = Shopware()
                 ->Models()
                 ->getRepository('\Shopware\Models\Voucher\Voucher')
@@ -64,8 +64,9 @@ class LineFactory extends AbstractFactory
         //shipping could have his own TaxCode
         if ($this->isShipping($lineData)) {
             $dispatchobject = Shopware()->Models()->getRepository('Shopware\Models\Dispatch\Dispatch')->find($lineData['dispatchID']);
-            if ($dispatchobject->getAttribute()) {
-                $taxCode = $dispatchobject->getAttribute()->getMoptAvalaraTaxcode();
+            if ($attr = $dispatchobject->getAttribute()) {
+                $taxCode = $attr->getMoptAvalaraTaxcode();
+                
                 return $taxCode;
             }
         }
@@ -100,13 +101,13 @@ class LineFactory extends AbstractFactory
 
     protected function isShipping($lineData)
     {
-        return $lineData['id'] == self::ARTICLEID__SHIPPING;
+        return self::ARTICLEID__SHIPPING == $lineData['id'];
     }
 
     protected function isNeitherVoucherNorShipping($lineData)
     {
         //voucher has modus 2
-        return $lineData['modus'] !== self::MODUS_VOUCHER && !$this->isShipping($lineData);
+        return self::MODUS_VOUCHER !== $lineData['modus'] && !$this->isShipping($lineData);
     }
     
     /**
