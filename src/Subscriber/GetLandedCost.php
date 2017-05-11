@@ -109,7 +109,9 @@ class GetLandedCost extends AbstractSubscriber
         if (!$landedCostEnabled) {
             return false;
         }
-
+        if (empty($model->items)) {
+            return false;
+        }
 
         /* @var $session Enlight_Components_Session_Namespace */
         $session = Shopware()->Session();
