@@ -85,7 +85,7 @@ class LandedCostCalculateRequestFactory extends AbstractFactory
      * @return Source
      */
     private function getShippingModel() {
-        if (empty(Shopware()->Session()->sOrderVariables['sBasket']['sShippingcostsWithTax'])) {
+        if (empty(Shopware()->Session()->sOrderVariables['sBasket']['sShippingcostsNet'])) {
             return null;
         }
         
