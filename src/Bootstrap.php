@@ -173,6 +173,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
         $subscribers = [];
         $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\AddressCheck($this);
         $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\Templating($this);
+        $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\GetLandedCost($this);
         $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\GetTax($this);
         $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\AdjustTax($this);
 
@@ -271,19 +272,19 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
     {
         $attributeCrudService = $this->getCrudService();
         
-        $attributeCrudService->update('s_categories_attributes', 'mopt_avalara_hccode', 'string', [
-            'label' => 'Avalara Harmonized Classification Code (hcCode)',
-            'supportText' => 'Hier wird der Avalara Harmonized Classification Code (hcCode) der Kategorie angegeben, der an Avalara übersendet wird.',
+        $attributeCrudService->update('s_categories_attributes', 'mopt_avalara_hscode', 'string', [
+            'label' => 'Avalara Harmonized Classification Code (hsCode)',
+            'supportText' => 'Hier wird der Avalara Harmonized Classification Code (hsCode) der Kategorie angegeben, der an Avalara übersendet wird.',
             'helpText' => '',
             'translatable' => false,
             'displayInBackend' => true,
             'position' => 10,
             'custom' => true,
         ]);
-        
-        $attributeCrudService->update('s_articles_attributes', 'mopt_avalara_hccode', 'string', [
-            'label' => 'Avalara Harmonized Classification Code (hcCode)',
-            'supportText' => 'Hier wird der Avalara Harmonized Classification Code (hcCode) des Artikel angegeben, der an Avalara übersendet wird.',
+
+        $attributeCrudService->update('s_articles_attributes', 'mopt_avalara_hscode', 'string', [
+            'label' => 'Avalara Harmonized Classification Code (hsCode)',
+            'supportText' => 'Hier wird der Avalara Harmonized Classification Code (hsCode) des Artikel angegeben, der an Avalara übersendet wird.',
             'helpText' => '',
             'translatable' => false,
             'displayInBackend' => true,
