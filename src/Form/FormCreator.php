@@ -68,11 +68,11 @@ class FormCreator {
     
     const DELIVERY_COUNTRY_USA_AND_CANADA = 4;
     
-    const INCOTERMS_DAP = 1;
-    const INCOTERMS_DDP = 2;
+    const INCOTERMS_DAP = 'DAP';
+    const INCOTERMS_DDP = 'DDP';
     
-    const TRANSACTION_TYPE_B2B = 1;
-    const TRANSACTION_TYPE_B2C = 2;
+    const TRANSACTION_TYPE_B2B = 'B2B';
+    const TRANSACTION_TYPE_B2C = 'B2C';
     
     /**
      *
