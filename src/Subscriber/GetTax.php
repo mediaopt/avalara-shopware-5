@@ -41,7 +41,7 @@ class GetTax extends AbstractSubscriber
         /* @var $session Enlight_Components_Session_Namespace */
         $session = Shopware()->Session();
         $adapter = $this->getAdapter();
-        
+
         /* @var $model \Avalara\CreateTransactionModel */
         $model = $adapter->getFactory('TransactionModelFactory')->build(
             DocumentType::C_SALESORDER,
@@ -312,20 +312,9 @@ class GetTax extends AbstractSubscriber
     
     /**
      * 
-     * @param \stdClass $object
-     * @return array
+     * @param \Enlight_Hook_HookArgs $args
+     * @return void
      */
-    private function objectToArray($object) {
-        $data = (array)$object;
-        foreach ($data as $key => $value) {
-            if (is_object($value) || is_array($value)) {
-                $data[$key] = $this->objectToArray($value);
-            }
-        }
-        
-        return $data;
-    }
-
     public function onAfterAdminGetPremiumDispatch(\Enlight_Hook_HookArgs $args)
     {
         $return = $args->getReturn();
@@ -374,6 +363,11 @@ class GetTax extends AbstractSubscriber
         $config['sTAXAUTOMODE'] = false;
     }
     
+    /**
+     * 
+     * @param \Enlight_Hook_HookArgs $args
+     * @return void
+     */
     public function onBeforeBasketSAddVoucher(\Enlight_Hook_HookArgs $args)
     {
         /* @var $session Enlight_Components_Session_Namespace */
