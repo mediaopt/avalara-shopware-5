@@ -4,8 +4,53 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "32a9203ec4000a38a72a0ef16f6a7f3f",
+    "content-hash": "a11051c4ec5b5c64c7f9e43a361bd67f",
     "packages": [
+        {
+            "name": "apimatic/jsonmapper",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/apimatic/jsonmapper.git",
+                "reference": "6925ede91d6a85a886d8e00819fe53e439d6e4c2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/apimatic/jsonmapper/zipball/6925ede91d6a85a886d8e00819fe53e439d6e4c2",
+                "reference": "6925ede91d6a85a886d8e00819fe53e439d6e4c2",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.2.*",
+                "squizlabs/php_codesniffer": "~1.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "apimatic\\jsonmapper\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "OSL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Christian Weiske",
+                    "email": "christian.weiske@netresearch.de",
+                    "homepage": "http://www.netresearch.de/",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Mehdi Jaffery",
+                    "email": "mehdi.jaffery@apimatic.io",
+                    "homepage": "http://apimatic.io/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Map nested JSON structures onto PHP classes",
+            "time": "2017-01-24T12:48:47+00:00"
+        },
         {
             "name": "avalara/avataxclient",
             "version": "dev-master",
@@ -72,6 +117,55 @@
                 "issues": "https://github.com/avadev/AvaTax-REST-V2-PHP-SDK/issues"
             },
             "time": "2017-05-04 10:56:40"
+        },
+        {
+            "name": "bubnov-mikhail/landedcostcalculationapi",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bubnov-mikhail/landedcostcalculationapi.git",
+                "reference": "ccc69698786567112c12ba6efceba3b63eb7a290"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bubnov-mikhail/landedcostcalculationapi/zipball/ccc69698786567112c12ba6efceba3b63eb7a290",
+                "reference": "ccc69698786567112c12ba6efceba3b63eb7a290",
+                "shasum": ""
+            },
+            "require": {
+                "apimatic/jsonmapper": "~1.0.0",
+                "ext-curl": "*",
+                "ext-json": "*",
+                "ext-mbstring": "*",
+                "mashape/unirest-php": "~3.0.1",
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "LandedCostCalculationAPILib\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mehdi Jaffery",
+                    "email": "mehdi.jaffery@apimatic.io",
+                    "homepage": "https://github.com/apimatic",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Landed Cost API providing duty rates, calculation, and item harmonization. A set of sample requests are available as a [Postman Collection](https://www.getpostman.com/collections/ad308f6c9351a18c2c12). ## Basics ### Timestamps Timestamps should be formatted using ISO-8601 to the nearest second, in UTC e.g `2015-06-12T09:17:37Z` ### Expiries All Requests will have an associated timestamp. The validity for any request is 1 minute to account for any clock-skew.  ## Authorization All API requests require an http header that contains your account ID and your account API Key. During account provisioning, you will be issued an API Key which you must supply with every request. ### Authorization Header To make an authorized API request, set the following HTTP header:  `authorization: avalaraapikey id:<accountId> key:<apiKey>`",
+            "homepage": "https://apimatic.io",
+            "keywords": [
+                "LandedCost Calculation API",
+                "api",
+                "sdk"
+            ],
+            "time": "2017-05-11T06:53:47+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -278,6 +372,52 @@
                 "stream"
             ],
             "time": "2014-10-12T19:18:40+00:00"
+        },
+        {
+            "name": "mashape/unirest-php",
+            "version": "v3.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Mashape/unirest-php.git",
+                "reference": "842c0f242dfaaf85f16b72e217bf7f7c19ab12cb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Mashape/unirest-php/zipball/842c0f242dfaaf85f16b72e217bf7f7c19ab12cb",
+                "reference": "842c0f242dfaaf85f16b72e217bf7f7c19ab12cb",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "codeclimate/php-test-reporter": "0.1.*",
+                "phpunit/phpunit": "~4.4"
+            },
+            "suggest": {
+                "ext-json": "Allows using JSON Bodies for sending and parsing requests"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Unirest\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Unirest PHP",
+            "homepage": "https://github.com/Mashape/unirest-php",
+            "keywords": [
+                "client",
+                "curl",
+                "http",
+                "https",
+                "rest"
+            ],
+            "time": "2016-08-11T17:49:21+00:00"
         },
         {
             "name": "monolog/monolog",

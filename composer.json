@@ -8,7 +8,8 @@
     "require": {
         "monolog/monolog": "1.12.*",
         "guzzlehttp/log-subscriber": "~1.0",
-        "avalara/avataxclient": "dev-master as 2.17"
+        "avalara/avataxclient": "dev-master as 2.17",
+        "bubnov-mikhail/landedcostcalculationapi": "~1.0"
     },
     "repositories": [
         {

@@ -8,10 +8,14 @@ use Shopware\Plugins\MoptAvalara\Logger\Formatter;
 use Shopware\Plugins\MoptAvalara\Logger\LogSubscriber;
 use Shopware\Plugins\MoptAvalara\Form\FormCreator;
 use Avalara\AvaTaxClient;
+use LandedCostCalculationAPILib\LandedCostCalculationAPIClient;
+use LandedCostCalculationAPILib\Controllers\BaseController;
+use LandedCostCalculationAPILib\Http\HttpCallBack;
+use LandedCostCalculationAPILib\Http\HttpRequest;
+use LandedCostCalculationAPILib\Http\HttpContext;
 
 /**
- * Description of Main
- *
+ * This is the adaptor for avalara's API
  */
 class AvalaraSDKAdapter implements AdapterInterface
 {
@@ -26,12 +30,20 @@ class AvalaraSDKAdapter implements AdapterInterface
     const SEVICES_NAMESPACE = '\Shopware\Plugins\MoptAvalara\Service\\';
     
     const FACTORY_NAMESPACE = '\Shopware\Plugins\MoptAvalara\Adapter\Factory\\';
+    
+    const LANDED_COST_LOG_FORMAT = '>>>>>>>> %s %s %s %s <<<<<<<< %s %s %s';
 
     /**
      *
      * @var \Avalara\AvaTaxClient
      */
     protected $avaTaxClient = null;
+    
+    /**
+     *
+     * @var \LandedCostCalculationAPILib\Controllers\LandedCostCalculationAPIController
+     */
+    protected $avaLandedCostController = null;
     
     /**
      *
@@ -114,6 +126,95 @@ class AvalaraSDKAdapter implements AdapterInterface
         $avaClient->getHttpClient()->getEmitter()->attach($subscriber);
         
         return $this->avaTaxClient;
+    }
+    
+    /**
+     * @return \LandedCostCalculationAPILib\Controllers\LandedCostCalculationAPIController
+     */
+    public function getAvaLandedCostController()
+    {
+        if ($this->avaLandedCostController !== null) {
+            return $this->avaLandedCostController;
+        }
+
+        $avaLandedCostClient = new LandedCostCalculationAPIClient();
+        $avaLandedCostController = $avaLandedCostClient->getLandedCostCalculationAPI();
+        $this->setCallbackForLandedCostController($avaLandedCostController);
+        
+        $this->avaLandedCostController = $avaLandedCostController;
+
+        return $this->avaLandedCostController;
+    }
+    
+    /**
+     * 
+     * @param BaseController $controller
+     * @return \Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter
+     */
+    private function setCallbackForLandedCostController(BaseController $controller)
+    {
+        $httpCallBack = new HttpCallBack();
+        $httpCallBack->setOnBeforeRequest([$this, 'onBeforeRequest']);
+        $httpCallBack->setOnAfterRequest([$this, 'onAfterRequest']);
+        $controller->setHttpCallBack($httpCallBack);
+
+        return $this;
+    }
+    
+    /**
+     * Will setup auth headers
+     * @param HttpRequest $httpRequest
+     * @return null
+     */
+    private function onBeforeRequest(HttpRequest $httpRequest) {
+        $accountNumber = $this->getPluginConfig(FormCreator::ACCOUNT_NUMBER_FIELD);
+        $licenseKey = $this->getPluginConfig(FormCreator::LICENSE_KEY_FIELD);
+        
+        $headers = $httpRequest->getHeaders();
+        $headers['authorization'] = 'avalaraapikey id:' . $accountNumber . ' key:' . $licenseKey;
+        $httpRequest->setHeaders($headers);
+        
+        return null;
+    }
+    
+    /**
+     * Will log response
+     * @param HttpContext $httpContext
+     * @return null
+     */
+    private function onAfterRequest(HttpContext $httpContext) {
+        $this->logResponse($httpContext);
+        
+        return null;
+    }
+    
+    /**
+     * Will log response
+     * @param HttpContext $httpContext
+     * @return null
+     */
+    private function logResponse(HttpContext $httpContext) {
+        $request = $httpContext->getRequest();
+        $response = $httpContext->getResponse();
+        
+        $message = sprintf(
+            self::LANDED_COST_LOG_FORMAT, 
+            $request->getMethod(),
+            $request->getQueryUrl(),
+            json_encode($request->getHeaders()),
+            json_encode($request->getParameters()),
+            $response->getStatusCode(),
+            json_encode($response->getHeaders()),
+            $response->getRawBody()
+        );
+        
+        if (200 === $response->getStatusCode()) {
+            $this->getLogger()->info($message);
+            return null;
+        }
+        $this->getLogger()->critical($message);
+        
+        return null;
     }
     
     /**
