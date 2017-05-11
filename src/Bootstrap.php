@@ -311,6 +311,26 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
             'custom' => true,
         ]);
         
+        $attributeCrudService->update('s_order_attributes', 'mopt_avalara_incoterms', 'string', [
+            'displayInBackend' => false,
+            'custom' => true,
+        ]);
+        
+        $attributeCrudService->update('s_order_attributes', 'mopt_avalara_insured', 'boolean', [
+            'displayInBackend' => false,
+            'custom' => true,
+        ]);
+        
+        $attributeCrudService->update('s_order_attributes', 'mopt_avalara_express_shipping', 'boolean', [
+            'displayInBackend' => false,
+            'custom' => true,
+        ]);
+        
+        $attributeCrudService->update('s_order_attributes', 'mopt_avalara_express_landedcost', 'string', [
+            'displayInBackend' => false,
+            'custom' => true,
+        ]);
+        
         return $this;
     }
     
