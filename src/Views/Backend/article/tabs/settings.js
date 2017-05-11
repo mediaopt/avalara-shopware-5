@@ -14,7 +14,7 @@
                 table: 's_articles_attributes'
             });
             me.attributeForm.loadAttribute(me.get('moptAvalaraTaxcode'));
-            me.attributeForm.loadAttribute(me.get('moptAvalaraHccode'));
+            me.attributeForm.loadAttribute(me.get('moptAvalaraHscode'));
             return result;
         },
         getArticleMapping: function () {
@@ -30,8 +30,8 @@
                     },
                     {
                         xtype: 'textfield',
-                        fieldLabel: 'Harmonized Classification Code (hcCode)',
-                        name: 'attribute[moptAvalaraHccode]'
+                        fieldLabel: 'Harmonized Classification Code (hsCode)',
+                        name: 'attribute[moptAvalaraHscode]'
                     }
                 ]
             });

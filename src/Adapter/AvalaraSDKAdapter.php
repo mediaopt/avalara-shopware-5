@@ -31,7 +31,7 @@ class AvalaraSDKAdapter implements AdapterInterface
     
     const FACTORY_NAMESPACE = '\Shopware\Plugins\MoptAvalara\Adapter\Factory\\';
     
-    const LANDED_COST_LOG_FORMAT = '>>>>>>>> %s %s %s %s <<<<<<<< %s %s %s';
+    const LANDED_COST_LOG_FORMAT = '>>>>>>>> %s %s %s <<<<<<<< %s %s %s';
 
     /**
      *
@@ -166,7 +166,7 @@ class AvalaraSDKAdapter implements AdapterInterface
      * @param HttpRequest $httpRequest
      * @return null
      */
-    private function onBeforeRequest(HttpRequest $httpRequest) {
+    public function onBeforeRequest(HttpRequest $httpRequest) {
         $accountNumber = $this->getPluginConfig(FormCreator::ACCOUNT_NUMBER_FIELD);
         $licenseKey = $this->getPluginConfig(FormCreator::LICENSE_KEY_FIELD);
         
@@ -182,7 +182,7 @@ class AvalaraSDKAdapter implements AdapterInterface
      * @param HttpContext $httpContext
      * @return null
      */
-    private function onAfterRequest(HttpContext $httpContext) {
+    public function onAfterRequest(HttpContext $httpContext) {
         $this->logResponse($httpContext);
         
         return null;
@@ -196,13 +196,12 @@ class AvalaraSDKAdapter implements AdapterInterface
     private function logResponse(HttpContext $httpContext) {
         $request = $httpContext->getRequest();
         $response = $httpContext->getResponse();
-        
+
         $message = sprintf(
-            self::LANDED_COST_LOG_FORMAT, 
-            $request->getMethod(),
+            self::LANDED_COST_LOG_FORMAT,
+            $request->getHttpMethod(),
             $request->getQueryUrl(),
             json_encode($request->getHeaders()),
-            json_encode($request->getParameters()),
             $response->getStatusCode(),
             json_encode($response->getHeaders()),
             $response->getRawBody()

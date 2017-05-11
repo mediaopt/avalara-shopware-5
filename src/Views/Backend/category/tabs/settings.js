@@ -25,8 +25,8 @@ Ext.define('Shopware.apps.moptAvalara.Category.view.category.tabs.settings', {
                 },
                 {
                     xtype: 'textfield',
-                    fieldLabel: 'Harmonized Classification Code (hcCode)',
-                    name: 'attribute[moptAvalaraHccode]'
+                    fieldLabel: 'Harmonized Classification Code (hsCode)',
+                    name: 'attribute[moptAvalaraHscode]'
                 }
             ]
         });

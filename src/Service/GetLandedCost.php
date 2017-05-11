@@ -2,8 +2,6 @@
 
 namespace Shopware\Plugins\MoptAvalara\Service;
 
-use LandedCostCalculationAPILib\Models\CalculateRequest;
-
 /**
  * Description of GetLandedCost
  *
@@ -12,10 +10,10 @@ class GetLandedCost extends AbstractService
 {
     /**
      * 
-     * @param CalculateRequest $request
+     * @param \LandedCostCalculationAPILib\Models\CalculateRequest $request
      * @return \stdClass
      */
-    public function calculate(CalculateRequest $request)
+    public function calculate($request)
     {
         $controller = $this
             ->getAdapter()
