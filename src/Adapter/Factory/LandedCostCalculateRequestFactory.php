@@ -94,8 +94,7 @@ class LandedCostCalculateRequestFactory extends AbstractFactory
         $shipping->express = false;
         $shipping->insurance = 0;
         
-        //Shopware()->Session()->sOrderVariables['sBasket']['sShippingcostsNet'];
-        $shipping->cost = (float)Shopware()->Session()->sOrderVariables['sBasket']['sShippingcostsWithTax'];
+        $shipping->cost = (float)Shopware()->Session()->sOrderVariables['sBasket']['sShippingcostsNet'];
         
         if ($attr = $this->getDispatchFromBasket()->getAttribute()) {
             $shipping->express = (bool)$attr->getMoptAvalaraExpressShipping();
