@@ -15,8 +15,10 @@ class LineFactory extends AbstractFactory
     const MODUS_BASKET_DISCOUNT = 3;
     const MODUS_DISCOUNT = 4;
     
-    const ARTICLEID__SHIPPING = 'shipping';
-    const ARTICLEID__VOUCHER = 'voucher';
+    const ARTICLEID_SHIPPING = 'shipping';
+    const TAXCODE_SHIPPING = 'FR010000';
+    const TAXCODE_INSUEANCE = 'FR070100';
+    const ARTICLEID_VOUCHER = 'voucher';
 
     /**
      * build Line-model based on passed in lineData
@@ -101,7 +103,7 @@ class LineFactory extends AbstractFactory
 
     protected function isShipping($lineData)
     {
-        return self::ARTICLEID__SHIPPING == $lineData['id'];
+        return self::ARTICLEID_SHIPPING == $lineData['id'];
     }
 
     protected function isNeitherVoucherNorShipping($lineData)
