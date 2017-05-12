@@ -196,7 +196,7 @@ class GetTax extends AbstractSubscriber
 
         /* @var $model \Avalara\CreateTransactionModel */
         $model = $adapter->getFactory('TransactionModelFactory')->build(
-            DocumentType::C_SALESINVOICE, 
+            DocumentType::C_SALESORDER, 
             true
         );
         
@@ -293,20 +293,25 @@ class GetTax extends AbstractSubscriber
     protected function getHashFromRequest(CreateTransactionModel $model)
     {
         $data = $this->objectToArray($model);
-
+        $itemCodeToBeRemoved = [
+            LineFactory::ARTICLEID_INSURANCE,
+            LineFactory::ARTICLEID_SHIPPING,
+        ];
+        
         unset($data['type']);
         unset($data['commit']);
 
         foreach ($data['lines'] as $key => $line) {
+            //remove shipping costs (shipping information is not in session on first getTax call)
+            if (in_array($line['itemCode'], $itemCodeToBeRemoved)) {
+                unset($data['lines'][$key]);
+                continue;
+            }
             unset($data['lines'][$key]['itemCode']);
             unset($data['lines'][$key]['amount']);
-
-            //remove shipping costs (shipping information is not in session on first getTax call)
-            if ($line['itemCode'] == 'shipping') {
-                unset($data['lines'][$key]);
-            }
         }
         $this->getAdapter()->getLogger()->debug(json_encode($data));
+        
         return md5(json_encode($data));
     }
     
