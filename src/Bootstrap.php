@@ -175,6 +175,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
         $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\Templating($this);
         $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\GetTax($this);
         $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\AdjustTax($this);
+        $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\Incoterms($this);
 
         foreach ($subscribers as $subscriber) {
             $this->Application()->Events()->addSubscriber($subscriber);
@@ -250,6 +251,13 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
             'custom' => true,
         ]);
         
+        $this->refreshAttributeModels([
+            's_categories_attributes',
+            's_articles_attributes',
+            's_user_attributes',
+            's_order_attributes',
+            's_emarketing_vouchers_attributes',
+        ]);
         return $this;
     }
     
@@ -350,6 +358,14 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
             'custom' => true,
         ]);
         
+        $this->refreshAttributeModels([
+            's_premium_dispatch_attributes',
+            's_categories_attributes',
+            's_articles_attributes',
+            's_core_countries_attributes',
+            's_order_attributes,'
+        ]);
+        
         return $this;
     }
     
@@ -371,5 +387,17 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
         $formCreator->createForms();
         
         return $this;
+    }
+    
+    /**
+     * 
+     * @param array $tables
+     */
+    private function refreshAttributeModels($tables = [])
+    {
+        $metaDataCacheDoctrine = Shopware()->Models()->getConfiguration()->getMetadataCacheImpl();
+        $metaDataCacheDoctrine->deleteAll();
+
+        Shopware()->Models()->generateAttributeModels($tables);
     }
 }
