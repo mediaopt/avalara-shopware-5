@@ -1,6 +1,6 @@
 {extends file="parent:frontend/checkout/confirm.tpl"}
 
-{block name='frontend_checkout_confirm_left_payment_method'}
+{block name='frontend_checkout_confirm_left_shipping_method'}
     {$smarty.block.parent}
     {if $MoptAvalaraLandedCost}
         <p class="payment--method-info">
