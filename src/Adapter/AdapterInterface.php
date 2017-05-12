@@ -29,12 +29,7 @@ interface AdapterInterface
      * @return \Avalara\AvaTaxClient
      */
     public function getAvaTaxClient();
-    
-    /**
-     * @return \LandedCostCalculationAPILib\Controllers\LandedCostCalculationAPIController
-     */
-    public function getAvaLandedCostController();
-    
+
     /**
      * @param string $key
      * @return mixed
