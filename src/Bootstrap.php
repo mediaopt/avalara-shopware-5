@@ -236,15 +236,6 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
             'displayInBackend' => false,
             'custom' => true,
         ]);
-        $attributeCrudService->update('s_premium_dispatch_attributes', 'mopt_avalara_taxcode', 'string', [
-            'label' => 'Avalara Tax Code',
-            'supportText' => 'Hier wird der Avalara Tax-Code für den Versand angegeben, der an Avalara übersendet wird.',
-            'helpText' => '',
-            'translatable' => false,
-            'displayInBackend' => true,
-            'position' => 10,
-            'custom' => true,
-        ]);
         $attributeCrudService->update('s_emarketing_vouchers_attributes', 'mopt_avalara_taxcode', 'string', [
             'label' => 'Avalara Tax Code',
             'supportText' => 'Hier wird der Avalara Tax-Code für Gutscheine angegeben, der an Avalara übersendet wird.',
@@ -270,6 +261,20 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
     private function addAttributes_2_0_0()
     {
         $attributeCrudService = $this->getCrudService();
+        
+        $attributeCrudService->update('s_premium_dispatch_attributes', 'mopt_avalara_taxcode', 'string', [
+            'label' => 'Avalara Tax Code',
+            'supportText' => 'Hier wird der Avalara Tax-Code für den Versand angegeben, der an Avalara übersendet wird.',
+            'helpText' => '',
+            'translatable' => false,
+            'displayInBackend' => true,
+            'position' => 10,
+            'custom' => true,
+            ], 
+            null, 
+            false, 
+            \Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory::TAXCODE_SHIPPING
+        );
         
         $attributeCrudService->update('s_categories_attributes', 'mopt_avalara_hscode', 'string', [
             'label' => 'Avalara Harmonized Classification Code (hsCode)',
@@ -310,6 +315,20 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
             'position' => 10,
             'custom' => true,
         ]);
+        
+        $attributeCrudService->update('s_core_countries_attributes', 'mopt_avalara_incoterms', 'string', [
+            'label' => 'Incoterms for Landed cost',
+            'supportText' => 'Terms of sale. Used to determine buyer obligations for a landed cost.',
+            'helpText' => '',
+            'translatable' => false,
+            'displayInBackend' => true,
+            'position' => 10,
+            'custom' => true,
+            ], 
+            null, 
+            false, 
+            \Shopware\Plugins\MoptAvalara\Form\FormCreator::INCOTERMS_DEFAULT
+        );
         
         $attributeCrudService->update('s_order_attributes', 'mopt_avalara_incoterms', 'string', [
             'displayInBackend' => false,
