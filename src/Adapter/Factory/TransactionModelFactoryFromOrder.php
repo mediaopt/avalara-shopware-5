@@ -94,7 +94,7 @@ class TransactionModelFactoryFromOrder extends AbstractFactory
                 continue;
             }
             
-            $position['id'] = LineFactory::ARTICLEID__VOUCHER;
+            $position['id'] = LineFactory::ARTICLEID_VOUCHER;
             $lines[] = $lineFactory->build($position);
         }
 
@@ -118,7 +118,7 @@ class TransactionModelFactoryFromOrder extends AbstractFactory
         
         //create shipping item for compatibility reasons with line data
         $shippingItem = [];
-        $shippingItem['id'] = LineFactory::ARTICLEID__SHIPPING;
+        $shippingItem['id'] = LineFactory::ARTICLEID_SHIPPING;
         $shippingItem['ean'] = '';
         $shippingItem['quantity'] = 1;
         $shippingItem['netprice'] = $order->getInvoiceShippingNet();

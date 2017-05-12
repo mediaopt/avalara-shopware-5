@@ -328,7 +328,7 @@ class GetTax extends AbstractSubscriber
 
         /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
         $service = $this->getAdapter()->getService('GetTax');
-        $taxRate = $service->getTaxRateForOrderBasketId(LineFactory::ARTICLEID__SHIPPING, $session->MoptAvalaraGetTaxResult);
+        $taxRate = $service->getTaxRateForOrderBasketId(LineFactory::ARTICLEID_SHIPPING, $session->MoptAvalaraGetTaxResult);
         
         if(!$taxRate) {
             return;
@@ -398,7 +398,7 @@ class GetTax extends AbstractSubscriber
         //get tax rate for voucher
         /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
         $service = $this->getAdapter()->getService('GetTax');
-        $taxRate = $service->getTaxRateForOrderBasketId(LineFactory::ARTICLEID__VOUCHER, $session->MoptAvalaraGetTaxResult);
+        $taxRate = $service->getTaxRateForOrderBasketId(LineFactory::ARTICLEID_VOUCHER, $session->MoptAvalaraGetTaxResult);
         
         $config = Shopware()->Config();
         $config['sVOUCHERTAX'] = $taxRate;
