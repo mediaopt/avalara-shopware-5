@@ -163,4 +163,18 @@ class AddressFactory extends AbstractFactory
         
         return $this;
     }
+    
+    /**
+     * 
+     * @param int $id
+     * @return \Shopware\Models\Country\Country
+     */
+    public function getDeliveryCountry($id)
+    {
+        return Shopware()
+            ->Models()
+            ->getRepository('\Shopware\Models\Country\Country')
+            ->find($id)
+        ;
+    }
 }
