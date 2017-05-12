@@ -68,7 +68,9 @@ class FormCreator {
     
     const INCOTERMS_DEFAULT = 'Use default';
     const INCOTERMS_DAP = 'DAP';
+    const INCOTERMS_DAP_LABEL = 'Delivered at Place (DAP)';
     const INCOTERMS_DDP = 'DDP';
+    const INCOTERMS_DDP_LABEL = 'Delivered Duty Paid (DDP)';
     
     /**
      *
@@ -215,8 +217,8 @@ class FormCreator {
             'description' => 'Terms of sale. Used to determine buyer obligations for a landed cost.',
             'value' => self::INCOTERMS_DAP,
             'store' => [
-                [self::INCOTERMS_DAP, 'Delivered at Place (DAP)'],
-                [self::INCOTERMS_DDP, 'Delivered Duty Paid (DDP)'],
+                [self::INCOTERMS_DAP, self::INCOTERMS_DAP_LABEL],
+                [self::INCOTERMS_DDP, self::INCOTERMS_DDP_LABEL],
             ],
         ]);
         

@@ -1,5 +1,9 @@
 <?php
-error_reporting( E_ALL );
+
+use Shopware\Plugins\MoptAvalara\Form\FormCreator;
+use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
+use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
+
 /**
  * this class configures:
  * installment, uninstallment, updates, hooks, events, payment methods
@@ -121,7 +125,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
         require_once $this->Path() . 'vendor/autoload.php';
         // @TODO remove this require after avalara will fix autoloading
         require_once $this->Path() . 'vendor/avalara/avataxclient/src/AvaTaxClient.php';
-        $serviceName = \Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter::SERVICE_NAME;
+        $serviceName = AvalaraSDKAdapter::SERVICE_NAME;
         Shopware()->Container()->set($serviceName, $this->createAvalaraSdkAdapter());
         
         //add snippets
@@ -134,7 +138,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
      */
     private function createAvalaraSdkAdapter()
     {
-        return new \Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter($this->getName(), $this->getVersion());
+        return new AvalaraSDKAdapter($this->getName(), $this->getVersion());
     }
     
     /**
@@ -175,7 +179,6 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
         $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\Templating($this);
         $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\GetTax($this);
         $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\AdjustTax($this);
-        $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\Incoterms($this);
 
         foreach ($subscribers as $subscriber) {
             $this->Application()->Events()->addSubscriber($subscriber);
@@ -281,7 +284,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
             ], 
             null, 
             false, 
-            \Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory::TAXCODE_SHIPPING
+            LineFactory::TAXCODE_SHIPPING
         );
         
         $attributeCrudService->update('s_categories_attributes', 'mopt_avalara_hscode', 'string', [
@@ -324,18 +327,33 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
             'custom' => true,
         ]);
         
-        $attributeCrudService->update('s_core_countries_attributes', 'mopt_avalara_incoterms', 'string', [
-            'label' => 'Incoterms for Landed cost',
-            'supportText' => 'Terms of sale. Used to determine buyer obligations for a landed cost.',
-            'helpText' => '',
-            'translatable' => false,
-            'displayInBackend' => true,
-            'position' => 10,
-            'custom' => true,
+        $attributeCrudService->update('s_core_countries_attributes', 'mopt_avalara_incoterms', 'combobox', [
+                'label' => 'Incoterms for Landed cost',
+                'supportText' => 'Terms of sale. Used to determine buyer obligations for a landed cost.',
+                'helpText' => '',
+                'translatable' => false,
+                'displayInBackend' => true,
+                'position' => 10,
+                'custom' => true,
+                'defaultValue' => FormCreator::INCOTERMS_DEFAULT,
+                'arrayStore' => [
+                    [
+                        'key' => FormCreator::INCOTERMS_DDP, 
+                        'value' => FormCreator::INCOTERMS_DDP_LABEL
+                    ],
+                    [
+                        'key' => FormCreator::INCOTERMS_DAP, 
+                        'value' => FormCreator::INCOTERMS_DAP_LABEL
+                    ],
+                    [
+                        'key' => FormCreator::INCOTERMS_DEFAULT, 
+                        'value' => FormCreator::INCOTERMS_DEFAULT
+                    ],
+                ],
             ], 
             null, 
             false, 
-            \Shopware\Plugins\MoptAvalara\Form\FormCreator::INCOTERMS_DEFAULT
+            FormCreator::INCOTERMS_DEFAULT
         );
         
         $attributeCrudService->update('s_order_attributes', 'mopt_avalara_incoterms', 'string', [
@@ -383,7 +401,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
      */
     private function createForm()
     {
-        $formCreator = new \Shopware\Plugins\MoptAvalara\Form\FormCreator($this);
+        $formCreator = new FormCreator($this);
         $formCreator->createForms();
         
         return $this;
