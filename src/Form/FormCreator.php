@@ -210,7 +210,7 @@ class FormCreator {
         ]);
 
         $form->setElement('select', self::INCOTERMS_FIELD, [
-            'label' => 'Incoterms for Landed cost',
+            'label' => 'Default incoterms for Landed cost',
             'description' => 'Terms of sale. Used to determine buyer obligations for a landed cost.',
             'value' => self::INCOTERMS_DAP,
             'store' => [
