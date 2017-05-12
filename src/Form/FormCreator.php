@@ -66,6 +66,7 @@ class FormCreator {
     
     const DELIVERY_COUNTRY_USA_AND_CANADA = 4;
     
+    const INCOTERMS_DEFAULT = 'Use default';
     const INCOTERMS_DAP = 'DAP';
     const INCOTERMS_DDP = 'DDP';
     
