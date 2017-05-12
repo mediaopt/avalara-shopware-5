@@ -24,11 +24,6 @@ class LandedCostCalculateRequestFactory extends AbstractFactory
             ->getPluginConfig(FormCreator::INCOTERMS_FIELD)
         ;
         
-        $entityType = $this
-            ->getAdapter()
-            ->getPluginConfig(FormCreator::TRANSACTION_TYPE_FIELD)
-        ;
-        
         /* @var $model \LandedCostCalculationAPILib\Models\CalculateRequest */
         $model = new \stdClass();
         $model->charges = ['duties'];
@@ -38,7 +33,6 @@ class LandedCostCalculateRequestFactory extends AbstractFactory
         $model->source = $this->getSourceModel();
         $model->shipping = $this->getShippingModel();
         $model->incoterms = $incoterms;
-        $model->entityType = $entityType;
         $model->items = $this->getItemModels();
         
         return $model;

@@ -34,8 +34,6 @@ class FormCreator {
     
     const INCOTERMS_FIELD = 'mopt_avalara__incoterms';
     
-    const TRANSACTION_TYPE_FIELD = 'mopt_avalara__transaction_type';
-    
     const ADDRESS_VALIDATION_COUNTRIES_FIELD = 'mopt_avalara_addressvalidation_countries';
     
     const LOG_LEVEL_FIELD = 'mopt_avalara_loglevel';
@@ -70,9 +68,6 @@ class FormCreator {
     
     const INCOTERMS_DAP = 'DAP';
     const INCOTERMS_DDP = 'DDP';
-    
-    const TRANSACTION_TYPE_B2B = 'B2B';
-    const TRANSACTION_TYPE_B2C = 'B2C';
     
     /**
      *
@@ -233,16 +228,6 @@ class FormCreator {
                 [self::DELIVERY_COUNTRY_USA, 'USA only'],
                 [self::DELIVERY_COUNTRY_CANADA, 'Canada only'],
                 [self::DELIVERY_COUNTRY_USA_AND_CANADA, 'USA & Canada']
-            ],
-        ]);
-        
-        $form->setElement('select', self::TRANSACTION_TYPE_FIELD, [
-            'label' => 'Transaction type for Landed cost',
-            'description' => 'Type of sale. Can be used to determine applicable tax types',
-            'value' => self::TRANSACTION_TYPE_B2C,
-            'store' => [
-                [self::TRANSACTION_TYPE_B2C, 'Business-to-Consumer (B2C)'],
-                [self::TRANSACTION_TYPE_B2B, 'Business-to-Business (B2B)'],
             ],
         ]);
 
@@ -428,7 +413,6 @@ class FormCreator {
             self::DOC_COMMIT_ENABLED_FIELD,
             self::LANDEDCOST_ENABLED_FIELD,
             self::INCOTERMS_FIELD,
-            self::TRANSACTION_TYPE_FIELD,
             self::ADDRESS_VALIDATION_COUNTRIES_FIELD,
             self::LOG_LEVEL_FIELD,
             self::LOG_ROTATION_DAYS_FIELD,
