@@ -59,13 +59,13 @@ class FormCreator {
      * Values and options
      */
     const DELIVERY_COUNTRY_NO_VALIDATION = 1;
-    
     const DELIVERY_COUNTRY_USA = 2;
-    
     const DELIVERY_COUNTRY_CANADA = 3;
-    
     const DELIVERY_COUNTRY_USA_AND_CANADA = 4;
     
+    /**
+     * Incoterms
+     */
     const INCOTERMS_DEFAULT = 'Use default';
     const INCOTERMS_DAP = 'DAP';
     const INCOTERMS_DAP_LABEL = 'Delivered at Place (DAP)';
