@@ -12,32 +12,37 @@ use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
  * actory to create CreateTransactionModel from the order
  *
  */
-class TransactionModelFactoryFromOrder extends AbstractFactory
+class TransactionModelFactoryFromOrder extends AbstractTransactionModelFactory
 {
+    /**
+     *
+     * @var Order 
+     */
+    private $orderContext;
+    
     /**
      * 
      * @param \Shopware\Models\Order\Order $order
+     * @param bool $isCommit
      * @return \Avalara\CreateTransactionModel
      */
-    public function build(Order $order)
+    public function build(Order $order, $isCommit = false)
     {
         /* @var $customer \Shopware\Models\Customer\Customer */
         $customer = $order->getCustomer();
-
+        $this->orderContext = $order;
+        
         $model = new CreateTransactionModel();
         $model->code = $order->getNumber();
-        $model->commit = true;
+        $model->commit = $isCommit;
         $model->customerCode = $customer->getId();
         $model->date = date('Y-m-d', time());
-        $model->lines = $this->getLineModels($order);
-        $model->discount = $this->getDiscount($order);
+        $model->lines = $this->getLineModels();
+        $model->discount = $this->getDiscount();
         $model->type = \Avalara\DocumentType::C_SALESINVOICE;
         $model->currencyCode = $order->getCurrency();
-        $model->addresses = $this->getAddressesModel($order);
-        $model->companyCode = $this
-            ->getAdapter()
-            ->getPluginConfig(FormCreator::COMPANY_CODE_FIELD)
-        ;
+        $model->addresses = $this->getAddressesModel();
+        $model->companyCode = $this->getCompanyCode();
         
         if ($customer->getBilling() && $customer->getBilling()->getVatId()) {
             $model->businessIdentificationNo = $customer->getBilling()->getVatId();
@@ -51,63 +56,37 @@ class TransactionModelFactoryFromOrder extends AbstractFactory
     }
 
     /**
-     * @param \Shopware\Models\Order\Order $order
      * @return \Avalara\AddressesModel
      */
-    protected function getAddressesModel(Order $order)
+    protected function getAddressesModel()
     {
-        /* @var $addressFactory AddressFactory */
-        $addressFactory = $this->getAdapter()->getFactory('AddressFactory');
+        $addressFactory = $this->getAddressFactory();
 
         $addressesModel = new AddressesModel();
         $addressesModel->shipFrom = $addressFactory->buildOriginAddress();
-        $addressesModel->shipTo = $addressFactory->buildDeliveryAddressFromOrder($order);
+        $addressesModel->shipTo = $addressFactory->buildDeliveryAddressFromOrder($this->orderContext);
         
         return $addressesModel;
     }
     
     /**
-     * @param \Shopware\Models\Order\Order $order
      * @return LineItemModel[]
      */
-    protected function getLineModels(Order $order)
+    protected function getLineModels()
     {
-        /* @var $lineFactory Line */
-        $lineFactory = $this->getAdapter()->getFactory('LineFactory');
-        $lines = [];
+        $positions = $this->getPositionsFromOrder($this->orderContext);
 
-        foreach ($order->getDetails() as $position) {
-            $position = $this->convertOrderDetailToLineData($position);
-            if (!LineFactory::isDiscount($position['modus'])) {
-                $lines[] = $lineFactory->build($position);
-                continue;
-            }
-            
-            if (LineFactory::isNotVoucher($position)) {
-                continue;
-            }
-            
-            $position['id'] = LineFactory::ARTICLEID_VOUCHER;
-            $lines[] = $lineFactory->build($position);
-        }
-
-        if ($shipment = $this->getShippingCharges($order)) {
-            $lines[] = $lineFactory->build($shipment);
-        }
-
-        return $lines;
+        return parent::getLineModels($positions);
     }
     
     /**
-     * @param \Shopware\Models\Order\Order $order
      * @return float
      */
-    protected function getDiscount(Order $order)
+    protected function getDiscount()
     {
         $discount = 0.0;
         
-        foreach ($order->getDetails() as $position) {
-            $position = $this->convertOrderDetailToLineData($position);
+        foreach ($this->getPositionsFromOrder($this->orderContext) as $position) {
             if (!LineFactory::isDiscount($position['modus'])) {
                 continue;
             }
@@ -119,30 +98,36 @@ class TransactionModelFactoryFromOrder extends AbstractFactory
 
         return $discount;
     }
-
+    
     /**
-     * get shipment information
+     * 
+     * @return int
+     */
+    protected function getShippingId() {
+        return $this->orderContext->getDispatch()->getId();
+    }
+    
+    /**
+     * 
+     * @return float
+     */
+    protected function getShippingPrice() {
+        return $this->orderContext->getInvoiceShipping();
+    }
+    
+    /**
      * @param \Shopware\Models\Order\Order $order
      * @return array
      */
-    protected function getShippingCharges(Order $order)
+    private function getPositionsFromOrder(Order $order)
     {
-        if (!$order->getInvoiceShipping()) {
-            return null;
+        $positions = [];
+
+        foreach ($order->getDetails() as $position) {
+            $positions[] = $this->convertOrderDetailToLineData($position);
         }
         
-        //create shipping item for compatibility reasons with line data
-        $shippingItem = [];
-        $shippingItem['id'] = LineFactory::ARTICLEID_SHIPPING;
-        $shippingItem['ean'] = '';
-        $shippingItem['quantity'] = 1;
-        $shippingItem['netprice'] = $order->getInvoiceShippingNet();
-        $shippingItem['brutprice'] = $order->getInvoiceShipping();
-        $shippingItem['articlename'] = 'Shipping';
-        $shippingItem['articleID'] = 0;
-        $shippingItem['dispatchID'] = $order->getDispatch()->getId();
-        
-        return $shippingItem;
+        return $positions;
     }
 
     /**
@@ -150,7 +135,7 @@ class TransactionModelFactoryFromOrder extends AbstractFactory
      * @param \Shopware\Models\Order\Detail $detail
      * @return array
      */
-    protected function convertOrderDetailToLineData(\Shopware\Models\Order\Detail $detail)
+    private function convertOrderDetailToLineData(\Shopware\Models\Order\Detail $detail)
     {
         $lineData = [];
         $lineData['id'] = $detail->getId();

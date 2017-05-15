@@ -6,6 +6,8 @@ use Shopware\Plugins\MoptAvalara\Form\FormCreator;
 use Avalara\DocumentType;
 use Avalara\CreateTransactionModel;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
+use Shopware\Plugins\MoptAvalara\Adapter\Factory\InsuranceFactory;
+use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
 
 /**
  * Description of Checkout
@@ -294,8 +296,8 @@ class GetTax extends AbstractSubscriber
     {
         $data = $this->objectToArray($model);
         $itemCodeToBeRemoved = [
-            LineFactory::ARTICLEID_INSURANCE,
-            LineFactory::ARTICLEID_SHIPPING,
+            InsuranceFactory::ARTICLE_ID,
+            ShippingFactory::ARTICLE_ID,
         ];
         
         unset($data['type']);
@@ -333,7 +335,7 @@ class GetTax extends AbstractSubscriber
 
         /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
         $service = $this->getAdapter()->getService('GetTax');
-        $taxRate = $service->getTaxRateForOrderBasketId(LineFactory::ARTICLEID_SHIPPING, $session->MoptAvalaraGetTaxResult);
+        $taxRate = $service->getTaxRateForOrderBasketId(ShippingFactory::ARTICLE_ID, $session->MoptAvalaraGetTaxResult);
         
         if(!$taxRate) {
             return;

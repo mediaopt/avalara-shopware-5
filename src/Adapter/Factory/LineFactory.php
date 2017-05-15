@@ -15,11 +15,7 @@ class LineFactory extends AbstractFactory
     const MODUS_VOUCHER = 2;
     const MODUS_BASKET_DISCOUNT = 3;
     const MODUS_DISCOUNT = 4;
-    
-    const ARTICLEID_SHIPPING = 'Shipping';
-    const ARTICLEID_INSURANCE = 'Insurance';
-    const TAXCODE_SHIPPING = 'FR010000';
-    const TAXCODE_INSUEANCE = 'FR070100';
+
     const ARTICLEID_VOUCHER = 'voucher';
 
     /**
@@ -37,7 +33,7 @@ class LineFactory extends AbstractFactory
         $line->quantity = $lineData['quantity'];
         $line->description = $lineData['articlename'];
         $line->taxCode = $this->getParamTaxCode($lineData);
-        $line->discounted = $this->isNeitherVoucherNorShipping($lineData);
+        $line->discounted = self::isNotVoucher($lineData);
         $line->taxIncluded = $this->getParamIsTaxIncluded($lineData);
         $line->parameters = $this->getParams($lineData);
 
@@ -51,7 +47,7 @@ class LineFactory extends AbstractFactory
      */
     protected function getParamAmount($lineData)
     {
-        if ($this->isShipping($lineData) && $this->getParamIsTaxIncluded($lineData)) {
+        if ($this->getParamIsTaxIncluded($lineData)) {
             return $lineData['brutprice'];
         }
 
@@ -67,19 +63,8 @@ class LineFactory extends AbstractFactory
     protected function getParamTaxCode($lineData)
     {
         $articleId = $lineData['articleID'];
-        if (self::MODUS_VOUCHER == $lineData['modus']){
-            $voucherRepository = Shopware()
-                ->Models()
-                ->getRepository('\Shopware\Models\Voucher\Voucher')
-            ;
-            $voucher = $voucherRepository->find($articleId);
-            
-            return $voucher->getAttribute()->getMoptAvalaraTaxcode();
-        }
-        
-        //shipping could have his own TaxCode
-        if ($this->isShipping($lineData)) {
-            return $this->getShippingTaxCode($lineData['dispatchID']);
+        if ($voucherTaxCode = $this->getVoucherTaxCode($articleId, $lineData['modus'])) {
+            return $voucherTaxCode;
         }
         
         //load model
@@ -105,33 +90,24 @@ class LineFactory extends AbstractFactory
     /**
      * 
      * @param int $id
+     * @param int $modus
      * @return string
      */
-    public function getShippingTaxCode($id)
+    private function getVoucherTaxCode($id, $modus)
     {
-        if (!$dispatchobject = $this->getShipping($id)) {
-            return self::TAXCODE_SHIPPING;
+        if (self::MODUS_VOUCHER !== $modus){
+            return null;
         }
-        $attr = $dispatchobject->getAttribute();
-        if ($attr && $attr->getMoptAvalaraTaxcode()) {
-            return $attr->getMoptAvalaraTaxcode();
+        
+        $voucherRepository = Shopware()
+            ->Models()
+            ->getRepository('\Shopware\Models\Voucher\Voucher')
+        ;
+        if (!$voucher = $voucherRepository->find($id)) {
+            return null;
         }
 
-        return self::TAXCODE_SHIPPING;
-    }
-    
-    /**
-     * 
-     * @param int $id
-     * @return \Shopware\Models\Dispatch\Dispatch | null
-     */
-    public function getShipping($id)
-    {
-        return Shopware()
-            ->Models()
-            ->getRepository('Shopware\Models\Dispatch\Dispatch')
-            ->find($id)
-        ;
+        return $voucher->getAttribute()->getMoptAvalaraTaxcode();
     }
 
     /**
@@ -143,7 +119,7 @@ class LineFactory extends AbstractFactory
     {
         $articleId = $lineData['articleID'];
         $params = new \stdClass();
-        if (self::MODUS_VOUCHER == $lineData['modus'] || $this->isShipping($lineData) || $this->isInsurance($lineData)){
+        if (self::MODUS_VOUCHER == $lineData['modus']){
             return $params;
         }
         
@@ -175,40 +151,9 @@ class LineFactory extends AbstractFactory
      */
     protected function getParamIsTaxIncluded($lineData)
     {
-        return $this->isInsurance($lineData) && $this->isShipping($lineData) && !$this->getParamTaxCode($lineData);
+        return !$this->getParamTaxCode($lineData);
     }
 
-    /**
-     * 
-     * @param array $lineData
-     * @return bool
-     */
-    protected function isShipping($lineData)
-    {
-        return self::ARTICLEID_SHIPPING == $lineData['id'];
-    }
-    
-    /**
-     * 
-     * @param array $lineData
-     * @return bool
-     */
-    protected function isInsurance($lineData)
-    {
-        return self::ARTICLEID_INSURANCE == $lineData['id'];
-    }
-
-    /**
-     * 
-     * @param array $lineData
-     * @return bool
-     */
-    protected function isNeitherVoucherNorShipping($lineData)
-    {
-        //voucher has modus 2
-        return self::MODUS_VOUCHER !== $lineData['modus'] && !$this->isShipping($lineData) && !$this->isInsurance($lineData);
-    }
-    
     /**
      * 
      * @param int $modus
@@ -222,17 +167,7 @@ class LineFactory extends AbstractFactory
             self::MODUS_DISCOUNT,
         ]);
     }
-    
-    /**
-     * 
-     * @param array $lineData
-     * @return bool
-     */
-    public static function isVoucher($lineData)
-    {
-        return self::MODUS_VOUCHER == $lineData['modus'];
-    }
-    
+
     /**
      * 
      * @param array $position
@@ -240,7 +175,7 @@ class LineFactory extends AbstractFactory
      */
     public static function isNotVoucher($position)
     {
-        if ($position['modus'] != LineFactory::MODUS_VOUCHER) {
+        if ($position['modus'] != LineFactory::MODUS_VOUCHER || empty($position['articleID'])) {
            return true; 
         }
         $voucher = Shopware()->Models()->getRepository('\Shopware\Models\Voucher\Voucher')->find($position['articleID']);

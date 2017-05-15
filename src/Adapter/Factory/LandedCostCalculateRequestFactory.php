@@ -124,7 +124,7 @@ class LandedCostCalculateRequestFactory extends AbstractFactory
         
         foreach ($positions['content'] as $position) {
             $item = $lineFactory->build($position);
-            if (null === $item || LineFactory::isVoucher($position)) {
+            if (null === $item || !LineFactory::isNotVoucher($position)) {
                 continue;
             }
 

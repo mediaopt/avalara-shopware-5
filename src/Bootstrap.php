@@ -1,7 +1,7 @@
 <?php
 
 use Shopware\Plugins\MoptAvalara\Form\FormCreator;
-use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
+use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
 use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
 
 /**
@@ -284,7 +284,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
             ], 
             null, 
             false, 
-            LineFactory::TAXCODE_SHIPPING
+            ShippingFactory::TAXCODE
         );
         
         $attributeCrudService->update('s_categories_attributes', 'mopt_avalara_hscode', 'string', [
