@@ -16,12 +16,6 @@ use Shopware\Plugins\MoptAvalara\LandedCost\LandedCostRequestParams;
 class TransactionModelFactory extends AbstractFactory
 {
     /**
-     * Total discount
-     * @var float
-     */
-    protected $discount = 0.0;
-
-    /**
      * 
      * @param string $docType
      * @param bool $isCommit
@@ -36,7 +30,7 @@ class TransactionModelFactory extends AbstractFactory
         $model->commit = $isCommit;
         $model->customerCode = $user['additional']['user']['id'];
         $model->date = date('Y-m-d', time());
-        $model->discount = $this->discount;
+        $model->discount = $this->getDiscount();
         $model->type = $docType;
         $model->currencyCode = Shopware()->Shop()->getCurrency()->getCurrency();
         $model->addresses = $this->getAddressesModel();
@@ -86,8 +80,7 @@ class TransactionModelFactory extends AbstractFactory
                 continue;
             }
             
-            if (LineFactory::isDiscountGlobal($position)) {
-                $this->discount -= floatval($position['netprice']);
+            if (LineFactory::isNotVoucher($position)) {
                 continue;
             }
             
@@ -104,6 +97,28 @@ class TransactionModelFactory extends AbstractFactory
         }
 
         return $lines;
+    }
+    
+    /**
+     * 
+     * @return float
+     */
+    protected function getDiscount()
+    {
+        $positions = Shopware()->Modules()->Basket()->sGetBasket();
+        $discount = 0.0;
+        
+        foreach ($positions['content'] as $position) {
+            if (!LineFactory::isDiscount($position['modus'])) {
+                continue;
+            }
+            
+            if (LineFactory::isNotVoucher($position)) {
+                $discount -= floatval($position['netprice']);
+            }
+        }
+
+        return $discount;
     }
 
     /**

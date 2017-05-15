@@ -15,12 +15,6 @@ use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
 class TransactionModelFactoryFromOrder extends AbstractFactory
 {
     /**
-     *
-     * @var float
-     */
-    protected $discount = 0.0;
-    
-    /**
      * 
      * @param \Shopware\Models\Order\Order $order
      * @return \Avalara\CreateTransactionModel
@@ -35,11 +29,11 @@ class TransactionModelFactoryFromOrder extends AbstractFactory
         $model->commit = true;
         $model->customerCode = $customer->getId();
         $model->date = date('Y-m-d', time());
-        $model->discount = $this->discount;
+        $model->lines = $this->getLineModels($order);
+        $model->discount = $this->getDiscount($order);
         $model->type = \Avalara\DocumentType::C_SALESINVOICE;
         $model->currencyCode = $order->getCurrency();
         $model->addresses = $this->getAddressesModel($order);
-        $model->lines = $this->getLineModels($order);
         $model->companyCode = $this
             ->getAdapter()
             ->getPluginConfig(FormCreator::COMPANY_CODE_FIELD)
@@ -89,8 +83,7 @@ class TransactionModelFactoryFromOrder extends AbstractFactory
                 continue;
             }
             
-            if (LineFactory::isDiscountGlobal($position)) {
-                $this->discount -= floatval($position['netprice']);
+            if (LineFactory::isNotVoucher($position)) {
                 continue;
             }
             
@@ -103,6 +96,28 @@ class TransactionModelFactoryFromOrder extends AbstractFactory
         }
 
         return $lines;
+    }
+    
+    /**
+     * @param \Shopware\Models\Order\Order $order
+     * @return float
+     */
+    protected function getDiscount(Order $order)
+    {
+        $discount = 0.0;
+        
+        foreach ($order->getDetails() as $position) {
+            $position = $this->convertOrderDetailToLineData($position);
+            if (!LineFactory::isDiscount($position['modus'])) {
+                continue;
+            }
+            
+            if (LineFactory::isNotVoucher($position)) {
+                $discount -= floatval($position['netprice']);
+            }
+        }
+
+        return $discount;
     }
 
     /**
