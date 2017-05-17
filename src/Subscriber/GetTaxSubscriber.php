@@ -161,10 +161,8 @@ class GetTaxSubscriber extends AbstractSubscriber
      */
     public function onBeforeSOrderSaveOrder(\Enlight_Hook_HookArgs $args)
     {
-        if (!$getTaxCommitRequest = $this->validateCommitCall()) {
-            //@todo error-message
-            throw new \Exception('MoptAvalara: invalid call.');
-        } elseif (!($getTaxCommitRequest instanceof CreateTransactionModel)) {
+        $getTaxCommitRequest = $this->validateCommitCall();
+        if (!($getTaxCommitRequest instanceof CreateTransactionModel)) {
             $adapter->getLogger()->error('Not in avalara context');
             return;
         }
@@ -201,7 +199,7 @@ class GetTaxSubscriber extends AbstractSubscriber
         //prevent parent execution on request mismatch
         if ($session->MoptAvalaraGetTaxRequestHash != $this->getHashFromRequest($model)) {
             $adapter->getLogger()->error('Mismatching requests, do not proceed.');
-            return false;
+            throw new \Exception('MoptAvalara: mismatching requests, do not proceed.');
         }
 
         $adapter->getLogger()->debug('Matching requests, proceed...', [$model]);
@@ -233,14 +231,9 @@ class GetTaxSubscriber extends AbstractSubscriber
         if ($result = $this->commitTransaction($model)) {
             //update order attributes
             $adapter->getLogger()->debug('UpdateOrderAttributes');
-            $order = Shopware()->Models()->getRepository('\Shopware\Models\Order\Order')->findOneBy([
-                'number' => $orderNumber]);
-            $adapter->getLogger()->debug('FoundOrder:', [$order]);
-            $sql = "UPDATE s_order_attributes SET " .
-                    "mopt_avalara_doc_code = ? " .
-                    "WHERE orderID = ?";
-            Shopware()->Db()->query($sql, [$result->code, $order->getId()]);
             $adapter->getLogger()->info('Save DocCode: ' . $result->code);
+            
+            $this->updateOrderAttributes($model, $orderNumber, $result);
         } else {
             $adapter->getLogger()->debug('No Result (Else)');
             //@todo: mark order as uncommitted (?)
@@ -248,6 +241,35 @@ class GetTaxSubscriber extends AbstractSubscriber
         $adapter->getLogger()->debug('End of AfterSaveMethod');
         unset(Shopware()->Session()->MoptAvalaraGetTaxRequestHash);
         unset(Shopware()->Session()->MoptAvalaraGetTaxResult);
+    }
+    
+    /**
+     * 
+     * @param CreateTransactionModel $model
+     * @param int $orderNumber
+     * @param type $result
+     */
+    private function updateOrderAttributes(CreateTransactionModel $model, $orderNumber, $result)
+    {
+        $order = Shopware()
+            ->Models()
+            ->getRepository('\Shopware\Models\Order\Order')
+            ->findOneBy(['number' => $orderNumber])
+        ;
+        if (!$order) {
+            $msg = 'There is no order with number: ' . $orderNumber;
+            $this->getAdapter()->getLogger()->critical($msg);
+            throw new \Exception($msg);
+        }
+        $order->getAttribute()->setMoptAvalaraDocCode($result->code);
+        Shopware()->Models()->persist($order);
+        Shopware()->Models()->flush();
+        return;
+        $sql = "UPDATE s_order_attributes SET " .
+            "mopt_avalara_doc_code = ? " .
+            "WHERE orderID = ?"
+        ;
+        Shopware()->Db()->query($sql, [$result->code, $order->getId()]);
     }
 
     /**
