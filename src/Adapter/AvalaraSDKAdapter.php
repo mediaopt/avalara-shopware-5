@@ -122,7 +122,7 @@ class AvalaraSDKAdapter implements AdapterInterface
     }
     
     /**
-     * 
+     * Lazy load of the LogSubscriber
      * @return LogSubscriber
      */
     public function getLogSubscriber()
@@ -136,35 +136,7 @@ class AvalaraSDKAdapter implements AdapterInterface
     }
     
     /**
-     * Will log response
-     * @param HttpContext $httpContext
-     * @return null
-     */
-    private function logResponse(HttpContext $httpContext) {
-        $request = $httpContext->getRequest();
-        $response = $httpContext->getResponse();
-
-        $message = sprintf(
-            self::LANDED_COST_LOG_FORMAT,
-            $request->getHttpMethod(),
-            $request->getQueryUrl(),
-            json_encode($request->getHeaders()),
-            $response->getStatusCode(),
-            json_encode($response->getHeaders()),
-            $response->getRawBody()
-        );
-        
-        if (200 === $response->getStatusCode()) {
-            $this->getLogger()->info($message);
-            return null;
-        }
-        $this->getLogger()->critical($message);
-        
-        return null;
-    }
-    
-    /**
-     * lazy load logger
+     * Lazy load logger
      * @return \Monolog\Logger
      */
     public function getLogger()
