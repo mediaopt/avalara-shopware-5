@@ -429,11 +429,14 @@ class GetTaxSubscriber extends AbstractSubscriber
 
     /**
      * 
-     * @param \stdClass $data
+     * @param \stdClass | string $data
      * @return \stdClass
      */
-    private function generateTaxResultFromResponse(\stdClass $data)
+    private function generateTaxResultFromResponse($data)
     {
+        if (is_string($data) || !is_object($data)) {
+            throw new \Exception($data);
+        }
         $result = new \stdClass();
         $result->totalTaxable = $data->totalTaxable;
         $result->totalTax = $data->totalTax;
