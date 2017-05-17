@@ -267,7 +267,6 @@ class GetLandedCost extends AbstractSubscriber
     {
         $data = $this->objectToArray($model);
 
-        $this->getAdapter()->getLogger()->debug(json_encode($data));
         return md5(json_encode($data));
     }
 }

@@ -312,8 +312,7 @@ class GetTax extends AbstractSubscriber
             unset($data['lines'][$key]['itemCode']);
             unset($data['lines'][$key]['amount']);
         }
-        $this->getAdapter()->getLogger()->debug(json_encode($data));
-        
+
         return md5(json_encode($data));
     }
     
