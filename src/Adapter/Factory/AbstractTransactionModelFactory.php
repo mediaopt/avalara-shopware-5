@@ -104,7 +104,7 @@ abstract class AbstractTransactionModelFactory extends AbstractFactory
         $shippingFactory = $this->getShippingFactory();
         $shippmentId = $this->getShippingId();
         
-        if ($price = $shippingFactory->isShippingInsured($shippmentId)) {
+        if (!$price = $shippingFactory->isShippingInsured($shippmentId)) {
             return null;
         }
         
