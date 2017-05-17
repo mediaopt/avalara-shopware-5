@@ -20,6 +20,12 @@ interface AdapterInterface
     public function getLogger();
     
     /**
+     * 
+     * @return \Shopware\Plugins\MoptAvalara\Logger\LogSubscriber
+     */
+    public function getLogSubscriber();
+    
+    /**
      * @param string $type
      * @return \Shopware\Plugins\MoptAvalara\Service\AbstractService
      */

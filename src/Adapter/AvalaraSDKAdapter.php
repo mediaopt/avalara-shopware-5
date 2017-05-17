@@ -53,6 +53,12 @@ class AvalaraSDKAdapter implements AdapterInterface
     protected $pluginVersion;
     
     /**
+     *
+     * @var LogSubscriber
+     */
+    private $logSubscriber;
+    
+    /**
      * 
      * @param string $pluginName
      * @param string $pluginVersion
@@ -108,13 +114,25 @@ class AvalaraSDKAdapter implements AdapterInterface
         $licenseKey = $this->getPluginConfig(FormCreator::LICENSE_KEY_FIELD);
         $avaClient->withSecurity($accountNumber, $licenseKey);
         $this->avaTaxClient = $avaClient;
-        
+
         // Attach a handler to log all requests
-        $formatter = new Formatter($this->getFormatterTemplate());
-        $subscriber = new LogSubscriber($this->getLogger(), $formatter);
-        $avaClient->getHttpClient()->getEmitter()->attach($subscriber);
+        $avaClient->getHttpClient()->getEmitter()->attach($this->getLogSubscriber());
         
         return $this->avaTaxClient;
+    }
+    
+    /**
+     * 
+     * @return LogSubscriber
+     */
+    public function getLogSubscriber()
+    {
+        if (null === $this->logSubscriber) {
+            $formatter = new Formatter($this->getFormatterTemplate());
+            $this->logSubscriber = new LogSubscriber($this->getLogger(), $formatter);
+        }
+        
+        return $this->logSubscriber;
     }
     
     /**
