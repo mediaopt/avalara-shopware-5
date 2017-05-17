@@ -27,7 +27,7 @@ class ShippingFactory extends AbstractFactory
         $line->amount = $price;
         $line->quantity = 1;
         $line->description = self::ARTICLE_ID;
-        $line->taxCode = $this->getShippingTaxCode($id);
+        $line->taxCode = $this->getTaxCode($id);
         $line->discounted = false;
         $line->taxIncluded = true;
         
@@ -39,7 +39,7 @@ class ShippingFactory extends AbstractFactory
      * @param int $id
      * @return string
      */
-    protected function getShippingTaxCode($id)
+    protected function getTaxCode($id)
     {
         if (!$dispatchObject = $this->getShippingEntity($id)) {
             return self::TAXCODE;
