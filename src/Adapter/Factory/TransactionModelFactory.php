@@ -18,7 +18,7 @@ use Shopware\Plugins\MoptAvalara\LandedCost\LandedCostRequestParams;
 class TransactionModelFactory extends AbstractTransactionModelFactory
 {
     /**
-     * 
+     *
      * @param string $docType
      * @param bool $isCommit
      * @return \Avalara\CreateTransactionModel
@@ -48,7 +48,7 @@ class TransactionModelFactory extends AbstractTransactionModelFactory
     }
 
     /**
-     * 
+     *
      * @return \Avalara\AddressesModel
      */
     protected function getAddressesModel()
@@ -64,7 +64,7 @@ class TransactionModelFactory extends AbstractTransactionModelFactory
     }
     
     /**
-     * 
+     *
      * @return LineItemModel[]
      */
     protected function getLineModels()
@@ -97,18 +97,20 @@ class TransactionModelFactory extends AbstractTransactionModelFactory
     }
 
     /**
-     * 
+     *
      * @return int
      */
-    protected function getShippingId() {
+    protected function getShippingId()
+    {
         return Shopware()->Session()->sOrderVariables['sDispatch']['id'];
     }
     
     /**
-     * 
+     *
      * @return float
      */
-    protected function getShippingPrice() {
+    protected function getShippingPrice()
+    {
         if (empty(Shopware()->Session()->sOrderVariables['sBasket']['sShippingcostsWithTax'])) {
             return null;
         }

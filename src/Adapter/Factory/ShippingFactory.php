@@ -35,7 +35,7 @@ class ShippingFactory extends AbstractFactory
     }
 
     /**
-     * 
+     *
      * @param int $id
      * @return string
      */
@@ -53,7 +53,7 @@ class ShippingFactory extends AbstractFactory
     }
     
     /**
-     * 
+     *
      * @param int $id
      * @return \Shopware\Models\Dispatch\Dispatch | null
      */
@@ -67,11 +67,12 @@ class ShippingFactory extends AbstractFactory
     }
     
     /**
-     * 
+     *
      * @param int $id
      * @return boolean
      */
-    public function isShippingInsured($id) {
+    public function isShippingInsured($id)
+    {
         $shippingEntity = $this->getShippingEntity($id);
         
         if (!$attr = $shippingEntity->getAttribute()) {

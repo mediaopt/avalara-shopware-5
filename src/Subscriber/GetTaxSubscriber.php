@@ -13,7 +13,7 @@ class GetTaxSubscriber extends AbstractSubscriber
 {
     /**
      * return array with all subsribed events
-     * 
+     *
      * @return array
      */
     public static function getSubscribedEvents()
@@ -191,7 +191,7 @@ class GetTaxSubscriber extends AbstractSubscriber
 
         /* @var $model \Avalara\CreateTransactionModel */
         $model = $adapter->getFactory('TransactionModelFactory')->build(
-            DocumentType::C_SALESORDER, 
+            DocumentType::C_SALESORDER,
             true
         );
         
@@ -244,7 +244,7 @@ class GetTaxSubscriber extends AbstractSubscriber
     }
     
     /**
-     * 
+     *
      * @param CreateTransactionModel $model
      * @param int $orderNumber
      * @param type $result
@@ -305,7 +305,7 @@ class GetTaxSubscriber extends AbstractSubscriber
     /**
      * get hash from request to compare calculate & commit call
      * unset changing fields during both calls
-     * 
+     *
      * @param \Avalara\CreateTransactionModel $model
      * @return string
      */
@@ -334,7 +334,7 @@ class GetTaxSubscriber extends AbstractSubscriber
     }
     
     /**
-     * 
+     *
      * @param \Enlight_Hook_HookArgs $args
      * @return void
      */
@@ -353,7 +353,7 @@ class GetTaxSubscriber extends AbstractSubscriber
         $service = $this->getAdapter()->getService('GetTax');
         $taxRate = $service->getTaxRateForOrderBasketId($session->MoptAvalaraGetTaxResult, ShippingFactory::ARTICLE_ID);
         
-        if(!$taxRate) {
+        if (!$taxRate) {
             return;
         }
         $return['tax_calculation'] = true;
@@ -387,7 +387,7 @@ class GetTaxSubscriber extends AbstractSubscriber
     }
     
     /**
-     * 
+     *
      * @param \Enlight_Hook_HookArgs $args
      * @return void
      */
@@ -404,15 +404,16 @@ class GetTaxSubscriber extends AbstractSubscriber
 
         // Load the voucher details
         $voucherDetails = Shopware()->Db()->fetchRow(
-                        'SELECT *
+            'SELECT *
               FROM s_emarketing_vouchers
               WHERE modus != 1
               AND LOWER(vouchercode) = ?
               AND (
                 (valid_to >= now() AND valid_from <= now())
                 OR valid_to IS NULL
-              )', [$voucherCode]
-                ) ? : [];
+              )',
+            [$voucherCode]
+        ) ? : [];
 
         if (empty($voucherDetails['strict'])) {
             return;
@@ -428,7 +429,7 @@ class GetTaxSubscriber extends AbstractSubscriber
     }
 
     /**
-     * 
+     *
      * @param \stdClass | string $data
      * @return \stdClass
      */

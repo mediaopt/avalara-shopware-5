@@ -20,7 +20,7 @@ class LineFactory extends AbstractFactory
 
     /**
      * build Line-model based on passed in lineData
-     * 
+     *
      * @param mixed $lineData
      * @return \Avalara\LineItemModel
      */
@@ -41,7 +41,7 @@ class LineFactory extends AbstractFactory
     }
 
     /**
-     * 
+     *
      * @param array $lineData
      * @return float
      */
@@ -57,7 +57,7 @@ class LineFactory extends AbstractFactory
     }
 
     /**
-     * 
+     *
      * @param array $lineData
      * @return string
      */
@@ -89,14 +89,14 @@ class LineFactory extends AbstractFactory
     }
     
     /**
-     * 
+     *
      * @param int $id
      * @param int $modus
      * @return string
      */
     private function getVoucherTaxCode($id, $modus)
     {
-        if (self::MODUS_VOUCHER !== $modus){
+        if (self::MODUS_VOUCHER !== $modus) {
             return null;
         }
         
@@ -120,7 +120,7 @@ class LineFactory extends AbstractFactory
     {
         $articleId = $lineData['articleID'];
         $params = new \stdClass();
-        if (self::MODUS_VOUCHER == $lineData['modus']){
+        if (self::MODUS_VOUCHER == $lineData['modus']) {
             return $params;
         }
         
@@ -146,7 +146,7 @@ class LineFactory extends AbstractFactory
     }
 
     /**
-     * 
+     *
      * @param array $lineData
      * @return bool
      */
@@ -156,28 +156,28 @@ class LineFactory extends AbstractFactory
     }
 
     /**
-     * 
+     *
      * @param int $modus
      * @return bool
      */
     public static function isDiscount($modus)
     {
         return in_array($modus, [
-            self::MODUS_VOUCHER, 
-            self::MODUS_BASKET_DISCOUNT, 
+            self::MODUS_VOUCHER,
+            self::MODUS_BASKET_DISCOUNT,
             self::MODUS_DISCOUNT,
         ]);
     }
 
     /**
-     * 
+     *
      * @param array $position
      * @return bool
      */
     public static function isNotVoucher($position)
     {
         if ($position['modus'] != LineFactory::MODUS_VOUCHER || empty($position['articleID'])) {
-           return true; 
+            return true;
         }
         $voucher = Shopware()->Models()->getRepository('\Shopware\Models\Voucher\Voucher')->find($position['articleID']);
         

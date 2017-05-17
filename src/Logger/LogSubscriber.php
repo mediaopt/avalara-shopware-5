@@ -12,7 +12,7 @@ use Psr\Log\LogLevel;
 
 /**
  * copy of GuzzleHttp\Subscriber\Log\LogSubscriber with slight changes (thx private properties...)
- * 
+ *
  * Plugin class that will add request and response logging to an HTTP request.
  *
  * The log plugin uses a message formatter that allows custom messages via
@@ -59,7 +59,7 @@ class LogSubscriber implements SubscriberInterface
     }
 
     /**
-     * 
+     *
      * @return array
      */
     public function getEvents()
@@ -72,17 +72,22 @@ class LogSubscriber implements SubscriberInterface
     }
 
     /**
-     * 
+     *
      * @param CompleteEvent $event
      */
     public function onComplete(CompleteEvent $event)
     {
         $this->logger->log(
-                substr($event->getResponse()->getStatusCode(), 0, 1) == '2' ? LogLevel::INFO : LogLevel::WARNING, $this->formatter->format(
-                        $event->getRequest(), $event->getResponse(), null, [
+            substr($event->getResponse()->getStatusCode(), 0, 1) == '2' ? LogLevel::INFO : LogLevel::WARNING,
+            $this->formatter->format(
+                $event->getRequest(),
+                $event->getResponse(),
+                null,
+                [
                             'processingTime' => $this->getProcessingTime(),
                         ]
-                ), [
+            ),
+            [
             'request' => $event->getRequest(),
             'response' => $event->getResponse()
                 ]
@@ -90,7 +95,7 @@ class LogSubscriber implements SubscriberInterface
     }
 
     /**
-     * 
+     *
      * @param ErrorEvent $event
      */
     public function onError(ErrorEvent $event)
@@ -98,12 +103,15 @@ class LogSubscriber implements SubscriberInterface
         $this->formatter->setTemplate(\GuzzleHttp\Subscriber\Log\Formatter::DEBUG);
         $ex = $event->getException();
         $this->logger->log(
-            LogLevel::CRITICAL, 
+            LogLevel::CRITICAL,
             $this->formatter->format(
-                $event->getRequest(), $event->getResponse(), $ex, [
+                $event->getRequest(),
+                $event->getResponse(),
+                $ex,
+                [
                     'processingTime' => $this->getProcessingTime(),
                 ]
-            ), 
+            ),
             [
                 'request' => $event->getRequest(),
                 'response' => $event->getResponse(),
@@ -116,7 +124,7 @@ class LogSubscriber implements SubscriberInterface
     }
     
     /**
-     * 
+     *
      * @return \GuzzleHttp\Message\Response
      */
     public function getLastResponseWithError()
@@ -134,7 +142,7 @@ class LogSubscriber implements SubscriberInterface
     }
     
     /**
-     * 
+     *
      * @return int
      */
     protected function getProcessingTime()

@@ -31,7 +31,7 @@ try {
     $addressData['Region'] = 'DC';
 
     $response = $adapter->getService('validateAddress')->validate($addressData);
-    if(empty($response['ResultCode']) || $response['ResultCode'] != 'Success') {
+    if (empty($response['ResultCode']) || $response['ResultCode'] != 'Success') {
         echo 'Validation failed !';
         exit;
     }
@@ -39,11 +39,10 @@ try {
     //compare address fields
     foreach ($addressData as $key => $value) {
         $adapter->getLogger()->info("".$key." : ".$value);
-        echo 'compare ' . $key . ': ' . $value . ' == ' . $response['Address'][$key]  . ' => ' . 
+        echo 'compare ' . $key . ': ' . $value . ' == ' . $response['Address'][$key]  . ' => ' .
                 ($value == $response['Address'][$key] ? 'true' : 'false') . '<br />';
     }
     echo 'Validation successful !';
-    
 } catch (Exception $e) {
     echo 'Validation failed due to technical reasons!';
 }

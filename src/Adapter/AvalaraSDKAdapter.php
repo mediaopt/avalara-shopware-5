@@ -59,7 +59,7 @@ class AvalaraSDKAdapter implements AdapterInterface
     private $logSubscriber;
     
     /**
-     * 
+     *
      * @param string $pluginName
      * @param string $pluginVersion
      */
@@ -71,7 +71,7 @@ class AvalaraSDKAdapter implements AdapterInterface
     
     /**
      * return factory
-     * 
+     *
      * @param string $type
      * @return AbstractFactory
      */
@@ -104,9 +104,9 @@ class AvalaraSDKAdapter implements AdapterInterface
         }
 
         $avaClient = new AvaTaxClient(
-            $this->pluginName, 
-            $this->pluginVersion, 
-            $this->getMachineName(), 
+            $this->pluginName,
+            $this->pluginVersion,
+            $this->getMachineName(),
             $this->getSDKEnv()
         );
         
@@ -159,7 +159,7 @@ class AvalaraSDKAdapter implements AdapterInterface
     }
     
     /**
-     * 
+     *
      * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
      */
     public function getBootstrap()
@@ -252,7 +252,7 @@ class AvalaraSDKAdapter implements AdapterInterface
     }
 
     /**
-     * 
+     *
      * @param string $messageFormat
      * @return type
      */

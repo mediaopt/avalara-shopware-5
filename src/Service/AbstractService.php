@@ -17,7 +17,7 @@ abstract class AbstractService
     protected $adapter;
     
     /**
-     * 
+     *
      * @param AdapterInterface $adapter
      */
     public function __construct(AdapterInterface $adapter)
@@ -27,7 +27,7 @@ abstract class AbstractService
     
     /**
      * get adapter
-     * 
+     *
      * @return \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface
      */
     public function getAdapter()

@@ -14,7 +14,7 @@ class AddressCheck extends AbstractSubscriber
 {
     /**
      * return array with all subsribed events
-     * 
+     *
      * @return array
      */
     public static function getSubscribedEvents()
@@ -26,7 +26,7 @@ class AddressCheck extends AbstractSubscriber
     }
 
     /**
-     * perform address check 
+     * perform address check
      * @param \Shopware\Plugins\MoptAvalara\Subscriber\Enlight_Event_EventArgs $args
      */
     public function onBeforeCheckoutConfirm(\Enlight_Event_EventArgs $args)
@@ -53,7 +53,7 @@ class AddressCheck extends AbstractSubscriber
             if ($changes = $service->getAddressChanges($address, $response)) {
                 $args->getSubject()->forward('edit', 'address', null, [
                     'MoptAvalaraAddressChanges' => $changes,
-                    'sTarget' => 'checkout', 
+                    'sTarget' => 'checkout',
                     'id' => $activeShippingAddressId
                 ]);
                 
@@ -79,11 +79,11 @@ class AddressCheck extends AbstractSubscriber
             return false;
         }
         
-        if(!$session->MoptAvalaraCheckedAddress) {
+        if (!$session->MoptAvalaraCheckedAddress) {
             return true;
         }
         
-        if($session->MoptAvalaraCheckedAddress != $this->getAddressHash($address)) {
+        if ($session->MoptAvalaraCheckedAddress != $this->getAddressHash($address)) {
             return true;
         }
 
@@ -91,7 +91,7 @@ class AddressCheck extends AbstractSubscriber
     }
     
     /**
-     * 
+     *
      * @param string $country
      * @return bool
      */
@@ -106,12 +106,12 @@ class AddressCheck extends AbstractSubscriber
             case FormCreator::DELIVERY_COUNTRY_NO_VALIDATION:
                 return false;
             case FormCreator::DELIVERY_COUNTRY_USA:
-                if($country == AddressFactory::COUNTRY_CODE__US) {
+                if ($country == AddressFactory::COUNTRY_CODE__US) {
                     return true;
                 }
                 break;
             case FormCreator::DELIVERY_COUNTRY_CANADA:
-                if($country == AddressFactory::COUNTRY_CODE__CA) {
+                if ($country == AddressFactory::COUNTRY_CODE__CA) {
                     return true;
                 }
                 break;
@@ -121,7 +121,7 @@ class AddressCheck extends AbstractSubscriber
                     AddressFactory::COUNTRY_CODE__US
                 ];
                 
-                if(in_array($country, $usaAndCanada)) {
+                if (in_array($country, $usaAndCanada)) {
                     return true;
                 }
                 break;
@@ -134,7 +134,8 @@ class AddressCheck extends AbstractSubscriber
      * get hash of given address
      * @param \Avalara\AddressLocationInfo $address
      */
-    protected function getAddressHash(AddressLocationInfo $address) {
+    protected function getAddressHash(AddressLocationInfo $address)
+    {
         return md5(serialize($address));
     }
 
@@ -180,7 +181,7 @@ class AddressCheck extends AbstractSubscriber
 
     /**
      * add error message
-     * 
+     *
      * @param \Shopware\Plugins\MoptAvalara\Subscriber\Enlight_View_Default $view
      */
     protected function addErrorMessage(\Enlight_View_Default $view)

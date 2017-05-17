@@ -7,7 +7,8 @@ namespace Shopware\Plugins\MoptAvalara\Form;
  *
  * @author bubnov
  */
-class FormCreator {
+class FormCreator
+{
     
     /**
      * Field names
@@ -79,10 +80,11 @@ class FormCreator {
     private $bootstrap;
     
     /**
-     * 
+     *
      * @param \Shopware_Plugins_Backend_MoptAvalara_Bootstrap $bootstrap
      */
-    public function __construct(\Shopware_Plugins_Backend_MoptAvalara_Bootstrap $bootstrap) {
+    public function __construct(\Shopware_Plugins_Backend_MoptAvalara_Bootstrap $bootstrap)
+    {
         $this->bootstrap = $bootstrap;
     }
 
@@ -102,7 +104,7 @@ class FormCreator {
             $countries[] = [$line['code'], ucfirst(strtolower($line['name']))];
         }
         
-        usort($countries, function($a, $b) {
+        usort($countries, function ($a, $b) {
             return ($a[1] > $b[1])
                 ? 1
                 : -1
@@ -132,7 +134,7 @@ class FormCreator {
             $regions[] = [$line['code'], ucfirst(strtolower($line['name']))];
         }
         
-        usort($regions, function($a, $b) {
+        usort($regions, function ($a, $b) {
             return ($a[1] > $b[1])
                 ? 1
                 : -1
@@ -439,10 +441,11 @@ class FormCreator {
     }
     
     /**
-     * 
+     *
      * @return \Shopware\Components\Routing\Context
      */
-    private function getContext() {
+    private function getContext()
+    {
         $container = Shopware()->Container();
         /** @var \Shopware\Models\Shop\Repository $repository */
         $repository = $container->get('models')->getRepository(\Shopware\Models\Shop\Shop::class);

@@ -11,7 +11,7 @@ class Shipping extends AbstractSubscriber
 
     /**
      * return array with all subsribed events
-     * 
+     *
      * @return array
      */
     public static function getSubscribedEvents()
@@ -19,7 +19,6 @@ class Shipping extends AbstractSubscriber
         return [
             'Enlight_Controller_Action_PostDispatch_Backend_Shipping' => 'onPostDispatchBackendShipping',
         ];
-    
     }
     
     public function onPostDispatchBackendShipping(\Enlight_Event_EventArgs $args)

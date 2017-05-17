@@ -18,8 +18,7 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
         
         $this->View()->assign([
             'success' => true,
-            'message' => 'Avalara: order has been cancelled successfully.']
-        );
+            'message' => 'Avalara: order has been cancelled successfully.']);
     }
     
     /**
@@ -40,12 +39,11 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
         
         $this->View()->assign([
             'success' => true,
-            'message' => 'Avalara: order has been updated.']
-        );
+            'message' => 'Avalara: order has been updated.']);
     }
     
     /**
-     * 
+     *
      * @return void
      */
     public function resetUpdateFlagAction()
@@ -58,12 +56,11 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
 
         $this->View()->assign([
             'success' => true,
-            'message' => 'Avalara: order has been unflagged.']
-        );
+            'message' => 'Avalara: order has been unflagged.']);
     }
     
     /**
-     * 
+     *
      * @return \Shopware\Models\Order\Order
      */
     protected function getAvalaraOrder()
@@ -74,8 +71,7 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             $this->View()->assign([
                 'success' => false,
                 'data' => $this->Request()->getParams(),
-                'message' => 'Avalara: invalid order.']
-            );
+                'message' => 'Avalara: invalid order.']);
             return null;
         }
 
@@ -83,8 +79,7 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             $this->View()->assign([
                 'success' => false,
                 'data' => $this->Request()->getParams(),
-                'message' => 'Avalara: order is not registered with Avalara.']
-            );
+                'message' => 'Avalara: order is not registered with Avalara.']);
             return null;
         }
         
@@ -92,12 +87,12 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
     }
     
     /**
-     * 
+     *
      * @param \Shopware\Models\Order\Order $order
      * @param string $cancelCode
      * @return boolean
      */
-    protected function cancelTax(\Shopware\Models\Order\Order $order, $cancelCode) 
+    protected function cancelTax(\Shopware\Models\Order\Order $order, $cancelCode)
     {
         $docCode = $order->getAttribute()->getMoptAvalaraDocCode();
         $adapter = $this->getAvalaraSDKAdapter();
@@ -112,14 +107,13 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             $adapter->getLogger()->error('CancelTax call failed: ' . $e->getMessage());
             $this->View()->assign([
                 'success' => false,
-                'message' => 'Avalara: Cancel Tax call failed: ' . $e->getMessage()]
-            );
+                'message' => 'Avalara: Cancel Tax call failed: ' . $e->getMessage()]);
             return false;
         }
     }
     
     /**
-     * 
+     *
      * @param \Shopware\Models\Order\Order $order
      * @return boolean
      */
@@ -152,14 +146,13 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             $adapter->getLogger()->error('GetTax call from order failed: '. $e->getMessage());
             $this->View()->assign([
                 'success' => false,
-                'message' => 'Avalara: Update order call failed: ' . $e->getMessage()]
-            );
+                'message' => 'Avalara: Update order call failed: ' . $e->getMessage()]);
             return false;
         }
     }
     
     /**
-     * 
+     *
      * @param \Shopware\Models\Order\Detail $detail
      * @param \stdClass $taxInformation
      * @return float
@@ -177,7 +170,7 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
     }
     
     /**
-     * 
+     *
      * @param \Shopware\Models\Order\Order $order
      */
     protected function resetUpdateFlag(\Shopware\Models\Order\Order $order)
@@ -188,10 +181,11 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
     }
 
     /**
-     * 
+     *
      * @return \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface
      */
-    protected function getAvalaraSDKAdapter() {
+    protected function getAvalaraSDKAdapter()
+    {
         $service = \Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter::SERVICE_NAME;
         return Shopware()->Container()->get($service);
     }

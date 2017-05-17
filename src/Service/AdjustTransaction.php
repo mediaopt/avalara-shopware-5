@@ -16,7 +16,7 @@ class AdjustTransaction extends AbstractService
     const UPDATE_DESCRIPTION = 'Order updated.';
     
     /**
-     * 
+     *
      * @param \Avalara\CreateTransactionModel $model
      * @param string $docCode
      * @return \stdClass

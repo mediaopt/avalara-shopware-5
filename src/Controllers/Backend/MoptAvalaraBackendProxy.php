@@ -67,7 +67,7 @@ class Shopware_Controllers_Backend_MoptAvalaraBackendProxy extends Shopware_Cont
     }
     
     /**
-     * 
+     *
      * @param string $fileName
      * @return \stdClass
      * @throws \Exception
@@ -85,7 +85,7 @@ class Shopware_Controllers_Backend_MoptAvalaraBackendProxy extends Shopware_Cont
     }
     
     /**
-     * 
+     *
      * @return string
      */
     protected function getCompanyCode()
@@ -97,7 +97,7 @@ class Shopware_Controllers_Backend_MoptAvalaraBackendProxy extends Shopware_Cont
     }
 
     /**
-     * 
+     *
      * @return \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface
      */
     private function getAdapter()

@@ -11,7 +11,7 @@ class Templating extends AbstractSubscriber
 
     /**
      * return array with all subsribed events
-     * 
+     *
      * @return array
      */
     public static function getSubscribedEvents()

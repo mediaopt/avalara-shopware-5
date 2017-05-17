@@ -73,14 +73,13 @@ try {
     $orderData['DocCode'] = 'DOC33333';
     $avalaraData['DocType'] = 'SalesInvoice';
     $avalaraData['Commit'] = 'true';
-    $response = $adapter->getService('getTax')->getTax($userData,$addressData,$lineData,$orderData,$avalaraData);
-    if(empty($response['ResultCode']) || $response['ResultCode'] != 'Success') {
+    $response = $adapter->getService('getTax')->getTax($userData, $addressData, $lineData, $orderData, $avalaraData);
+    if (empty($response['ResultCode']) || $response['ResultCode'] != 'Success') {
         echo 'Validation failed !';
         exit;
     }
     echo 'GETTAX CALL WORKS';
     //compare address fields
-    
 } catch (Exception $e) {
     echo 'Validation failed due to technical reasons!';
     echo $e->getMessage();

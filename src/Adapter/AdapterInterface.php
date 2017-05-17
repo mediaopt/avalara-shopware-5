@@ -8,7 +8,7 @@ namespace Shopware\Plugins\MoptAvalara\Adapter;
 interface AdapterInterface
 {
     /**
-     * 
+     *
      * @param string $type
      * @return \Shopware\Plugins\MoptAvalara\Adapter\Factory\AbstractFactory
      */
@@ -20,7 +20,7 @@ interface AdapterInterface
     public function getLogger();
     
     /**
-     * 
+     *
      * @return \Shopware\Plugins\MoptAvalara\Logger\LogSubscriber
      */
     public function getLogSubscriber();
@@ -43,7 +43,7 @@ interface AdapterInterface
     public function getPluginConfig($key);
     
     /**
-     * 
+     *
      * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
      */
     public function getBootstrap();

@@ -11,7 +11,7 @@ class TaxCodes extends AbstractSubscriber
 
     /**
      * return array with all subsribed events
-     * 
+     *
      * @return array
      */
     public static function getSubscribedEvents()
@@ -25,7 +25,7 @@ class TaxCodes extends AbstractSubscriber
 
     /**
      * extend backend category editing
-     * 
+     *
      * @param Enlight_Event_EventArgs $args
      */
     public function onPostDispatchBackendCategory(\Enlight_Event_EventArgs $args)
@@ -39,7 +39,7 @@ class TaxCodes extends AbstractSubscriber
 
     /**
      *  extend backend article editing
-     * 
+     *
      * @param Enlight_Event_EventArgs $args
      */
     public function onPostDispatchBackendArticle(\Enlight_Event_EventArgs $args)
@@ -61,5 +61,4 @@ class TaxCodes extends AbstractSubscriber
             $view->extendsTemplate('Backend/shipping/model/mopt_avalara__attribute.js');
         }
     }
-
 }

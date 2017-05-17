@@ -25,7 +25,6 @@ try {
     $avalaraData->type = 'SalesInvoice';
     $response = $adapter->getService('cancelTax')->cancelTax($orderData, $avalaraData);
     //compare address fields
-    
 } catch (Exception $e) {
     echo 'Validation failed due to technical reasons!';
     echo $e->getMessage();

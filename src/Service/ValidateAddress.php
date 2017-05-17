@@ -12,7 +12,7 @@ class ValidateAddress extends AbstractService
 {
     /**
      * Ignore any difference in this address parts
-     * @var array 
+     * @var array
      */
     private static $ignoreAddressParts = [
         'region',
@@ -21,7 +21,7 @@ class ValidateAddress extends AbstractService
     ];
     
     /**
-     * 
+     *
      * @param \Avalara\AddressLocationInfo $address
      * @return \stdClass
      */
@@ -31,7 +31,7 @@ class ValidateAddress extends AbstractService
     }
 
     /**
-     * 
+     *
      * @param \Avalara\AddressLocationInfo $checkedAddress
      * @param \stdClass $response
      * @return array
@@ -58,5 +58,4 @@ class ValidateAddress extends AbstractService
 
         return $changes;
     }
-
 }

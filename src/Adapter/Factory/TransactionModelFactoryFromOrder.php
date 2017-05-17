@@ -16,12 +16,12 @@ class TransactionModelFactoryFromOrder extends AbstractTransactionModelFactory
 {
     /**
      *
-     * @var Order 
+     * @var Order
      */
     private $orderContext;
     
     /**
-     * 
+     *
      * @param \Shopware\Models\Order\Order $order
      * @param bool $isCommit
      * @return \Avalara\CreateTransactionModel
@@ -101,18 +101,20 @@ class TransactionModelFactoryFromOrder extends AbstractTransactionModelFactory
     }
     
     /**
-     * 
+     *
      * @return int
      */
-    protected function getShippingId() {
+    protected function getShippingId()
+    {
         return $this->orderContext->getDispatch()->getId();
     }
     
     /**
-     * 
+     *
      * @return float
      */
-    protected function getShippingPrice() {
+    protected function getShippingPrice()
+    {
         return $this->orderContext->getInvoiceShipping();
     }
     
@@ -132,7 +134,7 @@ class TransactionModelFactoryFromOrder extends AbstractTransactionModelFactory
     }
 
     /**
-     * 
+     *
      * @param \Shopware\Models\Order\Detail $detail
      * @return array
      */

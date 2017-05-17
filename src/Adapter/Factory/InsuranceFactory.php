@@ -15,7 +15,7 @@ class InsuranceFactory extends AbstractFactory
 
     /**
      * build Line-model
-     * 
+     *
      * @param float $price
      * @return \Avalara\LineItemModel
      */

@@ -12,7 +12,7 @@ use Shopware\Plugins\MoptAvalara\Form\FormCreator;
 class CancelTax extends AbstractService
 {
     /**
-     * 
+     *
      * @param string $docCode
      * @param string $cancelCode
      * @return \stdClass

@@ -11,7 +11,7 @@ use Avalara\CreateTransactionModel;
 class GetTax extends AbstractService
 {
     /**
-     * 
+     *
      * @param CreateTransactionModel $model
      * @return \stdClass
      */

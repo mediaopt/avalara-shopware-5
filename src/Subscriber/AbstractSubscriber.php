@@ -24,13 +24,13 @@ abstract class AbstractSubscriber implements SubscriberInterface
     private $adapter;
     
     /**
-     * 
+     *
      * @param \Shopware\Components\Form\Container
      */
     private $container;
     
     /**
-     * 
+     *
      * @param \Shopware_Plugins_Backend_MoptAvalara_Bootstrap $bootstrap
      */
     public function __construct(\Shopware_Plugins_Backend_MoptAvalara_Bootstrap $bootstrap)
@@ -44,7 +44,7 @@ abstract class AbstractSubscriber implements SubscriberInterface
     abstract public static function getSubscribedEvents();
     
     /**
-     * 
+     *
      * @return \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface
      */
     protected function getAdapter()
@@ -57,7 +57,7 @@ abstract class AbstractSubscriber implements SubscriberInterface
     }
     
     /**
-     * 
+     *
      * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
      */
     protected function getBootstrap()
@@ -66,7 +66,7 @@ abstract class AbstractSubscriber implements SubscriberInterface
     }
     
     /**
-     * 
+     *
      * @return \Shopware\Components\Form\Container
      */
     protected function getContainer()
@@ -79,11 +79,12 @@ abstract class AbstractSubscriber implements SubscriberInterface
     }
     
     /**
-     * 
+     *
      * @param \stdClass $object
      * @return array
      */
-    protected function objectToArray($object) {
+    protected function objectToArray($object)
+    {
         $data = (array)$object;
         foreach ($data as $key => $value) {
             if (is_object($value) || is_array($value)) {

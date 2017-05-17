@@ -17,25 +17,25 @@ use Shopware\Plugins\MoptAvalara\LandedCost\LandedCostRequestParams;
 abstract class AbstractTransactionModelFactory extends AbstractFactory
 {
     /**
-     * 
+     *
      * @return \Avalara\AddressesModel
      */
     abstract protected function getAddressesModel();
     
     /**
-     * 
+     *
      * @return float
      */
     abstract protected function getDiscount();
     
     /**
-     * 
+     *
      * @return int
      */
     abstract protected function getShippingId();
     
     /**
-     * 
+     *
      * @return float
      */
     abstract protected function getShippingPrice();
@@ -97,7 +97,8 @@ abstract class AbstractTransactionModelFactory extends AbstractFactory
      * @param LineItemModel $shippingModel
      * @return LineItemModel
      */
-    protected function getInsuranceModel($shippingModel = null) {
+    protected function getInsuranceModel($shippingModel = null)
+    {
         if (null === $shippingModel) {
             return null;
         }
@@ -147,7 +148,7 @@ abstract class AbstractTransactionModelFactory extends AbstractFactory
     }
     
     /**
-     * 
+     *
      * @return object
      */
     protected function getTransactionParameters()
@@ -202,7 +203,7 @@ abstract class AbstractTransactionModelFactory extends AbstractFactory
     }
     
     /**
-     * 
+     *
      * @return string
      */
     protected function getCompanyCode()

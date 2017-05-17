@@ -16,7 +16,7 @@ class AddressFactory extends AbstractFactory
     
     /**
      * build Address-model based on delivery address
-     * 
+     *
      * @return \Avalara\AddressLocationInfo
      */
     public function buildDeliveryAddress()
@@ -34,7 +34,7 @@ class AddressFactory extends AbstractFactory
     
     /**
      * build Address-model based on delivery address
-     * 
+     *
      * @return \Avalara\AddressLocationInfo
      */
     public function buildBillingAddress()
@@ -52,7 +52,7 @@ class AddressFactory extends AbstractFactory
     
     /**
      * build Address-model based on delivery address
-     * 
+     *
      * @param \Shopware\Models\Order\Order $order
      * @return \Avalara\AddressLocationInfo
      */
@@ -77,7 +77,7 @@ class AddressFactory extends AbstractFactory
     
     /**
      * build Address-model based on delivery address
-     * 
+     *
      * @param \Shopware\Models\Order\Order $order
      * @return \Avalara\AddressLocationInfo
      */
@@ -165,7 +165,7 @@ class AddressFactory extends AbstractFactory
     }
     
     /**
-     * 
+     *
      * @param int $id
      * @return \Shopware\Models\Country\Country
      */

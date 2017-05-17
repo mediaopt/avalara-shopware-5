@@ -28,7 +28,7 @@ abstract class AbstractFactory
     protected $pluginConfig = null;
     
     /**
-     * 
+     *
      * @param AdapterInterface $adapter
      */
     public function __construct(AdapterInterface $adapter)
@@ -37,7 +37,7 @@ abstract class AbstractFactory
     }
     
     /**
-     * 
+     *
      * @return \Avalara\AvaTaxClient
      */
     public function getSdk()
@@ -46,7 +46,7 @@ abstract class AbstractFactory
     }
 
     /**
-     * 
+     *
      * @return AdapterInterface
      */
     public function getAdapter()
@@ -55,7 +55,7 @@ abstract class AbstractFactory
     }
 
     /**
-     * 
+     *
      * @return array
      */
     protected function getUserData()
@@ -67,7 +67,7 @@ abstract class AbstractFactory
     }
     
     /**
-     * 
+     *
      * @return array
      */
     protected function getPluginConfig($key)
