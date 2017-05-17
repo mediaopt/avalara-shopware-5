@@ -9,11 +9,7 @@ use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\InsuranceFactory;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
 
-/**
- * Description of Checkout
- *
- */
-class GetTax extends AbstractSubscriber
+class GetTaxSubscriber extends AbstractSubscriber
 {
     /**
      * return array with all subsribed events

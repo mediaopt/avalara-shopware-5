@@ -177,7 +177,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
         $subscribers = [];
         $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\AddressCheck($this);
         $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\Templating($this);
-        $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\GetTax($this);
+        $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\GetTaxSubscriber($this);
         $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\AdjustTax($this);
 
         foreach ($subscribers as $subscriber) {
