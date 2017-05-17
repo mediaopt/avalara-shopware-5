@@ -67,7 +67,8 @@ class FormCreator
     /**
      * Incoterms
      */
-    const INCOTERMS_DEFAULT = 'Use default';
+    const INCOTERMS_DEFAULT = 'default';
+    const INCOTERMS_DEFAULT_LABEL = 'default';
     const INCOTERMS_DAP = 'DAP';
     const INCOTERMS_DAP_LABEL = 'Delivered at Place (DAP)';
     const INCOTERMS_DDP = 'DDP';

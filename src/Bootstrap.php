@@ -355,7 +355,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
                     ],
                     [
                         'key' => FormCreator::INCOTERMS_DEFAULT,
-                        'value' => FormCreator::INCOTERMS_DEFAULT
+                        'value' => FormCreator::INCOTERMS_DEFAULT_LABEL
                     ],
                 ],
             ],
