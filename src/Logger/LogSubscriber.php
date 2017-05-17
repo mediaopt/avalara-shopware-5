@@ -29,7 +29,17 @@ class LogSubscriber implements SubscriberInterface
     /** @var Formatter Formatter used to format log messages */
     protected $formatter;
     
+    /**
+     *
+     * @var int
+     */
     protected $timestampBefore;
+    
+    /**
+     *
+     * @var \GuzzleHttp\Message\Response
+     */
+    protected $lastResponseWithError;
 
     /**
      * @param LoggerInterface|callable|resource|null $logger Logger used to log
@@ -48,6 +58,10 @@ class LogSubscriber implements SubscriberInterface
         $this->formatter = $formatter instanceof Formatter ? $formatter : new Formatter($formatter);
     }
 
+    /**
+     * 
+     * @return array
+     */
     public function getEvents()
     {
         return [
@@ -57,6 +71,10 @@ class LogSubscriber implements SubscriberInterface
         ];
     }
 
+    /**
+     * 
+     * @param CompleteEvent $event
+     */
     public function onComplete(CompleteEvent $event)
     {
         $this->logger->log(
@@ -71,35 +89,56 @@ class LogSubscriber implements SubscriberInterface
         );
     }
 
+    /**
+     * 
+     * @param ErrorEvent $event
+     */
     public function onError(ErrorEvent $event)
     {
         $this->formatter->setTemplate(\GuzzleHttp\Subscriber\Log\Formatter::DEBUG);
         $ex = $event->getException();
-        $this->logger->log
-                (LogLevel::CRITICAL, $this->formatter->format(
-                        $event->getRequest(), $event->getResponse(), $ex, [
-                            'processingTime' => $this->getProcessingTime(),
-                        ]
-                ), [
-            'request' => $event->getRequest(),
-            'response' => $event->getResponse(),
-            'exception' => $ex
+        $this->logger->log(
+            LogLevel::CRITICAL, 
+            $this->formatter->format(
+                $event->getRequest(), $event->getResponse(), $ex, [
+                    'processingTime' => $this->getProcessingTime(),
                 ]
+            ), 
+            [
+                'request' => $event->getRequest(),
+                'response' => $event->getResponse(),
+                'exception' => $ex
+            ]
         );
+        
+        $this->lastResponseWithError = $event->getResponse();
         $this->formatter->resetTemplate();
     }
     
     /**
-     * set timestamp
+     * 
+     * @return \GuzzleHttp\Message\Response
+     */
+    public function getLastResponseWithError()
+    {
+        return $this->lastResponseWithError;
+    }
+    
+    /**
+     * Will set last timestamp
+     * @param BeforeEvent $event
      */
     public function onBefore(BeforeEvent $event)
     {
         $this->timestampBefore = microtime(true);
     }
     
+    /**
+     * 
+     * @return int
+     */
     protected function getProcessingTime()
     {
         return number_format(microtime(true) - $this->timestampBefore, 2);
     }
-
 }
