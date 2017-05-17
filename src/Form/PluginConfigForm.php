@@ -7,9 +7,8 @@ namespace Shopware\Plugins\MoptAvalara\Form;
  *
  * @author bubnov
  */
-class FormCreator
+class PluginConfigForm
 {
-    
     /**
      * Field names
      */
@@ -148,7 +147,7 @@ class FormCreator
     /**
      * Will create all plugin config forms and fields
      */
-    public function createForms()
+    public function create()
     {
         $form = $this->bootstrap->Form();
         $parent = $this->bootstrap->Forms()->findOneBy(['name' => 'Frontend']);

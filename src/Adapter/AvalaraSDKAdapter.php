@@ -6,7 +6,7 @@ use Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface;
 use Shopware_Plugins_Backend_MoptAvalara_Bootstrap;
 use Shopware\Plugins\MoptAvalara\Logger\Formatter;
 use Shopware\Plugins\MoptAvalara\Logger\LogSubscriber;
-use Shopware\Plugins\MoptAvalara\Form\FormCreator;
+use Shopware\Plugins\MoptAvalara\Form\PluginConfigForm;
 use Avalara\AvaTaxClient;
 
 /**
@@ -110,8 +110,8 @@ class AvalaraSDKAdapter implements AdapterInterface
             $this->getSDKEnv()
         );
         
-        $accountNumber = $this->getPluginConfig(FormCreator::ACCOUNT_NUMBER_FIELD);
-        $licenseKey = $this->getPluginConfig(FormCreator::LICENSE_KEY_FIELD);
+        $accountNumber = $this->getPluginConfig(PluginConfigForm::ACCOUNT_NUMBER_FIELD);
+        $licenseKey = $this->getPluginConfig(PluginConfigForm::LICENSE_KEY_FIELD);
         $avaClient->withSecurity($accountNumber, $licenseKey);
         $this->avaTaxClient = $avaClient;
 
@@ -147,7 +147,7 @@ class AvalaraSDKAdapter implements AdapterInterface
 
         //setup monolog
         $this->logger = new \Monolog\Logger('mo_avalara');
-        $logFileName = FormCreator::LOG_FILE_NAME . FormCreator::LOG_FILE_EXT;
+        $logFileName = PluginConfigForm::LOG_FILE_NAME . PluginConfigForm::LOG_FILE_EXT;
         $streamHandler = new \Monolog\Handler\RotatingFileHandler(
             $this->getLogDir() . $logFileName,
             $this->getMaxFiles(),
@@ -190,7 +190,7 @@ class AvalaraSDKAdapter implements AdapterInterface
      */
     private function getSDKEnv()
     {
-        if ($this->getPluginConfig(FormCreator::IS_LIVE_MODE_FIELD)) {
+        if ($this->getPluginConfig(PluginConfigForm::IS_LIVE_MODE_FIELD)) {
             return self::PRODUCTION_ENV;
         }
         
@@ -220,7 +220,7 @@ class AvalaraSDKAdapter implements AdapterInterface
      */
     protected function getMaxFiles()
     {
-        if ($rotationDays = $this->getPluginConfig(FormCreator::LOG_ROTATION_DAYS_FIELD)) {
+        if ($rotationDays = $this->getPluginConfig(PluginConfigForm::LOG_ROTATION_DAYS_FIELD)) {
             return $rotationDays;
         }
 
@@ -235,7 +235,7 @@ class AvalaraSDKAdapter implements AdapterInterface
     {
         $logLevel = 'ERROR';
         
-        if ($overrideLogLevel = $this->getPluginConfig(FormCreator::LOG_LEVEL_FIELD)) {
+        if ($overrideLogLevel = $this->getPluginConfig(PluginConfigForm::LOG_LEVEL_FIELD)) {
             $logLevel = $overrideLogLevel;
         }
         

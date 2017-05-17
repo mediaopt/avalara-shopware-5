@@ -7,7 +7,7 @@ use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\InsuranceFactory;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\AddressFactory;
-use Shopware\Plugins\MoptAvalara\Form\FormCreator;
+use Shopware\Plugins\MoptAvalara\Form\PluginConfigForm;
 use Shopware\Plugins\MoptAvalara\LandedCost\LandedCostRequestParams;
 
 /**
@@ -157,7 +157,7 @@ abstract class AbstractTransactionModelFactory extends AbstractFactory
         
         $landedCostEnabled = $this
             ->getAdapter()
-            ->getPluginConfig(FormCreator::LANDEDCOST_ENABLED_FIELD)
+            ->getPluginConfig(PluginConfigForm::LANDEDCOST_ENABLED_FIELD)
         ;
         if (!$landedCostEnabled) {
             return $params;
@@ -165,7 +165,7 @@ abstract class AbstractTransactionModelFactory extends AbstractFactory
         
         $defaultIncoterms = $this
             ->getAdapter()
-            ->getPluginConfig(FormCreator::INCOTERMS_FIELD)
+            ->getPluginConfig(PluginConfigForm::INCOTERMS_FIELD)
         ;
         
         $countryIncoterm = $this->getCountryIncoterm();
@@ -195,7 +195,7 @@ abstract class AbstractTransactionModelFactory extends AbstractFactory
         }
         
         $incoterms = $attr->getMoptAvalaraIncoterms();
-        if (!$incoterms || FormCreator::INCOTERMS_DEFAULT === $incoterms) {
+        if (!$incoterms || PluginConfigForm::INCOTERMS_DEFAULT === $incoterms) {
             return null;
         }
         
@@ -210,7 +210,7 @@ abstract class AbstractTransactionModelFactory extends AbstractFactory
     {
         return $this
             ->getAdapter()
-            ->getPluginConfig(FormCreator::COMPANY_CODE_FIELD)
+            ->getPluginConfig(PluginConfigForm::COMPANY_CODE_FIELD)
         ;
     }
 }

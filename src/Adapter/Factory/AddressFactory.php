@@ -3,7 +3,7 @@
 namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
 use Avalara\AddressLocationInfo;
-use Shopware\Plugins\MoptAvalara\Form\FormCreator;
+use Shopware\Plugins\MoptAvalara\Form\PluginConfigForm;
 
 /**
  * Description of Config
@@ -107,13 +107,13 @@ class AddressFactory extends AbstractFactory
     public function buildOriginAddress()
     {
         $address = new AddressLocationInfo();
-        $address->line1 = $this->getPluginConfig(FormCreator::ORIGIN_ADDRESS_LINE_1_FIELD);
-        $address->line2 = $this->getPluginConfig(FormCreator::ORIGIN_ADDRESS_LINE_2_FIELD);
-        $address->line3 = $this->getPluginConfig(FormCreator::ORIGIN_ADDRESS_LINE_3_FIELD);
-        $address->city = $this->getPluginConfig(FormCreator::ORIGIN_CITY_FIELD);
-        $address->postalCode = $this->getPluginConfig(FormCreator::ORIGIN_POSTAL_CODE_FIELD);
-        $address->region = $this->getPluginConfig(FormCreator::ORIGIN_REGION_FIELD);
-        $address->country = $this->getPluginConfig(FormCreator::ORIGIN_COUNTRY_FIELD);
+        $address->line1 = $this->getPluginConfig(PluginConfigForm::ORIGIN_ADDRESS_LINE_1_FIELD);
+        $address->line2 = $this->getPluginConfig(PluginConfigForm::ORIGIN_ADDRESS_LINE_2_FIELD);
+        $address->line3 = $this->getPluginConfig(PluginConfigForm::ORIGIN_ADDRESS_LINE_3_FIELD);
+        $address->city = $this->getPluginConfig(PluginConfigForm::ORIGIN_CITY_FIELD);
+        $address->postalCode = $this->getPluginConfig(PluginConfigForm::ORIGIN_POSTAL_CODE_FIELD);
+        $address->region = $this->getPluginConfig(PluginConfigForm::ORIGIN_REGION_FIELD);
+        $address->country = $this->getPluginConfig(PluginConfigForm::ORIGIN_COUNTRY_FIELD);
         
         if (strlen($address->country) > 2) {
             $this->fixCountryCode($address);
@@ -134,8 +134,8 @@ class AddressFactory extends AbstractFactory
     {
         $country = strtolower($address->country);
 
-        $formCreator = new FormCreator($this->getAdapter()->getBootstrap());
-        foreach ($formCreator->getCountriesISO() as $item) {
+        $pluginConfigForm = new PluginConfigForm($this->getAdapter()->getBootstrap());
+        foreach ($pluginConfigForm->getCountriesISO() as $item) {
             if ($country === strtolower($item[1])) {
                 $address->country = $item[0];
                 break;
@@ -153,8 +153,8 @@ class AddressFactory extends AbstractFactory
     {
         $countryIso = $address->country;
         $region = strtolower($address->region);
-        $formCreator = new FormCreator($this->getAdapter()->getBootstrap());
-        foreach ($formCreator->getRegionsISO($countryIso) as $item) {
+        $pluginConfigForm = new PluginConfigForm($this->getAdapter()->getBootstrap());
+        foreach ($pluginConfigForm->getRegionsISO($countryIso) as $item) {
             if ($region === strtolower($item[1])) {
                 $address->region = $item[0];
                 break;

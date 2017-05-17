@@ -1,6 +1,6 @@
 <?php
 
-use Shopware\Plugins\MoptAvalara\Form\FormCreator;
+use Shopware\Plugins\MoptAvalara\Form\PluginConfigForm;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
 use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
 
@@ -343,25 +343,25 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
                 'displayInBackend' => true,
                 'position' => 10,
                 'custom' => true,
-                'defaultValue' => FormCreator::INCOTERMS_DEFAULT,
+                'defaultValue' => PluginConfigForm::INCOTERMS_DEFAULT,
                 'arrayStore' => [
                     [
-                        'key' => FormCreator::INCOTERMS_DDP,
-                        'value' => FormCreator::INCOTERMS_DDP_LABEL
+                        'key' => PluginConfigForm::INCOTERMS_DDP,
+                        'value' => PluginConfigForm::INCOTERMS_DDP_LABEL
                     ],
                     [
-                        'key' => FormCreator::INCOTERMS_DAP,
-                        'value' => FormCreator::INCOTERMS_DAP_LABEL
+                        'key' => PluginConfigForm::INCOTERMS_DAP,
+                        'value' => PluginConfigForm::INCOTERMS_DAP_LABEL
                     ],
                     [
-                        'key' => FormCreator::INCOTERMS_DEFAULT,
-                        'value' => FormCreator::INCOTERMS_DEFAULT_LABEL
+                        'key' => PluginConfigForm::INCOTERMS_DEFAULT,
+                        'value' => PluginConfigForm::INCOTERMS_DEFAULT_LABEL
                     ],
                 ],
             ],
             null,
             false,
-            FormCreator::INCOTERMS_DEFAULT
+            PluginConfigForm::INCOTERMS_DEFAULT
         );
         
         $attributeCrudService->update('s_order_attributes', 'mopt_avalara_incoterms', 'string', [
@@ -409,8 +409,8 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
      */
     private function createForm()
     {
-        $formCreator = new FormCreator($this);
-        $formCreator->createForms();
+        $pluginConfigForm = new PluginConfigForm($this);
+        $pluginConfigForm->create();
         
         return $this;
     }

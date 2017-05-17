@@ -5,7 +5,7 @@ namespace Shopware\Plugins\MoptAvalara\Service;
 use Avalara\CreateTransactionModel;
 use Avalara\AdjustTransactionModel;
 use Avalara\AdjustmentReason;
-use Shopware\Plugins\MoptAvalara\Form\FormCreator;
+use Shopware\Plugins\MoptAvalara\Form\PluginConfigForm;
 
 /**
  * Description of GetTax
@@ -23,7 +23,7 @@ class AdjustTransaction extends AbstractService
      */
     public function adjustTransaction(CreateTransactionModel $model, $docCode)
     {
-        $companyCode = $this->getAdapter()->getPluginConfig(FormCreator::COMPANY_CODE_FIELD);
+        $companyCode = $this->getAdapter()->getPluginConfig(PluginConfigForm::COMPANY_CODE_FIELD);
         $client = $this->getAdapter()->getAvaTaxClient();
         
         $adjustModel = new AdjustTransactionModel();

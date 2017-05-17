@@ -1,6 +1,6 @@
 <?php
 
-use Shopware\Plugins\MoptAvalara\Form\FormCreator;
+use Shopware\Plugins\MoptAvalara\Form\PluginConfigForm;
 
 /**
  * $Id: $
@@ -45,7 +45,7 @@ class Shopware_Controllers_Backend_MoptAvalaraBackendProxy extends Shopware_Cont
     {
         $adapter = $this->getAdapter();
         
-        $fileName = ($adapter->getPluginConfig(FormCreator::LANDEDCOST_ENABLED_FIELD))
+        $fileName = ($adapter->getPluginConfig(PluginConfigForm::LANDEDCOST_ENABLED_FIELD))
             ? 'testTaxAndLandedCostRequest.json'
             : 'testTaxRequest.json'
         ;
@@ -92,7 +92,7 @@ class Shopware_Controllers_Backend_MoptAvalaraBackendProxy extends Shopware_Cont
     {
         return $this
             ->getAdapter()
-            ->getPluginConfig(FormCreator::COMPANY_CODE_FIELD)
+            ->getPluginConfig(PluginConfigForm::COMPANY_CODE_FIELD)
         ;
     }
 

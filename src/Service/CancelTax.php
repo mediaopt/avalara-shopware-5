@@ -3,7 +3,7 @@
 namespace Shopware\Plugins\MoptAvalara\Service;
 
 use Avalara\VoidTransactionModel;
-use Shopware\Plugins\MoptAvalara\Form\FormCreator;
+use Shopware\Plugins\MoptAvalara\Form\PluginConfigForm;
 
 /**
  * Description of CancelTax
@@ -20,7 +20,7 @@ class CancelTax extends AbstractService
     public function cancel($docCode, $cancelCode)
     {
         $client = $this->getAdapter()->getAvaTaxClient();
-        $companyCode = $this->getAdapter()->getPluginConfig(FormCreator::COMPANY_CODE_FIELD);
+        $companyCode = $this->getAdapter()->getPluginConfig(PluginConfigForm::COMPANY_CODE_FIELD);
         
         $model = new VoidTransactionModel();
         $model->code = $cancelCode;

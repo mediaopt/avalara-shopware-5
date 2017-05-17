@@ -8,7 +8,7 @@ use Avalara\LineItemModel;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\InsuranceFactory;
-use Shopware\Plugins\MoptAvalara\Form\FormCreator;
+use Shopware\Plugins\MoptAvalara\Form\PluginConfigForm;
 use Shopware\Plugins\MoptAvalara\LandedCost\LandedCostRequestParams;
 
 /**

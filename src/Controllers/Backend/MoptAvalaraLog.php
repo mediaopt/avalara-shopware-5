@@ -17,8 +17,8 @@ class Shopware_Controllers_Backend_MoptAvalaraLog extends Shopware_Controllers_B
     public function downloadLogfileAction()
     {
         try {
-            $fileNamePart = \Shopware\Plugins\MoptAvalara\Form\FormCreator::LOG_FILE_NAME;
-            $logFileName = $fileNamePart . '-' . date('Y-m-d') . \Shopware\Plugins\MoptAvalara\Form\FormCreator::LOG_FILE_EXT;
+            $fileNamePart = \Shopware\Plugins\MoptAvalara\Form\PluginConfigForm::LOG_FILE_NAME;
+            $logFileName = $fileNamePart . '-' . date('Y-m-d') . \Shopware\Plugins\MoptAvalara\Form\PluginConfigForm::LOG_FILE_EXT;
 
             $logDirectory = $this->getLogDir();
 
