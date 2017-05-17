@@ -80,6 +80,7 @@ class TransactionModelFactoryFromOrder extends AbstractTransactionModelFactory
     }
     
     /**
+     * Discount amount from a voucher is a negative value!
      * @return float
      */
     protected function getDiscount()
