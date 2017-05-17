@@ -29,12 +29,12 @@ class LineFactory extends AbstractFactory
         $line = new LineItemModel();
         $line->number = $lineData['id'];
         $line->itemCode = $lineData['id'];
-        $line->amount = $this->getParamAmount($lineData);
+        $line->amount = $this->getAmount($lineData);
         $line->quantity = $lineData['quantity'];
         $line->description = $lineData['articlename'];
-        $line->taxCode = $this->getParamTaxCode($lineData);
+        $line->taxCode = $this->getTaxCode($lineData);
         $line->discounted = self::isNotVoucher($lineData);
-        $line->taxIncluded = $this->getParamIsTaxIncluded($lineData);
+        $line->taxIncluded = $this->isTaxIncluded($lineData);
         $line->parameters = $this->getParams($lineData);
 
         return $line;
@@ -45,14 +45,15 @@ class LineFactory extends AbstractFactory
      * @param array $lineData
      * @return float
      */
-    protected function getParamAmount($lineData)
+    protected function getAmount($lineData)
     {
-        if ($this->getParamIsTaxIncluded($lineData)) {
-            return $lineData['brutprice'];
-        }
-
-        $price = $lineData['netprice'] * $lineData['quantity'];
-        return $price;
+        $price = ($this->isTaxIncluded($lineData))
+            ? $lineData['price']
+            : $lineData['netprice']
+        ;
+        $normPrice = (float)str_replace(',', '.', $price);
+ 
+        return $normPrice * (float)$lineData['quantity'];
     }
 
     /**
@@ -60,7 +61,7 @@ class LineFactory extends AbstractFactory
      * @param array $lineData
      * @return string
      */
-    protected function getParamTaxCode($lineData)
+    protected function getTaxCode($lineData)
     {
         $articleId = $lineData['articleID'];
         if ($voucherTaxCode = $this->getVoucherTaxCode($articleId, $lineData['modus'])) {
@@ -149,9 +150,9 @@ class LineFactory extends AbstractFactory
      * @param array $lineData
      * @return bool
      */
-    protected function getParamIsTaxIncluded($lineData)
+    protected function isTaxIncluded($lineData)
     {
-        return !$this->getParamTaxCode($lineData);
+        return !$this->getTaxCode($lineData);
     }
 
     /**

@@ -12,7 +12,7 @@ class GetTax extends AbstractService
 {
     /**
      * 
-     * @param \Avalara\CreateTransactionModel $model
+     * @param CreateTransactionModel $model
      * @return \stdClass
      */
     public function calculate(CreateTransactionModel $model)
@@ -25,13 +25,13 @@ class GetTax extends AbstractService
     
     /**
      * get tax ammount from avalara response
+     * @param \stdClass $taxResult
      * @param string|int $id
-     * @param \stdClass $taxInformation
      * @return float
      */
-    public function getTaxForOrderBasketId($id, $taxInformation)
+    public function getTaxForOrderBasketId($taxResult, $id)
     {
-        if (!$taxLineInformation = $this->getTaxLineForOrderBasketId($id, $taxInformation)) {
+        if (!$taxLineInformation = $this->getTaxLineForOrderBasketId($taxResult, $id)) {
             return 0;
         }
 
@@ -40,13 +40,13 @@ class GetTax extends AbstractService
     
     /**
      * get tax rate from avalara response
+     * @param \stdClass $taxResult
      * @param string|int $id
-     * @param \stdClass $taxInformation
      * @return float
      */
-    public function getTaxRateForOrderBasketId($id, $taxInformation)
+    public function getTaxRateForOrderBasketId($taxResult, $id)
     {
-        if (!$taxLine = $this->getTaxLineForOrderBasketId($id, $taxInformation)) {
+        if (!$taxLine = $this->getTaxLineForOrderBasketId($taxResult, $id)) {
             return 0;
         }
 
@@ -55,13 +55,13 @@ class GetTax extends AbstractService
 
     /**
      * get tax line info from avalara response
+     * @param \stdClass $taxResult
      * @param string|int $id
-     * @param \stdClass $taxInformation
-     * @return \stdClass
+     * @return \stdClass | null
      */
-    private function getTaxLineForOrderBasketId($id, $taxInformation)
+    private function getTaxLineForOrderBasketId($taxResult, $id)
     {
-        foreach ($taxInformation->lines as $taxLine) {
+        foreach ($taxResult->lines as $taxLine) {
             if ($id == $taxLine->lineNumber && $taxLine->tax) {
                 return $taxLine;
             }
