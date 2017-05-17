@@ -193,11 +193,12 @@ abstract class AbstractTransactionModelFactory extends AbstractFactory
             return null;
         }
         
-        if ($incoterms = $attr->getMoptAvalaraIncoterms()) {
-            return $incoterms;
+        $incoterms = $attr->getMoptAvalaraIncoterms();
+        if (!$incoterms || FormCreator::INCOTERMS_DEFAULT === $incoterms) {
+            return null;
         }
         
-        return null;
+        return $incoterms;
     }
     
     /**
