@@ -31,7 +31,7 @@ class TransactionModelFactory extends AbstractTransactionModelFactory
         $model->businessIdentificationNo = $user['billingaddress']['ustid'];
         $model->commit = $isCommit;
         $model->customerCode = $user['additional']['user']['id'];
-        $model->date = date('Y-m-d', time());
+        $model->date = date(DATE_W3C);
         $model->discount = $this->getDiscount();
         $model->type = $docType;
         $model->currencyCode = Shopware()->Shop()->getCurrency()->getCurrency();

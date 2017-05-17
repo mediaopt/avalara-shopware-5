@@ -36,7 +36,7 @@ class TransactionModelFactoryFromOrder extends AbstractTransactionModelFactory
         $model->code = $order->getNumber();
         $model->commit = $isCommit;
         $model->customerCode = $customer->getId();
-        $model->date = date('Y-m-d', time());
+        $model->date = date(DATE_W3C);
         $model->lines = $this->getLineModels();
         $model->discount = $this->getDiscount();
         $model->type = \Avalara\DocumentType::C_SALESINVOICE;
