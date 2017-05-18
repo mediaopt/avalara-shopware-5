@@ -119,6 +119,10 @@ class AddressFactory extends AbstractFactory
             $this->fixCountryCode($address);
         }
         
+        if (strlen($address->region) > 3) {
+            $this->fixRegionCode($address);
+        }
+        
         return $address;
     }
     
@@ -134,6 +138,25 @@ class AddressFactory extends AbstractFactory
         foreach ($formCreator->getCountriesISO() as $item) {
             if ($country === strtolower($item[1])) {
                 $address->country = $item[0];
+                break;
+            }
+        }
+        
+        return $this;
+    }
+    
+    /**
+     * Change region name to ISO code
+     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
+     */
+    private function fixRegionCode(AddressLocationInfo $address)
+    {
+        $countryIso = $address->country;
+        $region = strtolower($address->region);
+        $formCreator = new FormCreator($this->getAdapter()->getBootstrap());
+        foreach ($formCreator->getRegionsISO($countryIso) as $item) {
+            if ($region === strtolower($item[1])) {
+                $address->region = $item[0];
                 break;
             }
         }
