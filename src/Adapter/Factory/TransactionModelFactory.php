@@ -6,10 +6,6 @@ use Avalara\CreateTransactionModel;
 use Avalara\AddressesModel;
 use Avalara\LineItemModel;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
-use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
-use Shopware\Plugins\MoptAvalara\Adapter\Factory\InsuranceFactory;
-use Shopware\Plugins\MoptAvalara\Form\PluginConfigForm;
-use Shopware\Plugins\MoptAvalara\LandedCost\LandedCostRequestParams;
 
 /**
  * Factory to create CreateTransactionModel from the bucket

@@ -5,7 +5,6 @@ namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 use Avalara\CreateTransactionModel;
 use Avalara\AddressesModel;
 use Shopware\Models\Order\Order;
-use Shopware\Plugins\MoptAvalara\Form\PluginConfigForm;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
 
 /**
