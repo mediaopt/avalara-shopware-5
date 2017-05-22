@@ -60,7 +60,7 @@ class GetTaxSubscriber extends AbstractSubscriber
 
             $session->MoptAvalaraGetTaxResult = $this->generateTaxResultFromResponse($response);
             $session->MoptAvalaraGetTaxRequestHash = $this->getHashFromRequest($model);
-        } catch (\GuzzleHttp\Exception\TransferException $e) {
+        } catch (\Exception $e) {
             $adapter->getLogger()->error('GetTax call failed: ' . $e->getMessage());
             $args->getSubject()->forward('checkout', 'index');
             
