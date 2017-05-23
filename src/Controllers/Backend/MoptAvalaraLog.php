@@ -43,11 +43,10 @@ class Shopware_Controllers_Backend_MoptAvalaraLog extends Shopware_Controllers_B
             $response->sendResponse();
             exit;
         } catch (Exception $e) {
-            echo("Exception");
             $this->View()->assign([
-            'success' => false,
-            'data' => $this->Request()->getParams(),
-            'message' => $e->getMessage()
+                'success' => false,
+                'data' => $this->Request()->getParams(),
+                'message' => $e->getMessage()
             ]);
             return;
         }
