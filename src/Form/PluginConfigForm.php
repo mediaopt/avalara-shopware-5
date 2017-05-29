@@ -14,7 +14,7 @@ class PluginConfigForm
      */
     const LOGGER_DEFAULT_ROTATING_DAYS = 7;
     
-    const LOG_FILE_NAME = 'mo_avalara';
+    const LOG_FILE_NAME = 'mopt_avalara';
 
     const LOG_FILE_EXT = '.log';
     
