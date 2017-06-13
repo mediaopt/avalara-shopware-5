@@ -45,7 +45,7 @@ class GetTaxSubscriber extends AbstractSubscriber
             DocumentType::C_SALESORDER,
             false
         );
-        
+
         if (!$this->isGetTaxCallAvalible($model) || empty($args->getSubject()->View()->sUserLoggedIn)) {
             $adapter->getLogger()->info('GetTax call for current basket already done / not enabled.');
             return;
@@ -91,7 +91,7 @@ class GetTaxSubscriber extends AbstractSubscriber
             return true;
         }
 
-        if ($session->MoptAvalaraGetTaxRequestHash != $this->getHashFromRequest($model)) {
+        if ($session->MoptAvalaraGetTaxRequestHash !== $this->getHashFromRequest($model)) {
             return true;
         }
 
@@ -264,12 +264,6 @@ class GetTaxSubscriber extends AbstractSubscriber
         $order->getAttribute()->setMoptAvalaraDocCode($result->code);
         Shopware()->Models()->persist($order);
         Shopware()->Models()->flush();
-        return;
-        $sql = "UPDATE s_order_attributes SET " .
-            "mopt_avalara_doc_code = ? " .
-            "WHERE orderID = ?"
-        ;
-        Shopware()->Db()->query($sql, [$result->code, $order->getId()]);
     }
 
     /**
@@ -318,6 +312,7 @@ class GetTaxSubscriber extends AbstractSubscriber
         ];
         
         unset($data['type']);
+        unset($data['date']);
         unset($data['commit']);
 
         foreach ($data['lines'] as $key => $line) {
@@ -380,7 +375,7 @@ class GetTaxSubscriber extends AbstractSubscriber
         }
         //abfangen voucher mode==2 strict=1 => eigene TaxRate zuweisen aus Avalara Response
         $taxRate = ((float)$session->MoptAvalaraGetTaxResult->totalTax / (float)$session->MoptAvalaraGetTaxResult->totalTaxable) * 100;
-        
+
         $config = Shopware()->Config();
         $config['sDISCOUNTTAX'] = number_format($taxRate, 2);
         $config['sTAXAUTOMODE'] = false;
