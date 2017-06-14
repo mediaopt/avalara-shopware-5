@@ -184,8 +184,10 @@ abstract class AbstractTransactionModelFactory extends AbstractFactory
     protected function getCountryIncoterm()
     {
         $user = $this->getUserData();
-        $countryId = $user['additional']['countryShipping']['id'];
-
+        if (!$countryId = $user['additional']['countryShipping']['id']) {
+            return null;
+        }
+        
         $addressFactory = $this->getAddressFactory();
         if (!$country = $addressFactory->getDeliveryCountry($countryId)) {
             return null;
