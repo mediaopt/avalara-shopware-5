@@ -132,12 +132,12 @@ class GetTaxSubscriber extends AbstractSubscriber
             //proceed with shopware standard
             return;
         }
-
+        
         $newPrice = $args->getReturn();
         $newPrice['taxID'] = 'mopt_avalara__' . $taxRate;
         $newPrice['tax_rate'] = $taxRate;
         $newPrice['tax'] = $service->getTaxForOrderBasketId($session->MoptAvalaraGetTaxResult, $args->get('id'));
-
+        
         return $newPrice;
     }
 
@@ -314,15 +314,13 @@ class GetTaxSubscriber extends AbstractSubscriber
         unset($data['type']);
         unset($data['date']);
         unset($data['commit']);
-
+        
         foreach ($data['lines'] as $key => $line) {
             //remove shipping costs (shipping information is not in session on first getTax call)
             if (in_array($line['itemCode'], $itemCodeToBeRemoved)) {
                 unset($data['lines'][$key]);
                 continue;
             }
-            unset($data['lines'][$key]['itemCode']);
-            unset($data['lines'][$key]['amount']);
         }
 
         return md5(json_encode($data));
