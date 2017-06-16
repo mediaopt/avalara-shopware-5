@@ -1,7 +1,7 @@
 <?php
 
-use Shopware\Plugins\MoptAvalara\Form\PluginConfigForm;
-use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
+use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
+use Shopware\Plugins\MoptWunschpaket\Bootstrap\Database;
 use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
 
 /**
@@ -66,45 +66,27 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
             ->registerEvents()
             ->addAttributes()
             ->createForm()
+            ->updateDatabase()
         ;
 
         return ['success' => true, 'invalidateCache' => ['backend', 'proxy']];
     }
 
     /**
-     * perform update depending on plugin version
-     *
-     * @param string $oldVersion
-     * @return array|bool
+     * Extend attributes with avalara properties
+     * @return \Shopware_Plugins_Backend_MoptWunschpaket_Bootstrap
+     * @throws \Exception
      */
-    public function update($oldVersion)
+    private function updateDatabase()
     {
-        if (version_compare($oldVersion, '1.0.2', '<=')) {
-            $this->update_1_1_0();
-        }
-        if (version_compare($oldVersion, '2.0.0', '<=')) {
-            $this->update_2_0_0();
-        }
-        return true;
+        $crudService = $this->get('shopware_attribute.crud_service');
+        $modelManager = Shopware()->Models();
+        $bootstrapDatabase = new Database($crudService, $modelManager);
+        $bootstrapDatabase->install();
+        
+        return $this;
     }
-
-    /**
-     *  compatibility to Shopware 5.2.
-     */
-    protected function update_1_1_0()
-    {
-        $this->addAttributes_1_1_0();
-    }
-
-    /**
-     * @TODO Add new fields to orders, shipping methods, categories and articles
-     *  New fields
-     */
-    protected function update_2_0_0()
-    {
-        $this->addAttributes_2_0_0();
-    }
-
+    
     /**
      * perform all neccessary uninstall tasks and return true if successful
      *
@@ -150,7 +132,6 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
     {
         $this->registerController('Backend', 'MoptAvalaraBackendProxy');
         $this->registerController('Backend', 'MoptAvalara');
-        $this->registerController('Backend', 'MoptAvalaraLog');
         
         return $this;
     }
@@ -186,244 +167,14 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
     }
 
     /**
-     * extend attributes with avalara properties
-     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
-     * @throws \Exception
-     */
-    private function addAttributes()
-    {
-        $this
-            ->addAttributes_1_1_0()
-            ->addAttributes_2_0_0()
-        ;
-        
-        return $this;
-    }
-
-    /**
-     * extend attributes with avalara properties
-     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
-     * @throws \Exception
-     */
-    private function addAttributes_1_1_0()
-    {
-        $attributeCrudService = $this->getCrudService();
-        
-        $attributeCrudService->update('s_categories_attributes', 'mopt_avalara_taxcode', 'string', [
-            'label' => 'Avalara Tax Code',
-            'supportText' => 'Hier wird der Avalara Tax-Code der Kategorie angegeben, der an Avalara übersendet wird.',
-            'helpText' => '',
-            'translatable' => false,
-            'displayInBackend' => true,
-            'position' => 10,
-            'custom' => true,
-        ]);
-        $attributeCrudService->update('s_articles_attributes', 'mopt_avalara_taxcode', 'string', [
-            'label' => 'Avalara Tax Code',
-            'supportText' => 'Hier wird der Avalara Tax-Code des Artikel angegeben, der an Avalara übersendet wird.',
-            'helpText' => '',
-            'translatable' => false,
-            'displayInBackend' => true,
-            'position' => 10,
-            'custom' => true,
-        ]);
-        $attributeCrudService->update('s_user_attributes', 'mopt_avalara_exemption_code', 'string', [
-            'label' => 'Avalara Exemption Code',
-            'supportText' => 'Hier wird der Exemption-Code für einen Benutzen angegeben, der steuerfrei bei Ihnen einkaufen kann.',
-            'helpText' => '',
-            'translatable' => false,
-            'displayInBackend' => true,
-            'position' => 10,
-            'custom' => true,
-        ]);
-        $attributeCrudService->update('s_order_attributes', 'mopt_avalara_doc_code', 'string', [
-            'displayInBackend' => false,
-            'custom' => true,
-        ]);
-        $attributeCrudService->update('s_emarketing_vouchers_attributes', 'mopt_avalara_taxcode', 'string', [
-            'label' => 'Avalara Tax Code',
-            'supportText' => 'Hier wird der Avalara Tax-Code für Gutscheine angegeben, der an Avalara übersendet wird.',
-            'helpText' => '',
-            'translatable' => false,
-            'displayInBackend' => true,
-            'position' => 10,
-            'custom' => true,
-        ]);
-        $attributeCrudService->update('s_order_attributes', 'mopt_avalara_order_changed', 'boolean', [
-            'displayInBackend' => false,
-            'custom' => true,
-        ]);
-        
-        $this->refreshAttributeModels([
-            's_categories_attributes',
-            's_articles_attributes',
-            's_user_attributes',
-            's_order_attributes',
-            's_emarketing_vouchers_attributes',
-        ]);
-        return $this;
-    }
-    
-    /**
-     * add new attributes with avalara landed cost properties
-     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
-     * @throws \Exception
-     */
-    private function addAttributes_2_0_0()
-    {
-        $attributeCrudService = $this->getCrudService();
-        
-        $attributeCrudService->update(
-            's_premium_dispatch_attributes',
-            'mopt_avalara_taxcode',
-            'string',
-            [
-                'label' => 'Avalara Tax Code',
-                'supportText' => 'Hier wird der Avalara Tax-Code für den Versand angegeben, der an Avalara übersendet wird.',
-                'helpText' => '',
-                'translatable' => false,
-                'displayInBackend' => true,
-                'position' => 10,
-                'custom' => true,
-            ],
-            null,
-            false,
-            ShippingFactory::TAXCODE
-        );
-        
-        $attributeCrudService->update('s_categories_attributes', 'mopt_avalara_hscode', 'string', [
-            'label' => 'Avalara Harmonized Classification Code (hsCode)',
-            'supportText' => 'Hier wird der Avalara Harmonized Classification Code (hsCode) der Kategorie angegeben, der an Avalara übersendet wird.',
-            'helpText' => '',
-            'translatable' => false,
-            'displayInBackend' => true,
-            'position' => 10,
-            'custom' => true,
-        ]);
-
-        $attributeCrudService->update('s_articles_attributes', 'mopt_avalara_hscode', 'string', [
-            'label' => 'Avalara Harmonized Classification Code (hsCode)',
-            'supportText' => 'Hier wird der Avalara Harmonized Classification Code (hsCode) des Artikel angegeben, der an Avalara übersendet wird.',
-            'helpText' => '',
-            'translatable' => false,
-            'displayInBackend' => true,
-            'position' => 10,
-            'custom' => true,
-        ]);
-        
-        $attributeCrudService->update('s_premium_dispatch_attributes', 'mopt_avalara_express_shipping', 'boolean', [
-            'label' => 'Express delivery',
-            'supportText' => 'You can designate this delivery set an express delivery.',
-            'helpText' => '',
-            'translatable' => false,
-            'displayInBackend' => true,
-            'position' => 10,
-            'custom' => true,
-        ]);
-        
-        $attributeCrudService->update('s_premium_dispatch_attributes', 'mopt_avalara_insured', 'boolean', [
-            'label' => 'Insurance 100%',
-            'supportText' => 'You can set if a delivery is completely insured.',
-            'helpText' => '',
-            'translatable' => false,
-            'displayInBackend' => true,
-            'position' => 10,
-            'custom' => true,
-        ]);
-        
-        $attributeCrudService->update(
-            's_core_countries_attributes',
-            'mopt_avalara_incoterms',
-            'combobox',
-            [
-                'label' => 'Incoterms for Landed cost',
-                'supportText' => 'Terms of sale. Used to determine buyer obligations for a landed cost.',
-                'helpText' => '',
-                'translatable' => false,
-                'displayInBackend' => true,
-                'position' => 10,
-                'custom' => true,
-                'defaultValue' => PluginConfigForm::INCOTERMS_DEFAULT,
-                'arrayStore' => [
-                    [
-                        'key' => PluginConfigForm::INCOTERMS_DDP,
-                        'value' => PluginConfigForm::INCOTERMS_DDP_LABEL
-                    ],
-                    [
-                        'key' => PluginConfigForm::INCOTERMS_DAP,
-                        'value' => PluginConfigForm::INCOTERMS_DAP_LABEL
-                    ],
-                    [
-                        'key' => PluginConfigForm::INCOTERMS_DEFAULT,
-                        'value' => PluginConfigForm::INCOTERMS_DEFAULT_LABEL
-                    ],
-                ],
-            ],
-            null,
-            false,
-            PluginConfigForm::INCOTERMS_DEFAULT
-        );
-        
-        $attributeCrudService->update('s_order_attributes', 'mopt_avalara_incoterms', 'string', [
-            'displayInBackend' => false,
-            'custom' => true,
-        ]);
-        
-        $attributeCrudService->update('s_order_attributes', 'mopt_avalara_insured', 'boolean', [
-            'displayInBackend' => false,
-            'custom' => true,
-        ]);
-        
-        $attributeCrudService->update('s_order_attributes', 'mopt_avalara_express_shipping', 'boolean', [
-            'displayInBackend' => false,
-            'custom' => true,
-        ]);
-        
-        $attributeCrudService->update('s_order_attributes', 'mopt_avalara_express_landedcost', 'string', [
-            'displayInBackend' => false,
-            'custom' => true,
-        ]);
-        
-        $this->refreshAttributeModels([
-            's_premium_dispatch_attributes',
-            's_categories_attributes',
-            's_articles_attributes',
-            's_core_countries_attributes',
-            's_order_attributes,'
-        ]);
-        
-        return $this;
-    }
-    
-    /**
-     * @return \Shopware\Bundle\AttributeBundle\Service\CrudService
-     */
-    private function getCrudService()
-    {
-        return $this->get('shopware_attribute.crud_service');
-    }
-
-    /**
      * create config form
      * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
      */
     private function createForm()
     {
-        $pluginConfigForm = new PluginConfigForm($this);
+        $pluginConfigForm = new Form($this);
         $pluginConfigForm->create();
         
         return $this;
-    }
-    
-    /**
-     *
-     * @param array $tables
-     */
-    private function refreshAttributeModels($tables = [])
-    {
-        $metaDataCacheDoctrine = Shopware()->Models()->getConfiguration()->getMetadataCacheImpl();
-        $metaDataCacheDoctrine->deleteAll();
-
-        Shopware()->Models()->generateAttributeModels($tables);
     }
 }

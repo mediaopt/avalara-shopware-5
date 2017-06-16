@@ -19,15 +19,11 @@ Ext.define('Shopware.apps.moptAvalara.Shipping.view.edit.default.FormLeft', {
             title: 'Avalara',
             anchor: '100%',
             defaults: me.defaults,
-            items: [{
+            items: [
+                {
                     xtype: 'textfield',
                     fieldLabel: 'Taxcode',
                     name: 'attribute[moptAvalaraTaxcode]'
-                },
-                {
-                    xtype: 'checkbox',
-                    fieldLabel: 'Express',
-                    name: 'attribute[moptAvalaraExpressShipping]'
                 },
                 {
                     xtype: 'checkbox',

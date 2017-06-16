@@ -2,7 +2,7 @@
 
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
-use Shopware\Plugins\MoptAvalara\Form\PluginConfigForm;
+use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 use Avalara\CreateTransactionModel;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\InsuranceFactory;
@@ -74,7 +74,7 @@ class GetTaxSubscriber extends AbstractSubscriber
     {
         $taxEnabled = $this
             ->getAdapter()
-            ->getPluginConfig(PluginConfigForm::TAX_ENABLED_FIELD)
+            ->getPluginConfig(Form::TAX_ENABLED_FIELD)
         ;
         if (!$taxEnabled) {
             return false;
@@ -269,7 +269,7 @@ class GetTaxSubscriber extends AbstractSubscriber
         $adapter = $this->getAdapter();
         $docCommitEnabled = $this
             ->getAdapter()
-            ->getPluginConfig(PluginConfigForm::DOC_COMMIT_ENABLED_FIELD)
+            ->getPluginConfig(Form::DOC_COMMIT_ENABLED_FIELD)
         ;
         if (!$docCommitEnabled) {
             $adapter->getLogger()->info('doc commit is not enabled.');

@@ -2,7 +2,7 @@
 
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
-use Shopware\Plugins\MoptAvalara\Form\PluginConfigForm;
+use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 use Avalara\AddressLocationInfo;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\AddressFactory;
 
@@ -99,23 +99,23 @@ class AddressCheck extends AbstractSubscriber
     {
         $countriesForDelivery = $this
             ->getAdapter()
-            ->getPluginConfig(PluginConfigForm::ADDRESS_VALIDATION_COUNTRIES_FIELD)
+            ->getPluginConfig(Form::ADDRESS_VALIDATION_COUNTRIES_FIELD)
         ;
 
         switch ($countriesForDelivery) {
-            case PluginConfigForm::DELIVERY_COUNTRY_NO_VALIDATION:
+            case Form::DELIVERY_COUNTRY_NO_VALIDATION:
                 return false;
-            case PluginConfigForm::DELIVERY_COUNTRY_USA:
+            case Form::DELIVERY_COUNTRY_USA:
                 if ($country == AddressFactory::COUNTRY_CODE__US) {
                     return true;
                 }
                 break;
-            case PluginConfigForm::DELIVERY_COUNTRY_CANADA:
+            case Form::DELIVERY_COUNTRY_CANADA:
                 if ($country == AddressFactory::COUNTRY_CODE__CA) {
                     return true;
                 }
                 break;
-            case PluginConfigForm::DELIVERY_COUNTRY_USA_AND_CANADA:
+            case Form::DELIVERY_COUNTRY_USA_AND_CANADA:
                 $usaAndCanada = [
                     AddressFactory::COUNTRY_CODE__CA,
                     AddressFactory::COUNTRY_CODE__US

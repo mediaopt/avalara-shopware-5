@@ -1,13 +1,13 @@
 <?php
 
-namespace Shopware\Plugins\MoptAvalara\Form;
+namespace Shopware\Plugins\MoptAvalara\Bootstrap;
 
 /**
  * Description of formCreator
  *
  * @author bubnov
  */
-class PluginConfigForm
+class Form
 {
     /**
      * Field names
@@ -375,36 +375,6 @@ class PluginConfigForm
                   });
             }'
         ]);
-
-        $form->setElement('button', 'mopt_avalara__log', [
-            'label' => 'Download logfile',
-            'maxWidth' => '150',
-            'handler' => 'function (){
-                var token = Ext.CSRFService.getToken();
-                var url = "' . $downloadUrlCall . '?__csrf_token=" + token;
-
-                var manualDownloadForm = new Ext.form.Panel({
-                  width: 400,
-                  bodyPadding: 5,
-                  title: "Avalara",
-                  floating: true,
-                  closable : true,
-                  draggable : true,
-                  items: [
-                    {  
-                      bodyPadding: 5,
-                      title: "Log",
-                      html: "The module has to be active to download the logfile.<br />'
-                . '<div class=\"sprite-drive-download\" style=\"width: 25px; height: 25px; float: left;\">&nbsp;</div>'
-                . '<div style=\"float: left;\"><a href=\'" + url + "\'  target=\'_blank\'>Download</a></div>"
-                    } 
-                  ]
-                });
-                manualDownloadForm.show();
-            }',
-        ]);
-
-
 
         //set positions
         $elements = [
