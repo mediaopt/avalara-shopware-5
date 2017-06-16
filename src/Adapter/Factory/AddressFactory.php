@@ -171,6 +171,9 @@ class AddressFactory extends AbstractFactory
      */
     public function getDeliveryCountry($id)
     {
+        if (!$id) {
+            throw new \Exception('Missing id for getDeliveryCountry');
+        }
         return Shopware()
             ->Models()
             ->getRepository('\Shopware\Models\Country\Country')
