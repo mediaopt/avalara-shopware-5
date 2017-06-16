@@ -18,7 +18,8 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
         
         $this->View()->assign([
             'success' => true,
-            'message' => 'Avalara: order has been cancelled successfully.']);
+            'message' => 'Avalara: order has been cancelled successfully.'
+        ]);
     }
     
     /**
@@ -39,7 +40,8 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
         
         $this->View()->assign([
             'success' => true,
-            'message' => 'Avalara: order has been updated.']);
+            'message' => 'Avalara: order has been updated.'
+        ]);
     }
     
     /**
@@ -82,7 +84,7 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             return null;
         }
 
-        if (!$order->getAttribute()->getMoptAvalaraDocCode()) {
+        if (!$order->getAttribute()->getMoptAvalaraTransactionType()) {
             $this->View()->assign([
                 'success' => false,
                 'data' => $this->Request()->getParams(),
