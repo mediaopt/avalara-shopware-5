@@ -31,12 +31,6 @@ abstract class AbstractSubscriber implements SubscriberInterface
     
     /**
      *
-     * @var \Shopware\Models\Order\Order
-     */
-    private $order;
-    
-    /**
-     *
      * @param \Shopware_Plugins_Backend_MoptAvalara_Bootstrap $bootstrap
      */
     public function __construct(\Shopware_Plugins_Backend_MoptAvalara_Bootstrap $bootstrap)
