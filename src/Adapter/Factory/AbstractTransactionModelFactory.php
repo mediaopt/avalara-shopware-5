@@ -175,6 +175,10 @@ abstract class AbstractTransactionModelFactory extends AbstractFactory
             : $defaultIncoterms
         ;
         
+        $shippingFactory = $this->getShippingFactory();
+        $expressShip = $shippingFactory->isShippingExpress($this->getShippingId());
+        $params->{LandedCostRequestParams::LANDED_COST_EXPRESS} = $expressShip;
+        
         return $params;
     }
     

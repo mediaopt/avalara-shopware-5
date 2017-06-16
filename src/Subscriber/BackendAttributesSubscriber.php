@@ -6,7 +6,7 @@ namespace Shopware\Plugins\MoptAvalara\Subscriber;
  * Description of Checkout
  *
  */
-class TaxCodes extends AbstractSubscriber
+class BackendAttributesSubscriber extends AbstractSubscriber
 {
 
     /**
@@ -30,7 +30,8 @@ class TaxCodes extends AbstractSubscriber
      */
     public function onPostDispatchBackendCategory(\Enlight_Event_EventArgs $args)
     {
-        $args->getSubject()->View()->addTemplateDir($this->getBootstrap()->Path() . 'Views/');
+        $view = $args->getSubject()->View();
+        $view->addTemplateDir($this->getBootstrap()->Path() . 'Views/');
         if ($args->getRequest()->getActionName() === 'load') {
             $args->getSubject()->View()->extendsTemplate('Backend/category/model/attribute.js');
             $args->getSubject()->View()->extendsTemplate('Backend/category/tabs/settings.js');

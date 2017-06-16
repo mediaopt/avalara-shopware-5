@@ -6,7 +6,7 @@ namespace Shopware\Plugins\MoptAvalara\Subscriber;
  * Description of Checkout
  *
  */
-class Templating extends AbstractSubscriber
+class TemplatingSubscriber extends AbstractSubscriber
 {
 
     /**

@@ -22,16 +22,16 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
     }
     
     /**
-     * Will void, delete and recreate a transaction for an order
+     * Will commit transaction to Avalara
      * @return void
      */
-    public function updateOrderAction()
+    public function commitOrderAction()
     {
         if (!$order = $this->getAvalaraOrder()) {
             return;
         }
 
-        if (!$this->updateOrder($order)) {
+        if (!$this->commitOrder($order)) {
             return;
         }
 
@@ -52,7 +52,9 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             return;
         }
 
-        $this->resetUpdateFlag($order);
+        $order->getAttribute()->setMoptAvalaraOrderChanged(0);
+        Shopware()->Models()->persist($order);
+        Shopware()->Models()->flush();
 
         $this->View()->assign([
             'success' => true,
@@ -66,8 +68,11 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
      */
     protected function getAvalaraOrder()
     {
-        $repository = Shopware()->Models()->getRepository('\Shopware\Models\Order\Order');
-        $order = $repository->find($this->Request()->getParam('id'));
+        $order = Shopware()
+            ->Models()
+            ->getRepository('\Shopware\Models\Order\Order')
+            ->find($this->Request()->getParam('id'))
+        ;
         if (!$order) {
             $this->View()->assign([
                 'success' => false,
@@ -97,13 +102,19 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
     protected function cancelTax(\Shopware\Models\Order\Order $order, $cancelCode)
     {
         $docCode = $order->getAttribute()->getMoptAvalaraDocCode();
-        $adapter = $this->getAvalaraSDKAdapter();
+        $adapter = $this->getAdapter();
 
         try {
             /* @var $service \Shopware\Plugins\MoptAvalara\Service\CancelTax */
             $service = $adapter->getService('CancelTax');
             $service->cancel($docCode);
             
+            $order
+                ->getAttribute()
+                ->setMoptAvalaraTransactionType(\Avalara\VoidReasonCode::C_DOCVOIDED)
+            ;
+            Shopware()->Models()->persist($order);
+            Shopware()->Models()->flush();
             return true;
         } catch (\Exception $e) {
             $adapter->getLogger()->error('CancelTax call failed: ' . $e->getMessage());
@@ -120,29 +131,27 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
      * @param \Shopware\Models\Order\Order $order
      * @return boolean
      */
-    protected function updateOrder(\Shopware\Models\Order\Order $order)
+    protected function commitOrder(\Shopware\Models\Order\Order $order)
     {
-        $adapter = $this->getAvalaraSDKAdapter();
+        $adapter = $this->getAdapter();
         try {
+            $docCommitEnabled = $adapter->getPluginConfig(Form::DOC_COMMIT_ENABLED_FIELD);
+            if (!$docCommitEnabled) {
+                $adapter->getLogger()->info('Doc commit is not enabled.');
+
+                return false;
+            }
+            
             $model = $adapter
                 ->getFactory('InvoiceTransactionModelFactory')
                 ->build($order)
             ;
-            $docCode = $order->getAttribute()->getMoptAvalaraDocCode();
-            $response = $adapter
-                ->getService('AdjustTransaction')
-                ->adjustTransaction($model, $docCode)
-            ;
-            
-            /*@var $detail Shopware\Models\Order\Detail */
-            foreach ($order->getDetails() as $detail) {
-                $taxRate = $this->getTaxRateForOrderDetail($detail, $response);
-                $detail->setTax(null);
-                $detail->setTaxRate($taxRate);
+            if (!$response = $adapter->getService('GetTax')->calculate($model)) {
+                 $adapter->getLogger()->debug('No result on order commiting to Avalara');
+                 return false;
             }
-            Shopware()->Models()->persist($order);
-            Shopware()->Models()->flush();
-            $order->calculateInvoiceAmount();
+            $adapter->getLogger()->info('Order ' . $order->getId() . ' has been commited with docCode: ' . $response->code);
+            $this->updateOrder($order, $response);
             
             return true;
         } catch (\Exception $e) {
@@ -151,8 +160,32 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
                 'success' => false,
                 'message' => 'Avalara: Update order call failed: ' . $e->getMessage()
             ]);
+            
             return false;
         }
+    }
+    
+    /**
+     *
+     * @param \Shopware\Models\Order\Order $order
+     * @param \stdClass $response
+     * @return boolean
+     */
+    protected function updateOrder(\Shopware\Models\Order\Order $order, $response)
+    {
+        $attr = $order->getAttribute();
+        $attr->setMoptAvalaraDocCode($response->code);
+        $attr->setMoptAvalaraTransactionType(\Avalara\DocumentType::C_SALESINVOICE);
+        
+        /*@var $detail Shopware\Models\Order\Detail */
+        foreach ($order->getDetails() as $detail) {
+            $taxRate = $this->getTaxRateForOrderDetail($detail, $response);
+            $detail->setTax(null);
+            $detail->setTaxRate($taxRate);
+        }
+        $order->calculateInvoiceAmount();
+        Shopware()->Models()->persist($order);
+        Shopware()->Models()->flush();
     }
     
     /**
@@ -165,7 +198,7 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
     protected function getTaxRateForOrderDetail(\Shopware\Models\Order\Detail $detail, $taxInformation)
     {
         /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
-        $service = $this->getAvalaraSDKAdapter()->getService('GetTax');
+        $service = $this->getAdapter()->getService('GetTax');
         if ($taxRate = $service->getTaxRateForOrderBasketId($detail->getId(), $taxInformation)) {
             return $taxRate;
         }
@@ -175,20 +208,9 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
     
     /**
      *
-     * @param \Shopware\Models\Order\Order $order
-     */
-    protected function resetUpdateFlag(\Shopware\Models\Order\Order $order)
-    {
-        $order->getAttribute()->setMoptAvalaraOrderChanged(0);
-        Shopware()->Models()->persist($order);
-        Shopware()->Models()->flush();
-    }
-
-    /**
-     *
      * @return \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface
      */
-    protected function getAvalaraSDKAdapter()
+    protected function getAdapter()
     {
         $service = \Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter::SERVICE_NAME;
         return Shopware()->Container()->get($service);

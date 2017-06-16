@@ -1,6 +1,6 @@
 <?php
 
-namespace Shopware\Plugins\MoptWunschpaket\Bootstrap;
+namespace Shopware\Plugins\MoptAvalara\Bootstrap;
 
 use Shopware\Bundle\AttributeBundle\Service\CrudService;
 use Shopware\Components\Model\ModelManager;
@@ -34,7 +34,9 @@ class Database
     const EXEMPTION_CODE_FIELD = 'mopt_avalara_exemption_code';
     const ORDER_CHANGED_FIELD = 'mopt_avalara_order_changed';
     const INSURED_FIELD = 'mopt_avalara_insured';
+    const EXPRESS_SHIPPING_FIELD = 'mopt_avalara_express_shipping';
     const INCOTERMS_FIELD = 'mopt_avalara_incoterms';
+    const TRANSACTION_TYPE_FIELD = 'mopt_avalara_transaction_type';
     
     /**
      *
@@ -61,7 +63,7 @@ class Database
     
     /**
      * Extends attributes with DHL properties
-     * @return \Shopware_Plugins_Backend_MoptWunschpaket_Bootstrap
+     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
      * @throws \Exception
      */
     public function install()
@@ -74,10 +76,24 @@ class Database
         );
         
         $this->addStringField(
+            self::CATEGORIES_ATTR_TABLE,
+            self::HSCODE_FIELD,
+            'Avalara Harmonized Classification Code (hsCode)',
+            'Hier wird der Avalara Harmonized Classification Code (hsCode) des Artikel angegeben, der an Avalara übersendet wird.'
+        );
+        
+        $this->addStringField(
             self::ARTICLES_ATTR_TABLE,
             self::TAXCODE_FIELD,
             'Avalara Tax Code',
             'Hier wird der Avalara Tax-Code des Artikel angegeben, der an Avalara übersendet wird.'
+        );
+        
+        $this->addStringField(
+            self::ARTICLES_ATTR_TABLE,
+            self::HSCODE_FIELD,
+            'Avalara Harmonized Classification Code (hsCode)',
+            'Hier wird der Avalara Harmonized Classification Code (hsCode) des Artikel angegeben, der an Avalara übersendet wird.'
         );
         
         $this->addStringField(
@@ -93,12 +109,12 @@ class Database
             null, null, null,
             false
         );
-
+        
         $this->addStringField(
-            self::VOUCHER_ATTR_TABLE,
-            self::TAXCODE_FIELD,
-            'Avalara Tax Code',
-            'Hier wird der Avalara Tax-Code für Gutscheine angegeben, der an Avalara übersendet wird.'
+            self::ORDER_ATTR_TABLE,
+            self::TRANSACTION_TYPE_FIELD,
+            null, null, null,
+            false
         );
         
         $this->addBoolField(
@@ -106,35 +122,6 @@ class Database
             self::ORDER_CHANGED_FIELD, 
             null, null, null, 
             false
-        );
-        
-        $this->addStringField(
-            self::DISPATCH_ATTR_TABLE,
-            self::TAXCODE_FIELD,
-            'Avalara Tax Code',
-            'Hier wird der Avalara Tax-Code für den Versand angegeben, der an Avalara übersendet wird.',
-            ShippingFactory::TAXCODE
-        );
-        
-        $this->addStringField(
-            self::CATEGORIES_ATTR_TABLE,
-            self::HSCODE_FIELD,
-            'Avalara Harmonized Classification Code (hsCode)',
-            'Hier wird der Avalara Harmonized Classification Code (hsCode) der Kategorie angegeben, der an Avalara übersendet wird.'
-        );
-        
-        $this->addStringField(
-            self::ARTICLES_ATTR_TABLE,
-            self::HSCODE_FIELD,
-            'Avalara Harmonized Classification Code (hsCode)',
-            'Hier wird der Avalara Harmonized Classification Code (hsCode) des Artikel angegeben, der an Avalara übersendet wird.'
-        );
-        
-        $this->addBoolField(
-            self::DISPATCH_ATTR_TABLE,
-            self::INSURED_FIELD,
-            'Insurance 100%',
-            'You can set if a delivery is completely insured.'
         );
         
         $this->addStringField(
@@ -151,6 +138,42 @@ class Database
             false
         );
         
+        $this->addBoolField(
+            self::ORDER_ATTR_TABLE,
+            self::EXPRESS_SHIPPING_FIELD,
+            null, null, null, 
+            false
+        );
+        
+        $this->addStringField(
+            self::VOUCHER_ATTR_TABLE,
+            self::TAXCODE_FIELD,
+            'Avalara Tax Code',
+            'Hier wird der Avalara Tax-Code für Gutscheine angegeben, der an Avalara übersendet wird.'
+        );
+        
+        $this->addStringField(
+            self::DISPATCH_ATTR_TABLE,
+            self::TAXCODE_FIELD,
+            'Avalara Tax Code',
+            'Hier wird der Avalara Tax-Code für den Versand angegeben, der an Avalara übersendet wird.',
+            ShippingFactory::TAXCODE
+        );
+        
+        $this->addBoolField(
+            self::DISPATCH_ATTR_TABLE,
+            self::INSURED_FIELD,
+            'Insurance 100%',
+            'You can set if a delivery is completely insured.'
+        );
+        
+        $this->addBoolField(
+            self::DISPATCH_ATTR_TABLE,
+            self::EXPRESS_SHIPPING_FIELD,
+            'Express delivery',
+            'You can set if this is an express delivery.'
+        );
+
         $this->crudService->update(
             self::COUNTRIES_ATTR_TABLE,
             self::INCOTERMS_FIELD,

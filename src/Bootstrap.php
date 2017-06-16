@@ -1,8 +1,9 @@
 <?php
 
 use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
-use Shopware\Plugins\MoptWunschpaket\Bootstrap\Database;
+use Shopware\Plugins\MoptAvalara\Bootstrap\Database;
 use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
+use Shopware\Plugins\MoptAvalara\Subscriber as SubscriberNamespace;
 
 /**
  * this class configures:
@@ -64,17 +65,16 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
         $this
             ->registerControllers()
             ->registerEvents()
-            ->addAttributes()
             ->createForm()
             ->updateDatabase()
         ;
 
-        return ['success' => true, 'invalidateCache' => ['backend', 'proxy']];
+        return ['success' => true, 'invalidateCache' => ['frontend', 'backend', 'proxy']];
     }
 
     /**
      * Extend attributes with avalara properties
-     * @return \Shopware_Plugins_Backend_MoptWunschpaket_Bootstrap
+     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
      * @throws \Exception
      */
     private function updateDatabase()
@@ -156,10 +156,14 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
     public function onDispatchLoopStartup(Enlight_Event_EventArgs $args)
     {
         $subscribers = [];
-        $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\AddressCheck($this);
-        $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\Templating($this);
-        $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\GetTaxSubscriber($this);
-        $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\AdjustTax($this);
+        $subscribers[] = new SubscriberNamespace\AddressSubscriber($this);
+        $subscribers[] = new SubscriberNamespace\TemplatingSubscriber($this);
+        $subscribers[] = new SubscriberNamespace\CheckoutSubscriber($this);
+        $subscribers[] = new SubscriberNamespace\BasketSubscriber($this);
+        $subscribers[] = new SubscriberNamespace\BackendOrderUpdateSubscriber($this);
+        // @todo load and save attributes
+        // @see https://developers.shopware.com/developers-guide/attribute-system/#add-your-field-and-load-the-data
+        //$subscribers[] = new SubscriberNamespace\BackendAttributesSubscriber($this);
 
         foreach ($subscribers as $subscriber) {
             $this->Application()->Events()->addSubscriber($subscriber);

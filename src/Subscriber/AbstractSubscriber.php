@@ -31,6 +31,12 @@ abstract class AbstractSubscriber implements SubscriberInterface
     
     /**
      *
+     * @var \Shopware\Models\Order\Order
+     */
+    private $order;
+    
+    /**
+     *
      * @param \Shopware_Plugins_Backend_MoptAvalara_Bootstrap $bootstrap
      */
     public function __construct(\Shopware_Plugins_Backend_MoptAvalara_Bootstrap $bootstrap)
@@ -80,6 +86,15 @@ abstract class AbstractSubscriber implements SubscriberInterface
     
     /**
      *
+     * @return \Enlight_Components_Session_Namespace
+     */
+    protected function getSession()
+    {
+        return $this->getContainer()->get('session');
+    }
+    
+    /**
+     *
      * @param \stdClass $object
      * @return array
      */
@@ -93,5 +108,16 @@ abstract class AbstractSubscriber implements SubscriberInterface
         }
         
         return $data;
+    }
+    
+    /**
+     * 
+     * @param int $id
+     * @return \Shopware\Models\Order\Order
+     */
+    protected function getOrderById($id)
+    {
+        $respository = Shopware()->Models()->getRepository('Shopware\Models\Order\Order');
+        return $respository->find($id);
     }
 }

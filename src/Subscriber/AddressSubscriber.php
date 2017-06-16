@@ -10,7 +10,7 @@ use Shopware\Plugins\MoptAvalara\Adapter\Factory\AddressFactory;
  * Description of Checkout
  *
  */
-class AddressCheck extends AbstractSubscriber
+class AddressSubscriber extends AbstractSubscriber
 {
     /**
      * return array with all subsribed events
@@ -31,8 +31,7 @@ class AddressCheck extends AbstractSubscriber
      */
     public function onBeforeCheckoutConfirm(\Enlight_Event_EventArgs $args)
     {
-        /* @var $session Enlight_Components_Session_Namespace */
-        $session = $this->getContainer()->get('session');
+        $session = $this->getSession();
         $adapter = $this->getAdapter();
         $address = $adapter->getFactory('AddressFactory')->buildDeliveryAddress();
 
@@ -72,9 +71,7 @@ class AddressCheck extends AbstractSubscriber
      */
     protected function isAddressToBeValidated(AddressLocationInfo $address)
     {
-        /*@var $session Enlight_Components_Session_Namespace */
-        $session = $this->getContainer()->get('session');
-        
+        $session = $this->getSession();
         if (!$this->isCountryForDelivery($address->country)) {
             return false;
         }

@@ -52,6 +52,19 @@ class GetTax extends AbstractService
 
         return ((float)$taxLine->tax / (float)$taxLine->taxableAmount) * 100;
     }
+    
+    /**
+     * get LandedCost from avalara response
+     * @param \stdClass $taxResult
+     * @return float
+     */
+    public function getLandedCost($taxResult)
+    {
+        echo '<h1>getLandedCost</h1>';
+        var_dump($taxResult);
+        die();
+        return 10.45;
+    }
 
     /**
      * get tax line info from avalara response

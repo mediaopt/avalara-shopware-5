@@ -12,6 +12,12 @@ class ShippingFactory extends AbstractFactory
 {
     const ARTICLE_ID = 'Shipping';
     const TAXCODE = 'FR010000';
+    
+    /**
+     *
+     * @var \Shopware\Models\Dispatch\Dispatch
+     */
+    private $dispatchEntity;
 
     /**
      * build Line-model based on passed in lineData
@@ -59,11 +65,15 @@ class ShippingFactory extends AbstractFactory
      */
     protected function getShippingEntity($id)
     {
-        return Shopware()
-            ->Models()
-            ->getRepository('Shopware\Models\Dispatch\Dispatch')
-            ->find($id)
-        ;
+        if (null === $this->dispatchEntity) {
+            $this->dispatchEntity = Shopware()
+                ->Models()
+                ->getRepository('\Shopware\Models\Dispatch\Dispatch')
+                ->find($id)
+            ;
+        }
+        
+        return $this->dispatchEntity;
     }
     
     /**
@@ -80,5 +90,21 @@ class ShippingFactory extends AbstractFactory
         }
         
         return $attr->getMoptAvalaraInsured();
+    }
+    
+    /**
+     *
+     * @param int $id
+     * @return boolean
+     */
+    public function isShippingExpress($id)
+    {
+        $shippingEntity = $this->getShippingEntity($id);
+        
+        if (!$attr = $shippingEntity->getAttribute()) {
+            return false;
+        }
+        
+        return $attr->getMoptAvalaraExpressShipping();
     }
 }

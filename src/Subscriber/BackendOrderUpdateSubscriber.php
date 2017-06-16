@@ -6,7 +6,7 @@ namespace Shopware\Plugins\MoptAvalara\Subscriber;
  * Description of Checkout
  *
  */
-class AdjustTax extends AbstractSubscriber
+class BackendOrderUpdateSubscriber extends AbstractSubscriber
 {
     /**
      * return array with all subsribed events
@@ -21,6 +21,11 @@ class AdjustTax extends AbstractSubscriber
         ];
     }
     
+    /**
+     * 
+     * @param \Enlight_Event_EventArgs $args
+     * @return void
+     */
     public function onPostDispatchBackendOrder(\Enlight_Event_EventArgs $args)
     {
         $request = $args->getSubject()->Request();
@@ -35,6 +40,11 @@ class AdjustTax extends AbstractSubscriber
         $this->$fnc($args);
     }
     
+    /**
+     * 
+     * @param \Enlight_Event_EventArgs $args
+     * @return void
+     */
     protected function onPostDispatchSavePosition(\Enlight_Event_EventArgs $args)
     {
         $view = $args->getSubject()->View();
@@ -46,14 +56,17 @@ class AdjustTax extends AbstractSubscriber
         Shopware()->Models()->clear();
         
         $orderId = $args->getSubject()->Request()->getParam('orderId', null);
-        $respository = Shopware()->Models()->getRepository('Shopware\Models\Order\Order');
-        /*@var $order \Shopware\Models\Order\Order */
-        $order = $respository->find($orderId);
+        $order = $this->getOrderById($orderId);
         $order->getAttribute()->setMoptAvalaraOrderChanged(1);
         Shopware()->Models()->persist($order);
         Shopware()->Models()->flush();
     }
     
+    /**
+     * 
+     * @param \Enlight_Event_EventArgs $args
+     * @return void
+     */
     protected function onPostDispatchSave(\Enlight_Event_EventArgs $args)
     {
         $view = $args->getSubject()->View();
@@ -65,9 +78,7 @@ class AdjustTax extends AbstractSubscriber
         Shopware()->Models()->clear();
         
         $orderId = $args->getSubject()->Request()->getParam('id', null);
-        $respository = Shopware()->Models()->getRepository('Shopware\Models\Order\Order');
-        /*@var $order \Shopware\Models\Order\Order */
-        $order = $respository->find($orderId);
+        $order = $this->getOrderById($orderId);
         $order->getAttribute()->setMoptAvalaraOrderChanged(1);
         Shopware()->Models()->persist($order);
         Shopware()->Models()->flush();
