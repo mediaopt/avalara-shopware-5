@@ -21,6 +21,8 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
         var exemptionCode = '';
         var userId = me.record.getCustomerStore.first().get('id');
         var docCode = '';
+        var transactionType = '';
+        var incoterms = '';
         Ext.Ajax.request({
             url: '{url controller=AttributeData action=loadData}',
             params: {
@@ -31,6 +33,8 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
             success: function(responseData, request) {
                 var response = Ext.JSON.decode(responseData.responseText);
                 docCode = response.data.__attribute_mopt_avalara_doc_code;
+                transactionType = response.data.__attribute_mopt_avalara_transaction_type;
+                incoterms = response.data.__attribute_mopt_avalara_incoterms;
             }
         });
 
@@ -62,6 +66,18 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
                             xtype: 'displayfield',
                             fieldLabel: 'Exemption code',
                             value: exemptionCode ? exemptionCode : '-',
+                            labelWidth: 130
+                        },
+                        {
+                            xtype: 'displayfield',
+                            fieldLabel: 'Transaction status',
+                            value: transactionType ? transactionType : '-',
+                            labelWidth: 130
+                        },
+                        {
+                            xtype: 'displayfield',
+                            fieldLabel: 'Incoterms',
+                            value: incoterms ? incoterms : '-',
                             labelWidth: 130
                         },
                         {
@@ -103,11 +119,11 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
                         },
                         {
                             xtype: 'button',
-                            text: 'Update order',
+                            text: 'Commit order to Avalara',
                             width: 130,
                             handler: function () {
                                 Ext.Ajax.request({
-                                    url: '{url controller="MoptAvalara" action="updateOrder"}',
+                                    url: '{url controller="MoptAvalara" action="commitOrder"}',
                                     method: 'POST',
                                     params: { id: me.record.get('id')},
                                     headers: { 'Accept': 'application/json'},

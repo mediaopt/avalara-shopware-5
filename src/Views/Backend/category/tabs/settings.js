@@ -5,7 +5,8 @@ Ext.define('Shopware.apps.moptAvalara.Category.view.category.tabs.settings', {
     /**
      * @Override
      */
-    getItems: function () {
+    getItems: function () 
+    {
         var me = this;
         var result = me.callParent(arguments);
         result.push(me.getCategoryMapping());
