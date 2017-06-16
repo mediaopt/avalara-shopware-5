@@ -65,6 +65,9 @@ class ShippingFactory extends AbstractFactory
      */
     protected function getShippingEntity($id)
     {
+        if (!$id) {
+            throw new \Exception('Missing id for getShippingEntity');
+        }
         if (null === $this->dispatchEntity) {
             $this->dispatchEntity = Shopware()
                 ->Models()
