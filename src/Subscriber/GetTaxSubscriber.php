@@ -3,7 +3,6 @@
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
 use Shopware\Plugins\MoptAvalara\Form\PluginConfigForm;
-use Avalara\DocumentType;
 use Avalara\CreateTransactionModel;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\InsuranceFactory;
@@ -41,10 +40,7 @@ class GetTaxSubscriber extends AbstractSubscriber
         $adapter = $this->getAdapter();
 
         /* @var $model \Avalara\CreateTransactionModel */
-        $model = $adapter->getFactory('TransactionModelFactory')->build(
-            DocumentType::C_SALESORDER,
-            false
-        );
+        $model = $adapter->getFactory('OrderTransactionModelFactory')->build();
 
         if (!$this->isGetTaxCallAvalible($model) || empty($args->getSubject()->View()->sUserLoggedIn)) {
             $adapter->getLogger()->info('GetTax call for current basket already done / not enabled.');
@@ -190,10 +186,7 @@ class GetTaxSubscriber extends AbstractSubscriber
         }
 
         /* @var $model \Avalara\CreateTransactionModel */
-        $model = $adapter->getFactory('TransactionModelFactory')->build(
-            DocumentType::C_SALESORDER,
-            true
-        );
+        $model = $adapter->getFactory('OrderTransactionModelFactory')->build();
         
         $adapter->getLogger()->error('validateCommitCall...');
         //prevent parent execution on request mismatch

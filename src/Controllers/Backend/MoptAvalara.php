@@ -126,7 +126,7 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
         $adapter = $this->getAvalaraSDKAdapter();
         try {
             $model = $adapter
-                ->getFactory('TransactionModelFactoryFromOrder')
+                ->getFactory('InvoiceTransactionModelFactory')
                 ->build($order)
             ;
             $docCode = $order->getAttribute()->getMoptAvalaraDocCode();

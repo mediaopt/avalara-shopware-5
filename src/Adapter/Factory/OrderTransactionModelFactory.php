@@ -5,31 +5,32 @@ namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 use Avalara\CreateTransactionModel;
 use Avalara\AddressesModel;
 use Avalara\LineItemModel;
+use Avalara\DocumentType;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
 
 /**
  * Factory to create CreateTransactionModel from the bucket
+ * Just to get estimated tax and landed cost
+ * Without commiting it to Avalara
  *
  */
-class TransactionModelFactory extends AbstractTransactionModelFactory
+class OrderTransactionModelFactory extends AbstractTransactionModelFactory
 {
     /**
      *
-     * @param string $docType
-     * @param bool $isCommit
      * @return \Avalara\CreateTransactionModel
      */
-    public function build($docType, $isCommit = false)
+    public function build()
     {
         $user = $this->getUserData();
 
         $model = new CreateTransactionModel();
         $model->businessIdentificationNo = $user['billingaddress']['ustid'];
-        $model->commit = $isCommit;
+        $model->commit = false;
         $model->customerCode = $user['additional']['user']['id'];
         $model->date = date(DATE_W3C);
         $model->discount = $this->getDiscount();
-        $model->type = $docType;
+        $model->type = DocumentType::C_SALESORDER;
         $model->currencyCode = Shopware()->Shop()->getCurrency()->getCurrency();
         $model->addresses = $this->getAddressesModel();
         $model->lines = $this->getLineModels();

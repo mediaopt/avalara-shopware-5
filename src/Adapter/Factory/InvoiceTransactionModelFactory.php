@@ -4,14 +4,16 @@ namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
 use Avalara\CreateTransactionModel;
 use Avalara\AddressesModel;
+use Avalara\DocumentType;
 use Shopware\Models\Order\Order;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
 
 /**
- * actory to create CreateTransactionModel from the order
+ * Factory to create CreateTransactionModel from the order
+ * Will return a model ready to be commited to Avalara
  *
  */
-class TransactionModelFactoryFromOrder extends AbstractTransactionModelFactory
+class InvoiceTransactionModelFactory extends AbstractTransactionModelFactory
 {
     /**
      *
@@ -22,10 +24,9 @@ class TransactionModelFactoryFromOrder extends AbstractTransactionModelFactory
     /**
      *
      * @param \Shopware\Models\Order\Order $order
-     * @param bool $isCommit
      * @return \Avalara\CreateTransactionModel
      */
-    public function build(Order $order, $isCommit = false)
+    public function build(Order $order)
     {
         /* @var $customer \Shopware\Models\Customer\Customer */
         $customer = $order->getCustomer();
@@ -33,12 +34,12 @@ class TransactionModelFactoryFromOrder extends AbstractTransactionModelFactory
         
         $model = new CreateTransactionModel();
         $model->code = $order->getNumber();
-        $model->commit = $isCommit;
+        $model->commit = true;
         $model->customerCode = $customer->getId();
         $model->date = date(DATE_W3C);
         $model->lines = $this->getLineModels();
         $model->discount = $this->getDiscount();
-        $model->type = \Avalara\DocumentType::C_SALESINVOICE;
+        $model->type = DocumentType::C_SALESINVOICE;
         $model->currencyCode = $order->getCurrency();
         $model->addresses = $this->getAddressesModel();
         $model->companyCode = $this->getCompanyCode();
