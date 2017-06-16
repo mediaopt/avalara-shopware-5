@@ -12,7 +12,7 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             return;
         }
         
-        if (!$this->cancelTax($order, \Avalara\VoidReasonCode::C_DOCVOIDED)) {
+        if (!$this->cancelTax($order)) {
             return;
         }
         
@@ -92,7 +92,6 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
     /**
      *
      * @param \Shopware\Models\Order\Order $order
-     * @param string $cancelCode
      * @return boolean
      */
     protected function cancelTax(\Shopware\Models\Order\Order $order, $cancelCode)
@@ -103,7 +102,7 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
         try {
             /* @var $service \Shopware\Plugins\MoptAvalara\Service\CancelTax */
             $service = $adapter->getService('CancelTax');
-            $service->cancel($docCode, $cancelCode);
+            $service->cancel($docCode);
             
             return true;
         } catch (\Exception $e) {
