@@ -56,7 +56,8 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
 
         $this->View()->assign([
             'success' => true,
-            'message' => 'Avalara: order has been unflagged.']);
+            'message' => 'Avalara: order has been unflagged.'
+        ]);
     }
     
     /**
@@ -71,7 +72,8 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             $this->View()->assign([
                 'success' => false,
                 'data' => $this->Request()->getParams(),
-                'message' => 'Avalara: invalid order.']);
+                'message' => 'Avalara: invalid order.'
+            ]);
             return null;
         }
 
@@ -79,7 +81,8 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             $this->View()->assign([
                 'success' => false,
                 'data' => $this->Request()->getParams(),
-                'message' => 'Avalara: order is not registered with Avalara.']);
+                'message' => 'Avalara: order is not registered with Avalara.'
+            ]);
             return null;
         }
         
@@ -107,7 +110,8 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             $adapter->getLogger()->error('CancelTax call failed: ' . $e->getMessage());
             $this->View()->assign([
                 'success' => false,
-                'message' => 'Avalara: Cancel Tax call failed: ' . $e->getMessage()]);
+                'message' => 'Avalara: Cancel Tax call failed: ' . $e->getMessage()
+            ]);
             return false;
         }
     }
@@ -146,7 +150,8 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             $adapter->getLogger()->error('GetTax call from order failed: '. $e->getMessage());
             $this->View()->assign([
                 'success' => false,
-                'message' => 'Avalara: Update order call failed: ' . $e->getMessage()]);
+                'message' => 'Avalara: Update order call failed: ' . $e->getMessage()
+            ]);
             return false;
         }
     }
