@@ -16,6 +16,7 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
         result.add(me.createAvalaraTab());
         return result;
     },
+
     createAvalaraTab: function () {
         var me = this;
         var exemptionCode = '';
@@ -50,7 +51,15 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
                 exemptionCode = response.data.__attribute_mopt_avalara_exemption_code;
             }
         });
-
+        
+        var actionPanel = me.createActionPanel(transactionType);
+        var itemsArray = [
+            me.createInformationPanel(exemptionCode, transactionType, incoterms, docCode)
+        ];
+        if (actionPanel) {
+            itemsArray.push(actionPanel);
+        }
+        
         return Ext.create('Ext.container.Container', {
             defaults: me.defaults,
             title: 'Avalara',
@@ -58,120 +67,129 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
                 type: 'hbox'
             },
             style: 'padding: 5px',
-            items: [
-                Ext.create('Ext.form.Panel', {
-                    title: 'Information',
-                    items: [
-                        {
-                            xtype: 'displayfield',
-                            fieldLabel: 'Exemption code',
-                            value: exemptionCode ? exemptionCode : '-',
-                            labelWidth: 130
-                        },
-                        {
-                            xtype: 'displayfield',
-                            fieldLabel: 'Transaction status',
-                            value: transactionType ? transactionType : '-',
-                            labelWidth: 130
-                        },
-                        {
-                            xtype: 'displayfield',
-                            fieldLabel: 'Incoterms',
-                            value: incoterms ? incoterms : '-',
-                            labelWidth: 130
-                        },
-                        {
-                            xtype: 'displayfield',
-                            fieldLabel: 'Document code',
-                            value: docCode ? docCode : '-',
-                            labelWidth: 130
-                        }
-                    ],
-                    width: '45%',
-                    height: 130,
-                    style: 'margin-right: 10px;',
-                    bodyPadding: '5px 10px'
-                }),
-                Ext.create('Ext.form.Panel', {
-                    title: 'Actions',
-                    items: [
-                        {
-                            xtype: 'button',
-                            text: 'Cancel Tax',
-                            width: 130,
-                            handler: function () {
-                                Ext.Ajax.request({
-                                    url: '{url controller="MoptAvalara" action="cancelOrder"}',
-                                    method: 'POST',
-                                    params: { id: me.record.get('id')},
-                                    headers: { 'Accept': 'application/json'},
-                                    success: function (response)
-                                    {
-                                        var jsonData = Ext.JSON.decode(response.responseText);
-                                        Shopware.Notification.createGrowlMessage(
-                                                (jsonData.success ? '{s name=success}success{/s}' : '{s name=error}error{/s}'), 
-                                                jsonData.message, 
-                                                'Avalara');
-                                    }
-
-                                });
-                            }
-                        },
-                        {
-                            xtype: 'button',
-                            text: 'Commit order to Avalara',
-                            width: 130,
-                            handler: function () {
-                                Ext.Ajax.request({
-                                    url: '{url controller="MoptAvalara" action="commitOrder"}',
-                                    method: 'POST',
-                                    params: { id: me.record.get('id')},
-                                    headers: { 'Accept': 'application/json'},
-                                    success: function (response)
-                                    {
-                                        var jsonData = Ext.JSON.decode(response.responseText);
-                                        Shopware.Notification.createGrowlMessage(
-                                                (jsonData.success ? '{s name=success}success{/s}' : '{s name=error}error{/s}'), 
-                                                jsonData.message, 
-                                                'Avalara');
-                                    }
-
-                                });
-                            }
-                        },
-                        {
-                            xtype: 'button',
-                            text: 'Reset update flag',
-                            width: 130,
-                            handler: function () {
-                                Ext.Ajax.request({
-                                    url: '{url controller="MoptAvalara" action="resetUpdateFlag"}',
-                                    method: 'POST',
-                                    params: { id: me.record.get('id')},
-                                    headers: { 'Accept': 'application/json'},
-                                    success: function (response)
-                                    {
-                                        var jsonData = Ext.JSON.decode(response.responseText);
-                                        Shopware.Notification.createGrowlMessage(
-                                                (jsonData.success ? '{s name=success}success{/s}' : '{s name=error}error{/s}'), 
-                                                jsonData.message, 
-                                                'Avalara');
-                                    }
-
-                                });
-                            }
-                        }
-                    ],
-                    width: '45%',
-                    height: 130,
-                    bodyPadding: '5px 10px',
-                    layout: {
-                        type: 'vbox',
-                        defaultMargins: '5 0'
-                    }
-                })
-            ]
+            items: itemsArray
         });
     },
+    
+    createActionPanel: function (transactionType) {
+        if (null === transactionType) {
+            return null;
+        }
+        
+        return Ext.create('Ext.form.Panel', {
+            title: 'Actions',
+            items: [
+                {
+                    xtype: 'button',
+                    text: 'Cancel Tax',
+                    width: 130,
+                    handler: function () {
+                        Ext.Ajax.request({
+                            url: '{url controller="MoptAvalara" action="cancelOrder"}',
+                            method: 'POST',
+                            params: { id: me.record.get('id')},
+                            headers: { 'Accept': 'application/json'},
+                            success: function (response)
+                            {
+                                var jsonData = Ext.JSON.decode(response.responseText);
+                                Shopware.Notification.createGrowlMessage(
+                                        (jsonData.success ? '{s name=success}success{/s}' : '{s name=error}error{/s}'), 
+                                        jsonData.message, 
+                                        'Avalara');
+                            }
+
+                        });
+                    }
+                },
+                {
+                    xtype: 'button',
+                    text: 'Commit order to Avalara',
+                    width: 130,
+                    handler: function () {
+                        Ext.Ajax.request({
+                            url: '{url controller="MoptAvalara" action="commitOrder"}',
+                            method: 'POST',
+                            params: { id: me.record.get('id')},
+                            headers: { 'Accept': 'application/json'},
+                            success: function (response)
+                            {
+                                var jsonData = Ext.JSON.decode(response.responseText);
+                                Shopware.Notification.createGrowlMessage(
+                                        (jsonData.success ? '{s name=success}success{/s}' : '{s name=error}error{/s}'), 
+                                        jsonData.message, 
+                                        'Avalara');
+                            }
+
+                        });
+                    }
+                },
+                {
+                    xtype: 'button',
+                    text: 'Reset update flag',
+                    width: 130,
+                    handler: function () {
+                        Ext.Ajax.request({
+                            url: '{url controller="MoptAvalara" action="resetUpdateFlag"}',
+                            method: 'POST',
+                            params: { id: me.record.get('id')},
+                            headers: { 'Accept': 'application/json'},
+                            success: function (response)
+                            {
+                                var jsonData = Ext.JSON.decode(response.responseText);
+                                Shopware.Notification.createGrowlMessage(
+                                        (jsonData.success ? '{s name=success}success{/s}' : '{s name=error}error{/s}'), 
+                                        jsonData.message, 
+                                        'Avalara');
+                            }
+
+                        });
+                    }
+                }
+            ],
+            width: '45%',
+            height: 130,
+            bodyPadding: '5px 10px',
+            layout: {
+                type: 'vbox',
+                defaultMargins: '5 0'
+            }
+        });
+    },
+    
+    createInformationPanel: function (exemptionCode, transactionType, incoterms, docCode) {
+        return Ext.create('Ext.form.Panel', {
+            title: 'Information',
+            items: [
+                {
+                    xtype: 'displayfield',
+                    fieldLabel: 'Exemption code',
+                    value: exemptionCode ? exemptionCode : '-',
+                    labelWidth: 130
+                },
+                {
+                    xtype: 'displayfield',
+                    fieldLabel: 'Transaction status',
+                    value: transactionType ? transactionType : '-',
+                    labelWidth: 130
+                },
+                {
+                    xtype: 'displayfield',
+                    fieldLabel: 'Incoterms',
+                    value: incoterms ? incoterms : '-',
+                    labelWidth: 130
+                },
+                {
+                    xtype: 'displayfield',
+                    fieldLabel: 'Document code',
+                    value: docCode ? docCode : '-',
+                    labelWidth: 130
+                }
+            ],
+            width: '45%',
+            height: 130,
+            style: 'margin-right: 10px;',
+            bodyPadding: '5px 10px'
+        });
+    }
 });
 //{/block}
