@@ -12,6 +12,7 @@ use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 class GetTax extends AbstractService
 {
     const IMPORT_FEES_LINE = 'ImportFees';
+    const IMPORT_DUTIES_LINE = 'ImportDuties';
     
     /**
      *
@@ -64,12 +65,15 @@ class GetTax extends AbstractService
      */
     public function getLandedCost($taxResult)
     {
-//        var_dump($taxResult->lines);
-//        die();
-//        echo '<h1>getLandedCost</h1>';
-//        var_dump($taxResult);
-//        die();
-        return 10.45;
+        $totalLandedCost = 0.0;
+        $landedCostLineNumbers = [self::IMPORT_DUTIES_LINE, self::IMPORT_FEES_LINE];
+        foreach ($taxResult->lines as $line) {
+            if (in_array($line->lineNumber, $landedCostLineNumbers)) {
+                $totalLandedCost += ($line->lineAmount + $line->tax);
+            }
+        }
+
+        return $totalLandedCost;
     }
     
     /**
