@@ -177,7 +177,7 @@ abstract class AbstractTransactionModelFactory extends AbstractFactory
         
         $shippingFactory = $this->getShippingFactory();
         $expressShip = $shippingFactory->isShippingExpress($this->getShippingId());
-        $params->{LandedCostRequestParams::LANDED_COST_EXPRESS} = $expressShip;
+        $params->{LandedCostRequestParams::LANDED_COST_EXPRESS} = (bool)$expressShip;
         
         return $params;
     }
