@@ -43,6 +43,7 @@ class InvoiceTransactionModelFactory extends AbstractTransactionModelFactory
         $model->currencyCode = $order->getCurrency();
         $model->addresses = $this->getAddressesModel();
         $model->companyCode = $this->getCompanyCode();
+        $model->parameters = $this->getTransactionParameters();
         
         if ($customer->getBilling() && $customer->getBilling()->getVatId()) {
             $model->businessIdentificationNo = $customer->getBilling()->getVatId();
@@ -151,4 +152,15 @@ class InvoiceTransactionModelFactory extends AbstractTransactionModelFactory
         
         return $lineData;
     }
+
+    /**
+     * @return string | null
+     */
+    protected function getIncoterm() {
+        if (!$attr = $this->orderContext->getAttribute()) {
+            return null;
+        }
+        return $attr->getMoptAvalaraIncoterms();
+    }
+
 }

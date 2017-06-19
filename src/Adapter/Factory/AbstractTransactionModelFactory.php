@@ -41,6 +41,11 @@ abstract class AbstractTransactionModelFactory extends AbstractFactory
     abstract protected function getShippingPrice();
     
     /**
+     * @return string | null
+     */
+    abstract protected function getIncoterm();
+    
+    /**
      * @param array $positions
      * @return LineItemModel[]
      */
@@ -169,7 +174,7 @@ abstract class AbstractTransactionModelFactory extends AbstractFactory
             ->getPluginConfig(Form::INCOTERMS_FIELD)
         ;
         
-        $countryIncoterm = $this->getCountryIncoterm();
+        $countryIncoterm = $this->getIncoterm();
         $params->{LandedCostRequestParams::LANDED_COST_INCOTERMS} = ($countryIncoterm)
             ? $countryIncoterm
             : $defaultIncoterms
@@ -180,33 +185,6 @@ abstract class AbstractTransactionModelFactory extends AbstractFactory
         $params->{LandedCostRequestParams::LANDED_COST_EXPRESS} = (bool)$expressShip;
         
         return $params;
-    }
-    
-    /**
-     * @return string | null
-     */
-    protected function getCountryIncoterm()
-    {
-        $user = $this->getUserData();
-        if (!$countryId = $user['additional']['countryShipping']['id']) {
-            return null;
-        }
-        
-        $addressFactory = $this->getAddressFactory();
-        if (!$country = $addressFactory->getDeliveryCountry($countryId)) {
-            return null;
-        }
-        
-        if (!$attr = $country->getAttribute()) {
-            return null;
-        }
-        
-        $incoterms = $attr->getMoptAvalaraIncoterms();
-        if (!$incoterms || Form::INCOTERMS_DEFAULT === $incoterms) {
-            return null;
-        }
-        
-        return $incoterms;
     }
     
     /**

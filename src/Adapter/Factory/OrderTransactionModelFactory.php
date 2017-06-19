@@ -6,6 +6,7 @@ use Avalara\CreateTransactionModel;
 use Avalara\AddressesModel;
 use Avalara\LineItemModel;
 use Avalara\DocumentType;
+use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
 
 /**
@@ -113,5 +114,32 @@ class OrderTransactionModelFactory extends AbstractTransactionModelFactory
         }
         
         return Shopware()->Session()->sOrderVariables['sBasket']['sShippingcostsNet'];
+    }
+    
+    /**
+     * @return string | null
+     */
+    protected function getIncoterm()
+    {
+        $user = $this->getUserData();
+        if (!$countryId = $user['additional']['countryShipping']['id']) {
+            return null;
+        }
+        
+        $addressFactory = $this->getAddressFactory();
+        if (!$country = $addressFactory->getDeliveryCountry($countryId)) {
+            return null;
+        }
+        
+        if (!$attr = $country->getAttribute()) {
+            return null;
+        }
+        
+        $incoterms = $attr->getMoptAvalaraIncoterms();
+        if (!$incoterms || Form::INCOTERMS_DEFAULT === $incoterms) {
+            return null;
+        }
+        
+        return $incoterms;
     }
 }
