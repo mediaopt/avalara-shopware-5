@@ -102,7 +102,7 @@ class BasketSubscriber extends AbstractSubscriber
                 //throw new \Exception($msg);
             }
 
-            return;
+            $args->getReturn();
         }
         
         $newPrice = $args->getReturn();
