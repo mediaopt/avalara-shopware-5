@@ -32,16 +32,17 @@ class CheckoutSubscriber extends AbstractSubscriber
      */
     public function onBeforeCheckoutConfirm(\Enlight_Event_EventArgs $args)
     {
+        $action = $args->getRequest()->getActionName();
+        // Trigger this subscriber only on 'confirm' action
+        if ('confirm' !== $action) {
+            return;
+        }
+        
         $session = $this->getSession();
         $adapter = $this->getAdapter();
         /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
         $service = $adapter->getService('GetTax');
-        $action = $args->getRequest()->getActionName();
-        // Do not call Avalara in ajaxCart - we do not have all information yet!
-        if (in_array($action, ['ajaxAmount', 'ajaxCart'])) {
-            return;
-        }
-        
+
         try {
             /* @var $model \Avalara\CreateTransactionModel */
             $model = $adapter->getFactory('OrderTransactionModelFactory')->build();
@@ -62,7 +63,7 @@ class CheckoutSubscriber extends AbstractSubscriber
         
         //Recall controller so basket tax and landedCost could be applied
         $args->getSubject()->forward('confirm');
-        return false;
+        return;
     }
 
     /**
@@ -130,12 +131,12 @@ class CheckoutSubscriber extends AbstractSubscriber
         $session = $this->getSession();
         if (!$orderNumber = $args->getReturn()) {
             $adapter->getLogger()->debug('orderNumber did not exist');
-            return $args->getReturn();
+            return;
         }
 
         if (!$taxRequest = $session->MoptAvalaraGetTaxCommitRequest) {
             $adapter->getLogger()->debug('MoptAvalaragetTaxCommitrequest is empty');
-            return $args->getReturn();
+            return;
         }
 
         if (!$order = $this->getOrderByNumber($orderNumber)) {
@@ -148,8 +149,6 @@ class CheckoutSubscriber extends AbstractSubscriber
         unset($session->MoptAvalaraGetTaxRequestHash);
         unset($session->MoptAvalaraGetTaxCommitRequest);
         unset($session->MoptAvalaraGetTaxResult);
-        
-        return $args->getReturn();
     }
 
     /**
@@ -254,7 +253,6 @@ class CheckoutSubscriber extends AbstractSubscriber
             : null
         ;
         $order->getAttribute()->setMoptAvalaraTransactionType(DocumentType::C_SALESORDER);
-        $order->getAttribute()->setMoptAvalaraExemptionCode($taxRequest->exemptionNo);
         $order->getAttribute()->setMoptAvalaraIncoterms($incoterms);
         
         Shopware()->Models()->persist($order);
