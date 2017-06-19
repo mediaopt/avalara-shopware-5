@@ -5,6 +5,7 @@ namespace Shopware\Plugins\MoptAvalara\Subscriber;
 use Avalara\DocumentType;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
+use Shopware\Plugins\MoptAvalara\LandedCost\LandedCostRequestParams;
 
 class CheckoutSubscriber extends AbstractSubscriber
 {
@@ -70,17 +71,20 @@ class CheckoutSubscriber extends AbstractSubscriber
      */
     public function onBeforeSOrderSaveOrder(\Enlight_Hook_HookArgs $args)
     {
+        $adapter = $this->getAdapter();
         $getTaxCommitRequest = $this->validateCommitCall();
-        if (!($getTaxCommitRequest instanceof CreateTransactionModel)) {
+        if (!$getTaxCommitRequest) {
             $adapter->getLogger()->error('Not in avalara context');
-            return;
+            return $args->getReturn();
         }
-        Shopware()->Session()->MoptAvalaraGetTaxCommitRequest = $getTaxCommitRequest;
+        $this->getSession()->MoptAvalaraGetTaxCommitRequest = $getTaxCommitRequest;
         //set all basket items' taxId to 0 for custom taxrates in backend etc.
         foreach ($args->getSubject()->sBasketData["content"] as &$basketRow) {
             $basketRow["taxId"] = 0;
             $basketRow["taxID"] = 0;
         }
+        
+        return $args->getReturn();
     }
 
     /**
@@ -97,12 +101,12 @@ class CheckoutSubscriber extends AbstractSubscriber
         //proceed if no sales order call was made
         if (!$session->MoptAvalaraGetTaxRequestHash) {
             $adapter->getLogger()->debug('No sales order call was made.');
-            return true;
+            return null;
         }
 
         /* @var $model \Avalara\CreateTransactionModel */
         $model = $adapter->getFactory('OrderTransactionModelFactory')->build();
-        $adapter->getLogger()->info('validateCommitCall...');
+        $adapter->getLogger()->debug('validateCommitCall...');
         //prevent parent execution on request mismatch
         if ($session->MoptAvalaraGetTaxRequestHash != $service->getHashFromRequest($model)) {
             $adapter->getLogger()->error('Mismatching requests, do not proceed.');
@@ -122,30 +126,30 @@ class CheckoutSubscriber extends AbstractSubscriber
     public function onAfterSOrderSaveOrder(\Enlight_Hook_HookArgs $args)
     {
         $adapter = $this->getAdapter();
-        $adapter->getLogger()->info('onAfterSOrderSaveOrder call');
+        $adapter->getLogger()->debug('onAfterSOrderSaveOrder call');
+        $session = $this->getSession();
         if (!$orderNumber = $args->getReturn()) {
             $adapter->getLogger()->debug('orderNumber did not exist');
-            return;
+            return $args->getReturn();
         }
 
-        /*@var \Avalara\CreateTransactionModel $model */
-        if (!$model = Shopware()->Session()->MoptAvalaraGetTaxCommitRequest) {
+        if (!$taxRequest = $session->MoptAvalaraGetTaxCommitRequest) {
             $adapter->getLogger()->debug('MoptAvalaragetTaxCommitrequest is empty');
-            return;
+            return $args->getReturn();
         }
 
-        if (!$order = $this->getOrderById($orderNumber)) {
-            $msg = 'There is no order with number: ' . $id;
+        if (!$order = $this->getOrderByNumber($orderNumber)) {
+            $msg = 'There is no order with number: ' . $orderNumber;
             $this->getAdapter()->getLogger()->critical($msg);
             throw new \Exception($msg);
         }
-        $order->getAttribute()->setMoptAvalaraTransactionType(DocumentType::C_SALESORDER);
-        Shopware()->Models()->persist($order);
-        Shopware()->Models()->flush();
+        $this->setOrderAttributes($order, $taxRequest);
         
-        unset(Shopware()->Session()->MoptAvalaraGetTaxRequestHash);
-        unset(Shopware()->Session()->MoptAvalaraGetTaxCommitRequest);
-        unset(Shopware()->Session()->MoptAvalaraGetTaxResult);
+        unset($session->MoptAvalaraGetTaxRequestHash);
+        unset($session->MoptAvalaraGetTaxCommitRequest);
+        unset($session->MoptAvalaraGetTaxResult);
+        
+        return $args->getReturn();
     }
 
     /**
@@ -236,5 +240,24 @@ class CheckoutSubscriber extends AbstractSubscriber
         
         $config = Shopware()->Config();
         $config['sVOUCHERTAX'] = $taxRate;
+    }
+    
+    /**
+     * 
+     * @param \Shopware\Models\Order\Order $order
+     * @param \stdClass $taxRequest
+     */
+    private function setOrderAttributes(\Shopware\Models\Order\Order $order, $taxRequest)
+    {
+        $incoterms = isset($taxRequest->parameters->{LandedCostRequestParams::LANDED_COST_INCOTERMS})
+            ? $taxRequest->parameters->{LandedCostRequestParams::LANDED_COST_INCOTERMS}
+            : null
+        ;
+        $order->getAttribute()->setMoptAvalaraTransactionType(DocumentType::C_SALESORDER);
+        $order->getAttribute()->setMoptAvalaraExemptionCode($taxRequest->exemptionNo);
+        $order->getAttribute()->setMoptAvalaraIncoterms($incoterms);
+        
+        Shopware()->Models()->persist($order);
+        Shopware()->Models()->flush();
     }
 }
