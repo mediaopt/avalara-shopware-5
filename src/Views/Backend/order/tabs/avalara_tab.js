@@ -76,32 +76,32 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
             return null;
         }
         
-        return Ext.create('Ext.form.Panel', {
-            title: 'Actions',
-            items: [
-                {
-                    xtype: 'button',
-                    text: 'Cancel Tax',
-                    width: 130,
-                    handler: function () {
-                        Ext.Ajax.request({
-                            url: '{url controller="MoptAvalara" action="cancelOrder"}',
-                            method: 'POST',
-                            params: { id: me.record.get('id')},
-                            headers: { 'Accept': 'application/json'},
-                            success: function (response)
-                            {
-                                var jsonData = Ext.JSON.decode(response.responseText);
-                                Shopware.Notification.createGrowlMessage(
-                                        (jsonData.success ? '{s name=success}success{/s}' : '{s name=error}error{/s}'), 
-                                        jsonData.message, 
-                                        'Avalara');
-                            }
-
-                        });
+        var items = [{
+            xtype: 'button',
+            text: 'Reset update flag',
+            width: 130,
+            handler: function () {
+                Ext.Ajax.request({
+                    url: '{url controller="MoptAvalara" action="resetUpdateFlag"}',
+                    method: 'POST',
+                    params: { id: me.record.get('id')},
+                    headers: { 'Accept': 'application/json'},
+                    success: function (response)
+                    {
+                        var jsonData = Ext.JSON.decode(response.responseText);
+                        Shopware.Notification.createGrowlMessage(
+                                (jsonData.success ? '{s name=success}success{/s}' : '{s name=error}error{/s}'), 
+                                jsonData.message, 
+                                'Avalara');
                     }
-                },
-                {
+
+                });
+            }
+        }];
+    
+        switch (transactionType) {
+            case 'SalesOrder':
+                items.push({
                     xtype: 'button',
                     text: 'Commit order to Avalara',
                     width: 130,
@@ -122,14 +122,17 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
 
                         });
                     }
-                },
-                {
+                });
+                break;
+                
+            case 'SalesInvoice':
+                items.push({
                     xtype: 'button',
-                    text: 'Reset update flag',
+                    text: 'Cancel Tax',
                     width: 130,
                     handler: function () {
                         Ext.Ajax.request({
-                            url: '{url controller="MoptAvalara" action="resetUpdateFlag"}',
+                            url: '{url controller="MoptAvalara" action="cancelOrder"}',
                             method: 'POST',
                             params: { id: me.record.get('id')},
                             headers: { 'Accept': 'application/json'},
@@ -144,8 +147,13 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
 
                         });
                     }
-                }
-            ],
+                });
+                break;
+        }
+        
+        return Ext.create('Ext.form.Panel', {
+            title: 'Actions',
+            items: items,
             width: '45%',
             height: 130,
             bodyPadding: '5px 10px',

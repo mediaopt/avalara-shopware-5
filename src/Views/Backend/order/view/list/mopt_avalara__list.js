@@ -23,7 +23,7 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.list.List', {
     
     moptAvalaraListColumnRender: function (value, metaData, record) {
         var output = '';
-        var docCode = '';
+        var transactionType = '';
         var orderChanged = false;
         Ext.Ajax.request({
             url: '{url controller=AttributeData action=loadData}',
@@ -34,19 +34,28 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.list.List', {
             async: false,
             success: function(responseData, request) {
                 var response = Ext.JSON.decode(responseData.responseText);
-                docCode = response.data.__attribute_mopt_avalara_doc_code;
+                transactionType = response.data.__attribute_mopt_avalara_transaction_type;
                 orderChanged = parseInt(response.data.__attribute_mopt_avalara_order_changed) == 1;
             }
         });
 
-        if (docCode) {
-            output = '<img src="{link file="images/avalara.png"}" alt="Avalara" data-qtip="Committed to Avalara" />';
+        switch (transactionType) {
+            case 'SalesOrder':
+                output = '<img src="{link file="images/avalara_not_commited.png"}" alt="Avalara" data-qtip="The order has to be commited to Avalara." />';
+                break;
+                
+            case 'SalesInvoice':
+                output = (orderChanged)
+                    ? '<img src="{link file="images/avalara_warning.png"}" alt="Avalara" data-qtip="The order was changed and may not coincide with the transaction you sent to Avalar!" />'
+                    : '<img src="{link file="images/avalara.png"}" alt="Avalara" data-qtip="Committed to Avalara" />'
+                ;
+                break;
+                
+            case 'DocVoided':
+                output = '<img src="{link file="images/avalara_voided.png"}" alt="Avalara" data-qtip="The order has been voided in Avalara." />';
+                break;
         }
-        
-        if (orderChanged) {
-            output = '<img src="{link file="images/avalara_warning.png"}" alt="Avalara" data-qtip="Please check if your order has to be updated with Avalara." />';
-        }
-        
+
         return output;
     }
 });
