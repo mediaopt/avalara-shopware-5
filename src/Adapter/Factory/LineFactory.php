@@ -34,7 +34,7 @@ class LineFactory extends AbstractFactory
         $line->description = $lineData['articlename'];
         $line->taxCode = $this->getTaxCode($lineData);
         $line->discounted = self::isNotVoucher($lineData);
-        $line->taxIncluded = $this->isTaxIncluded($lineData);
+        $line->taxIncluded = false;
         $line->parameters = $this->getParams($lineData);
 
         return $line;
@@ -47,13 +47,9 @@ class LineFactory extends AbstractFactory
      */
     protected function getAmount($lineData)
     {
-        $price = ($this->isTaxIncluded($lineData))
-            ? $lineData['price']
-            : $lineData['netprice']
-        ;
-        $normPrice = (float)str_replace(',', '.', $price);
+        $price = (float)str_replace(',', '.', $lineData['netprice']);
  
-        return $normPrice * (float)$lineData['quantity'];
+        return $price * (float)$lineData['quantity'];
     }
 
     /**

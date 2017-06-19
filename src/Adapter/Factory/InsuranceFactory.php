@@ -29,7 +29,7 @@ class InsuranceFactory extends AbstractFactory
         $line->description = self::ARTICLE_ID;
         $line->taxCode = self::TAXCODE;
         $line->discounted = false;
-        $line->taxIncluded = true;
+        $line->taxIncluded = false;
         
         return $line;
     }

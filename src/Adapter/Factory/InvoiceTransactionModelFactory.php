@@ -115,7 +115,7 @@ class InvoiceTransactionModelFactory extends AbstractTransactionModelFactory
      */
     protected function getShippingPrice()
     {
-        return $this->orderContext->getInvoiceShipping();
+        return $this->orderContext->getInvoiceShippingNet();
     }
     
     /**

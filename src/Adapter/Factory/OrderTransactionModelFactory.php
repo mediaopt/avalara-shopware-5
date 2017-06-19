@@ -67,7 +67,7 @@ class OrderTransactionModelFactory extends AbstractTransactionModelFactory
     protected function getLineModels()
     {
         $positions = Shopware()->Modules()->Basket()->sGetBasket();
-        
+
         return parent::getLineModels($positions['content']);
     }
     
@@ -108,10 +108,10 @@ class OrderTransactionModelFactory extends AbstractTransactionModelFactory
      */
     protected function getShippingPrice()
     {
-        if (empty(Shopware()->Session()->sOrderVariables['sBasket']['sShippingcostsWithTax'])) {
+        if (empty(Shopware()->Session()->sOrderVariables['sBasket']['sShippingcostsNet'])) {
             return null;
         }
         
-        return Shopware()->Session()->sOrderVariables['sBasket']['sShippingcostsWithTax'];
+        return Shopware()->Session()->sOrderVariables['sBasket']['sShippingcostsNet'];
     }
 }

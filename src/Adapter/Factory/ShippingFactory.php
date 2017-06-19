@@ -35,7 +35,7 @@ class ShippingFactory extends AbstractFactory
         $line->description = self::ARTICLE_ID;
         $line->taxCode = $this->getTaxCode($id);
         $line->discounted = false;
-        $line->taxIncluded = true;
+        $line->taxIncluded = false;
         
         return $line;
     }
@@ -66,7 +66,7 @@ class ShippingFactory extends AbstractFactory
     protected function getShippingEntity($id)
     {
         if (!$id) {
-            throw new \Exception('Missing id for getShippingEntity');
+            return null;
         }
         if (null === $this->dispatchEntity) {
             $this->dispatchEntity = Shopware()
@@ -88,7 +88,7 @@ class ShippingFactory extends AbstractFactory
     {
         $shippingEntity = $this->getShippingEntity($id);
         
-        if (!$attr = $shippingEntity->getAttribute()) {
+        if (!$shippingEntity || !$attr = $shippingEntity->getAttribute()) {
             return false;
         }
         
@@ -104,7 +104,7 @@ class ShippingFactory extends AbstractFactory
     {
         $shippingEntity = $this->getShippingEntity($id);
         
-        if (!$attr = $shippingEntity->getAttribute()) {
+        if (!$shippingEntity || !$attr = $shippingEntity->getAttribute()) {
             return false;
         }
         
