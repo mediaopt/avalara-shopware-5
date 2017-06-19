@@ -86,24 +86,7 @@ abstract class AbstractSubscriber implements SubscriberInterface
     {
         return $this->getContainer()->get('session');
     }
-    
-    /**
-     *
-     * @param \stdClass $object
-     * @return array
-     */
-    protected function objectToArray($object)
-    {
-        $data = (array)$object;
-        foreach ($data as $key => $value) {
-            if (is_object($value) || is_array($value)) {
-                $data[$key] = $this->objectToArray($value);
-            }
-        }
-        
-        return $data;
-    }
-    
+
     /**
      * 
      * @param int $id

@@ -3,6 +3,7 @@
 namespace Shopware\Plugins\MoptAvalara\Service;
 
 use Avalara\CreateTransactionModel;
+use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 
 /**
  * Description of GetTax
@@ -10,6 +11,8 @@ use Avalara\CreateTransactionModel;
  */
 class GetTax extends AbstractService
 {
+    const IMPORT_FEES_LINE = 'ImportFees';
+    
     /**
      *
      * @param CreateTransactionModel $model
@@ -49,8 +52,9 @@ class GetTax extends AbstractService
         if (!$taxLine = $this->getTaxLineForOrderBasketId($taxResult, $id)) {
             return 0;
         }
-
-        return ((float)$taxLine->tax / (float)$taxLine->taxableAmount) * 100;
+        $taxRate = ((float)$taxLine->tax / (float)$taxLine->taxableAmount) * 100;
+        
+        return number_format($taxRate, 2);
     }
     
     /**
@@ -60,10 +64,81 @@ class GetTax extends AbstractService
      */
     public function getLandedCost($taxResult)
     {
-        echo '<h1>getLandedCost</h1>';
-        var_dump($taxResult);
-        die();
+//        var_dump($taxResult->lines);
+//        die();
+//        echo '<h1>getLandedCost</h1>';
+//        var_dump($taxResult);
+//        die();
         return 10.45;
+    }
+    
+    /**
+     * check if getTax call has to be made
+     * @param \Avalara\CreateTransactionModel $model
+     * @param 
+     * @return boolean
+     * @todo: check country (?)
+     */
+    public function isGetTaxCallAvalible(CreateTransactionModel $model, \Enlight_Components_Session_Namespace $session)
+    {
+        $taxEnabled = $this
+            ->getAdapter()
+            ->getPluginConfig(Form::TAX_ENABLED_FIELD)
+        ;
+        if (!$taxEnabled) {
+            return false;
+        }
+
+        if (!$session->MoptAvalaraGetTaxResult || !$session->MoptAvalaraGetTaxRequestHash) {
+            return true;
+        }
+
+        if ($session->MoptAvalaraGetTaxRequestHash !== $this->getHashFromRequest($model)) {
+            return true;
+        }
+
+        return false;
+    }
+    
+    /**
+     * get hash from request to compare calculate & commit call
+     * unset changing fields during both calls
+     *
+     * @param \Avalara\CreateTransactionModel $model
+     * @return string
+     */
+    public function getHashFromRequest(CreateTransactionModel $model)
+    {
+        $data = $this->objectToArray($model);
+        $data['discount'] = number_format($data['discount'], 0);
+        unset($data['type']);
+        unset($data['date']);
+        unset($data['commit']);
+        
+        //Normalize floats
+        foreach ($data['lines'] as $key => $line) {
+            $data['lines'][$key]['amount'] = number_format($line['amount'], 0);
+        }
+
+        return md5(json_encode($data));
+    }
+    
+    /**
+     *
+     * @param \stdClass | string $data
+     * @return \stdClass
+     */
+    public function generateTaxResultFromResponse($data)
+    {
+        if (is_string($data) || !is_object($data)) {
+            throw new \Exception($data);
+        }
+        $result = new \stdClass();
+        $result->totalTaxable = $data->totalTaxable;
+        $result->totalTax = $data->totalTax;
+        $result->lines = $data->lines;
+        
+        return $result;
     }
 
     /**
@@ -81,5 +156,22 @@ class GetTax extends AbstractService
         }
 
         return null;
+    }
+
+    /**
+     *
+     * @param \stdClass $object
+     * @return array
+     */
+    protected function objectToArray($object)
+    {
+        $data = (array)$object;
+        foreach ($data as $key => $value) {
+            if (is_object($value) || is_array($value)) {
+                $data[$key] = $this->objectToArray($value);
+            }
+        }
+        
+        return $data;
     }
 }

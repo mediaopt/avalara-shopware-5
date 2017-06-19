@@ -2,11 +2,8 @@
 
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
-use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
-use Avalara\CreateTransactionModel;
 use Avalara\DocumentType;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
-use Shopware\Plugins\MoptAvalara\Adapter\Factory\InsuranceFactory;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
 
 class CheckoutSubscriber extends AbstractSubscriber
@@ -19,7 +16,7 @@ class CheckoutSubscriber extends AbstractSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            'Enlight_Controller_Action_Frontend_Checkout_Confirm' => 'onBeforeCheckoutConfirm',
+            'Enlight_Controller_Action_PostDispatchSecure_Frontend_Checkout' => 'onBeforeCheckoutConfirm',
             'sOrder::sSaveOrder::before' => 'onBeforeSOrderSaveOrder',
             'sOrder::sSaveOrder::after' => 'onAfterSOrderSaveOrder',
             'sAdmin::sGetPremiumDispatch::after' => 'onAfterAdminGetPremiumDispatch',
@@ -36,58 +33,34 @@ class CheckoutSubscriber extends AbstractSubscriber
     {
         $session = $this->getSession();
         $adapter = $this->getAdapter();
-
-        /* @var $model \Avalara\CreateTransactionModel */
-        $model = $adapter->getFactory('OrderTransactionModelFactory')->build();
-
-        if (!$this->isGetTaxCallAvalible($model) || empty($args->getSubject()->View()->sUserLoggedIn)) {
-            $adapter->getLogger()->info('GetTax call for current basket already done / not enabled.');
+        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
+        $service = $adapter->getService('GetTax');
+        $action = $args->getRequest()->getActionName();
+        // Do not call Avalara in ajaxCart - we do not have all information yet!
+        if (in_array($action, ['ajaxAmount', 'ajaxCart'])) {
             return;
         }
-
+        
         try {
+            /* @var $model \Avalara\CreateTransactionModel */
+            $model = $adapter->getFactory('OrderTransactionModelFactory')->build();
+
+            if (!$service->isGetTaxCallAvalible($model, $this->getSession()) || empty($args->getSubject()->View()->sUserLoggedIn)) {
+                $adapter->getLogger()->info('GetTax call for current basket already done / not enabled.');
+                return;
+            }
+            
             $adapter->getLogger()->info('GetTax for current basket.');
-
-            /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
-            $service = $adapter->getService('GetTax');
             $response = $service->calculate($model);
-
-            $session->MoptAvalaraGetTaxResult = $this->generateTaxResultFromResponse($response);
-            $session->MoptAvalaraGetTaxRequestHash = $this->getHashFromRequest($model);
+            
+            $session->MoptAvalaraGetTaxResult = $service->generateTaxResultFromResponse($response);
+            $session->MoptAvalaraGetTaxRequestHash = $service->getHashFromRequest($model);
         } catch (\Exception $e) {
             $adapter->getLogger()->error('GetTax call failed: ' . $e->getMessage());
-            $args->getSubject()->forward('checkout', 'index');
-            
-            return true;
         }
-    }
-
-    /**
-     * check if getTax call has to be made
-     * @param \Avalara\CreateTransactionModel $model
-     * @return boolean
-     * @todo: check country (?)
-     */
-    protected function isGetTaxCallAvalible(CreateTransactionModel $model)
-    {
-        $taxEnabled = $this
-            ->getAdapter()
-            ->getPluginConfig(Form::TAX_ENABLED_FIELD)
-        ;
-        if (!$taxEnabled) {
-            return false;
-        }
-
-
-        $session = $this->getSession();
-        if (!$session->MoptAvalaraGetTaxResult || !$session->MoptAvalaraGetTaxRequestHash) {
-            return true;
-        }
-
-        if ($session->MoptAvalaraGetTaxRequestHash !== $this->getHashFromRequest($model)) {
-            return true;
-        }
-
+        
+        //Recall controller so basket tax and landedCost could be applied
+        $args->getSubject()->forward('confirm');
         return false;
     }
 
@@ -105,6 +78,7 @@ class CheckoutSubscriber extends AbstractSubscriber
         Shopware()->Session()->MoptAvalaraGetTaxCommitRequest = $getTaxCommitRequest;
         //set all basket items' taxId to 0 for custom taxrates in backend etc.
         foreach ($args->getSubject()->sBasketData["content"] as &$basketRow) {
+            $basketRow["taxId"] = 0;
             $basketRow["taxID"] = 0;
         }
     }
@@ -117,6 +91,8 @@ class CheckoutSubscriber extends AbstractSubscriber
     {
         $session = $this->getSession();
         $adapter = $this->getAdapter();
+        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
+        $service = $this->getAdapter()->getService('GetTax');
 
         //proceed if no sales order call was made
         if (!$session->MoptAvalaraGetTaxRequestHash) {
@@ -128,7 +104,7 @@ class CheckoutSubscriber extends AbstractSubscriber
         $model = $adapter->getFactory('OrderTransactionModelFactory')->build();
         $adapter->getLogger()->info('validateCommitCall...');
         //prevent parent execution on request mismatch
-        if ($session->MoptAvalaraGetTaxRequestHash != $this->getHashFromRequest($model)) {
+        if ($session->MoptAvalaraGetTaxRequestHash != $service->getHashFromRequest($model)) {
             $adapter->getLogger()->error('Mismatching requests, do not proceed.');
             throw new \Exception('MoptAvalara: mismatching requests, do not proceed.');
         }
@@ -172,36 +148,6 @@ class CheckoutSubscriber extends AbstractSubscriber
         unset(Shopware()->Session()->MoptAvalaraGetTaxResult);
     }
 
-    /**
-     * get hash from request to compare calculate & commit call
-     * unset changing fields during both calls
-     *
-     * @param \Avalara\CreateTransactionModel $model
-     * @return string
-     */
-    protected function getHashFromRequest(CreateTransactionModel $model)
-    {
-        $data = $this->objectToArray($model);
-        $itemCodeToBeRemoved = [
-            InsuranceFactory::ARTICLE_ID,
-            ShippingFactory::ARTICLE_ID,
-        ];
-        
-        unset($data['type']);
-        unset($data['date']);
-        unset($data['commit']);
-        
-        foreach ($data['lines'] as $key => $line) {
-            //remove shipping costs (shipping information is not in session on first getTax call)
-            if (in_array($line['itemCode'], $itemCodeToBeRemoved)) {
-                unset($data['lines'][$key]);
-                continue;
-            }
-        }
-
-        return md5(json_encode($data));
-    }
-    
     /**
      *
      * @param \Enlight_Hook_HookArgs $args
@@ -290,23 +236,5 @@ class CheckoutSubscriber extends AbstractSubscriber
         
         $config = Shopware()->Config();
         $config['sVOUCHERTAX'] = $taxRate;
-    }
-
-    /**
-     *
-     * @param \stdClass | string $data
-     * @return \stdClass
-     */
-    private function generateTaxResultFromResponse($data)
-    {
-        if (is_string($data) || !is_object($data)) {
-            throw new \Exception($data);
-        }
-        $result = new \stdClass();
-        $result->totalTaxable = $data->totalTaxable;
-        $result->totalTax = $data->totalTax;
-        $result->lines = $data->lines;
-        
-        return $result;
     }
 }
