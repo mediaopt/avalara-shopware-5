@@ -30,8 +30,9 @@ class BasketSubscriber extends AbstractSubscriber
     {
         $session = $this->getSession();
         $newBasket = $args->getReturn();
-        $taxResult = $session->MoptAvalaraGetTaxResult;
-        if(!$taxResult) {
+        $adapter = $this->getAdapter();
+
+        if(!$taxResult = $session->MoptAvalaraGetTaxResult) {
             return $newBasket;
         }
         /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
@@ -56,7 +57,7 @@ class BasketSubscriber extends AbstractSubscriber
                 $newBasket[$prop] += $landedCost;
             }
         }
-        
+
         return $newBasket;
     }
     
@@ -66,12 +67,11 @@ class BasketSubscriber extends AbstractSubscriber
      */
     public function afterGetTaxRateByConditions(\Enlight_Hook_HookArgs $args)
     {
-        $taxId = $args->get('taxID');
+        $taxId = $args->get('taxId');
         if (!preg_match('#^mopt_avalara__(.+)$#', $taxId, $matches)) {
             return;
         }
-
-        $args->setReturn($matches[1]);
+        return $matches[1];
     }
     
     /**
@@ -81,14 +81,14 @@ class BasketSubscriber extends AbstractSubscriber
     public function onGetPriceForUpdateArticle(\Enlight_Event_EventArgs $args)
     {
         $session = $this->getSession();
-        if (empty($session->MoptAvalaraGetTaxResult)) {
+        if (!$taxResult = $session->MoptAvalaraGetTaxResult) {
             return;
         }
 
         $adapter = $this->getAdapter();
         /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
         $service = $adapter->getService('GetTax');
-        $taxRate = $service->getTaxRateForOrderBasketId($session->MoptAvalaraGetTaxResult, $args->get('id'));
+        $taxRate = $service->getTaxRateForOrderBasketId($taxResult, $args->get('id'));
         
         if (null === $taxRate) {
             //tax has to be present for all positions on checkout confirm
@@ -97,21 +97,19 @@ class BasketSubscriber extends AbstractSubscriber
             if ('checkout' == $controller && 'confirm' == $action) {
                 $msg = 'No tax information for basket-position ' . $args->get('id');
                 $adapter->getLogger()->error($msg);
-                
                 //@todo Check if we should remove this
                 //customer should not be warning if avalara is not working.
                 //throw new \Exception($msg);
             }
 
-            //proceed with shopware standard
             return;
         }
         
         $newPrice = $args->getReturn();
         $newPrice['taxID'] = 'mopt_avalara__' . $taxRate;
         $newPrice['tax_rate'] = $taxRate;
-        $newPrice['tax'] = $service->getTaxForOrderBasketId($session->MoptAvalaraGetTaxResult, $args->get('id'));
-        
+        $newPrice['tax'] = $service->getTaxForOrderBasketId($taxResult, $args->get('id'));
+
         return $newPrice;
     }
 }
