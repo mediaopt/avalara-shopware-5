@@ -86,26 +86,4 @@ abstract class AbstractSubscriber implements SubscriberInterface
     {
         return $this->getContainer()->get('session');
     }
-
-    /**
-     * 
-     * @param int $id
-     * @return \Shopware\Models\Order\Order
-     */
-    protected function getOrderById($id)
-    {
-        $respository = Shopware()->Models()->getRepository('Shopware\Models\Order\Order');
-        return $respository->find($id);
-    }
-
-    /**
-     * 
-     * @param int $orderNumber
-     * @return \Shopware\Models\Order\Order
-     */
-    protected function getOrderByNumber($orderNumber)
-    {
-        $respository = Shopware()->Models()->getRepository('Shopware\Models\Order\Order');
-        return $respository->findOneByNumber($orderNumber);
-    }
 }

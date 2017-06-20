@@ -47,4 +47,18 @@ interface AdapterInterface
      * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
      */
     public function getBootstrap();
+    
+    /**
+     * 
+     * @param int $id
+     * @return \Shopware\Models\Order\Order
+     */
+    public function getOrderById($id);
+    
+    /**
+     * 
+     * @param int $orderNumber
+     * @return \Shopware\Models\Order\Order
+     */
+    public function getOrderByNumber($orderNumber);
 }

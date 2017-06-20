@@ -184,6 +184,28 @@ class AvalaraSDKAdapter implements AdapterInterface
         
         return null;
     }
+    
+    /**
+     * 
+     * @param int $id
+     * @return \Shopware\Models\Order\Order
+     */
+    public function getOrderById($id)
+    {
+        $respository = Shopware()->Models()->getRepository('Shopware\Models\Order\Order');
+        return $respository->find($id);
+    }
+
+    /**
+     * 
+     * @param int $orderNumber
+     * @return \Shopware\Models\Order\Order
+     */
+    public function getOrderByNumber($orderNumber)
+    {
+        $respository = Shopware()->Models()->getRepository('Shopware\Models\Order\Order');
+        return $respository->findOneByNumber($orderNumber);
+    }
 
     /**
      * @return string

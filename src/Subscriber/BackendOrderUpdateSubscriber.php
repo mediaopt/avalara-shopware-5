@@ -47,6 +47,7 @@ class BackendOrderUpdateSubscriber extends AbstractSubscriber
      */
     protected function onPostDispatchSavePosition(\Enlight_Event_EventArgs $args)
     {
+        $adapter = $this->getAdapter();
         $view = $args->getSubject()->View();
         if (!$view->getAssign('success')) {
             return;
@@ -56,7 +57,7 @@ class BackendOrderUpdateSubscriber extends AbstractSubscriber
         Shopware()->Models()->clear();
         
         $orderId = $args->getSubject()->Request()->getParam('orderId', null);
-        $order = $this->getOrderById($orderId);
+        $order = $adapter->getOrderById($orderId);
         $order->getAttribute()->setMoptAvalaraOrderChanged(1);
         Shopware()->Models()->persist($order);
         Shopware()->Models()->flush();
@@ -69,6 +70,7 @@ class BackendOrderUpdateSubscriber extends AbstractSubscriber
      */
     protected function onPostDispatchSave(\Enlight_Event_EventArgs $args)
     {
+        $adapter = $this->getAdapter();
         $view = $args->getSubject()->View();
         if (!$view->getAssign('success')) {
             return;
@@ -78,7 +80,7 @@ class BackendOrderUpdateSubscriber extends AbstractSubscriber
         Shopware()->Models()->clear();
         
         $orderId = $args->getSubject()->Request()->getParam('id', null);
-        $order = $this->getOrderById($orderId);
+        $order = $adapter->getOrderById($orderId);
         $order->getAttribute()->setMoptAvalaraOrderChanged(1);
         Shopware()->Models()->persist($order);
         Shopware()->Models()->flush();

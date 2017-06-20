@@ -139,7 +139,7 @@ class CheckoutSubscriber extends AbstractSubscriber
             return;
         }
 
-        if (!$order = $this->getOrderByNumber($orderNumber)) {
+        if (!$order = $adapter->getOrderByNumber($orderNumber)) {
             $msg = 'There is no order with number: ' . $orderNumber;
             $this->getAdapter()->getLogger()->critical($msg);
             throw new \Exception($msg);
