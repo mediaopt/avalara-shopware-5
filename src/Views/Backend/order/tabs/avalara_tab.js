@@ -18,12 +18,13 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
     },
 
     createAvalaraTab: function () {
-        var me = this;
-        var exemptionCode = '';
-        var userId = me.record.getCustomerStore.first().get('id');
-        var docCode = '';
-        var transactionType = '';
-        var incoterms = '';
+        var me = this,
+            exemptionCode = '',
+            userId = me.record.getCustomerStore.first().get('id'),
+            docCode = '',
+            transactionType = '',
+            incoterms = ''
+        ;
         Ext.Ajax.request({
             url: '{url controller=AttributeData action=loadData}',
             params: {
@@ -75,7 +76,7 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
         if (null === transactionType) {
             return null;
         }
-        
+        var me = this;
         var items = [{
             xtype: 'button',
             text: 'Reset update flag',
