@@ -4,6 +4,7 @@ namespace Shopware\Plugins\MoptAvalara\Service;
 
 use Avalara\VoidTransactionModel;
 use Avalara\VoidReasonCode;
+use Avalara\DocumentType;
 use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 
 /**
@@ -22,6 +23,12 @@ class CancelTax extends AbstractService
         $adapter = $this->getAdapter();
         try {
             $docCode = $order->getAttribute()->getMoptAvalaraDocCode();
+            $transactionType = $order->getAttribute()->getMoptAvalaraTransactionType();
+            
+            if (DocumentType::C_SALESINVOICE !== $transactionType) {
+                throw new \Exception('Cannot cancel not commited transaction.');
+            }
+            
             if (empty($docCode)) {
                 throw new \Exception('Cannot cancel transaction with empty DocCode');
             }
