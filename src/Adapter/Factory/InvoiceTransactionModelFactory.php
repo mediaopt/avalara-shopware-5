@@ -33,7 +33,6 @@ class InvoiceTransactionModelFactory extends AbstractTransactionModelFactory
         $this->orderContext = $order;
         
         $model = new CreateTransactionModel();
-        $model->code = $order->getNumber();
         $model->commit = true;
         $model->customerCode = $customer->getId();
         $model->date = date(DATE_W3C);
