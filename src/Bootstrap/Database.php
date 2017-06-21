@@ -36,6 +36,7 @@ class Database
     const INSURED_FIELD = 'mopt_avalara_insured';
     const EXPRESS_SHIPPING_FIELD = 'mopt_avalara_express_shipping';
     const INCOTERMS_FIELD = 'mopt_avalara_incoterms';
+    const LANDEDCOST_FIELD = 'mopt_avalara_landedcost';
     const TRANSACTION_TYPE_FIELD = 'mopt_avalara_transaction_type';
     
     /**
@@ -120,6 +121,13 @@ class Database
         $this->addBoolField(
             self::ORDER_ATTR_TABLE,
             self::ORDER_CHANGED_FIELD, 
+            null, null, null, 
+            false
+        );
+        
+        $this->addStringField(
+            self::ORDER_ATTR_TABLE,
+            self::LANDEDCOST_FIELD, 
             null, null, null, 
             false
         );

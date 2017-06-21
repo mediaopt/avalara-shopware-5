@@ -252,8 +252,14 @@ class CheckoutSubscriber extends AbstractSubscriber
             ? $taxRequest->parameters->{LandedCostRequestParams::LANDED_COST_INCOTERMS}
             : null
         ;
+        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
+        $service = $this->getAdapter()->getService('GetTax');
+        $session = $this->getSession();
+        $landedCost = $service->getLandedCost($session->MoptAvalaraGetTaxResult);
+
         $order->getAttribute()->setMoptAvalaraTransactionType(DocumentType::C_SALESORDER);
         $order->getAttribute()->setMoptAvalaraIncoterms($incoterms);
+        $order->getAttribute()->setMoptAvalaraLandedcost($landedCost);
         
         Shopware()->Models()->persist($order);
         Shopware()->Models()->flush();

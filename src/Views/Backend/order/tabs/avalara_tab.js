@@ -23,7 +23,8 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
             userId = me.record.getCustomerStore.first().get('id'),
             docCode = '',
             transactionType = '',
-            incoterms = ''
+            incoterms = '',
+            landedCost = ''
         ;
         Ext.Ajax.request({
             url: '{url controller=AttributeData action=loadData}',
@@ -37,6 +38,7 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
                 docCode = response.data.__attribute_mopt_avalara_doc_code;
                 transactionType = response.data.__attribute_mopt_avalara_transaction_type;
                 incoterms = response.data.__attribute_mopt_avalara_incoterms;
+                landedCost = response.data.__attribute_mopt_avalara_landedcost;
             }
         });
 
@@ -55,7 +57,7 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
         
         var actionPanel = me.createActionPanel(transactionType);
         var itemsArray = [
-            me.createInformationPanel(exemptionCode, transactionType, incoterms, docCode)
+            me.createInformationPanel(exemptionCode, transactionType, incoterms, docCode, landedCost)
         ];
         if (actionPanel) {
             itemsArray.push(actionPanel);
@@ -165,37 +167,43 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
         });
     },
     
-    createInformationPanel: function (exemptionCode, transactionType, incoterms, docCode) {
+    createInformationPanel: function (exemptionCode, transactionType, incoterms, docCode, landedCost) {
         return Ext.create('Ext.form.Panel', {
             title: 'Information',
             items: [
                 {
                     xtype: 'displayfield',
-                    fieldLabel: 'Exemption code',
-                    value: exemptionCode ? exemptionCode : '-',
-                    labelWidth: 130
+                    fieldLabel: 'Document code',
+                    value: docCode ? docCode : '-',
+                    labelWidth: 170
                 },
                 {
                     xtype: 'displayfield',
                     fieldLabel: 'Transaction status',
                     value: transactionType ? transactionType : '-',
-                    labelWidth: 130
+                    labelWidth: 170
                 },
                 {
                     xtype: 'displayfield',
                     fieldLabel: 'Incoterms',
                     value: incoterms ? incoterms : '-',
-                    labelWidth: 130
+                    labelWidth: 170
                 },
                 {
                     xtype: 'displayfield',
-                    fieldLabel: 'Document code',
-                    value: docCode ? docCode : '-',
-                    labelWidth: 130
+                    fieldLabel: 'Customs duties and fees',
+                    value: landedCost ? landedCost : '-',
+                    labelWidth: 170
+                },
+                {
+                    xtype: 'displayfield',
+                    fieldLabel: 'Exemption code',
+                    value: exemptionCode ? exemptionCode : '-',
+                    labelWidth: 170
                 }
             ],
-            width: '45%',
-            height: 130,
+            width: '50%',
+            height: 180,
             style: 'margin-right: 10px;',
             bodyPadding: '5px 10px'
         });
