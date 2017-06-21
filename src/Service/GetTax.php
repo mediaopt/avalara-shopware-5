@@ -4,6 +4,8 @@ namespace Shopware\Plugins\MoptAvalara\Service;
 
 use Avalara\CreateTransactionModel;
 use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
+use Shopware\Plugins\MoptAvalara\Adapter\Factory\InsuranceFactory;
+use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
 
 /**
  * Description of GetTax
@@ -72,6 +74,37 @@ class GetTax extends AbstractService
         }
 
         return $totalLandedCost;
+    }
+    
+    /**
+     * Get insurance cost  from avalara response
+     * @param \stdClass $taxResult
+     * @return float
+     */
+    public function getInsuranceCost($taxResult)
+    {
+        foreach ($taxResult->lines as $line) {
+            if (InsuranceFactory::ARTICLE_ID === $line->lineNumber) {
+                return $line->lineAmount + $line->tax;
+            }
+        }
+
+        return 0.0;
+    }
+    /**
+     * Get shipping cost from avalara response
+     * @param \stdClass $taxResult
+     * @return float
+     */
+    public function getShippingCost($taxResult)
+    {
+        foreach ($taxResult->lines as $line) {
+            if (ShippingFactory::ARTICLE_ID === $line->lineNumber) {
+                return $line->lineAmount + $line->tax;
+            }
+        }
+
+        return 0.0;
     }
     
     /**
