@@ -35,13 +35,16 @@ class BasketSubscriber extends AbstractSubscriber
         if(!$taxResult = $session->MoptAvalaraGetTaxResult) {
             return $newBasket;
         }
+        
         /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
         $service = $adapter->getService('GetTax');
-        if (!$landedCost = $service->getLandedCost($taxResult)) {
-            return $newBasket;
-        }
-        
+        $landedCost = $service->getLandedCost($taxResult);
+        $insurance = $service->getInsuranceCost($taxResult);
+        $totalMagnifier = $landedCost + $insurance;
+
+        $newBasket['moptAvalaraAmountMagnifier'] = $totalMagnifier;
         $newBasket['moptAvalaraLandedCost'] = $landedCost;
+        $newBasket['moptAvalaraInsuranceCost'] = $insurance;
         
         $toAppend = [
             'Amount',
@@ -51,14 +54,31 @@ class BasketSubscriber extends AbstractSubscriber
             'AmountWithTax',
             'AmountWithTaxNumeric'
         ];
-        
-        foreach ($toAppend as $prop) {
-            if ($newBasket[$prop]) {
-                $newBasket[$prop] += $landedCost;
-            }
-        }
 
+        foreach ($toAppend as $prop) {
+            $newBasket[$prop] = $this->addCostToValue($newBasket[$prop], $totalMagnifier);
+        }
+        
         return $newBasket;
+    }
+    
+    /**
+     * 
+     * @param mixed $value
+     * @param float $cost
+     * @return mixed
+     */
+    private function addCostToValue($value, $cost)
+    {
+        if (!$value) {
+            return $value;
+        }
+        
+        if (is_string($value)) {
+            $float = (float)str_replace(',', '.', $value);
+            return str_replace('.', ',', (string)($float + $cost));
+        }
+        return $value += $cost;
     }
     
     /**
