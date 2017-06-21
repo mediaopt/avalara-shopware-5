@@ -73,35 +73,35 @@ class Database
             self::CATEGORIES_ATTR_TABLE,
             self::TAXCODE_FIELD,
             'Avalara Tax Code',
-            'Hier wird der Avalara Tax-Code der Kategorie angegeben, der an Avalara übersendet wird.'
+            'This is the Avalara Tax code of the category sent to Avalara.'
         );
         
         $this->addStringField(
             self::CATEGORIES_ATTR_TABLE,
             self::HSCODE_FIELD,
             'Avalara Harmonized Classification Code (hsCode)',
-            'Hier wird der Avalara Harmonized Classification Code (hsCode) des Artikel angegeben, der an Avalara übersendet wird.'
+            'This is the Avalara Harmonized Classification Code (hsCode) of the article sent to Avalara.'
         );
         
         $this->addStringField(
             self::ARTICLES_ATTR_TABLE,
             self::TAXCODE_FIELD,
             'Avalara Tax Code',
-            'Hier wird der Avalara Tax-Code des Artikel angegeben, der an Avalara übersendet wird.'
+            'This is the Avalara Tax code of the article sent to Avalara.'
         );
         
         $this->addStringField(
             self::ARTICLES_ATTR_TABLE,
             self::HSCODE_FIELD,
             'Avalara Harmonized Classification Code (hsCode)',
-            'Hier wird der Avalara Harmonized Classification Code (hsCode) des Artikel angegeben, der an Avalara übersendet wird.'
+            'This is the Avalara Harmonized Classification Code (hsCode) of the article sent to Avalara.'
         );
         
         $this->addStringField(
             self::USER_ATTR_TABLE,
             self::EXEMPTION_CODE_FIELD,
             'Avalara Exemption Code',
-            'Hier wird der Exemption-Code für einen Benutzen angegeben, der steuerfrei bei Ihnen einkaufen kann.'
+            'Here is the exemption code for a use that can be tax-free for you.'
         );
         
         $this->addStringField(
@@ -157,14 +157,14 @@ class Database
             self::VOUCHER_ATTR_TABLE,
             self::TAXCODE_FIELD,
             'Avalara Tax Code',
-            'Hier wird der Avalara Tax-Code für Gutscheine angegeben, der an Avalara übersendet wird.'
+            'This is where the Avalara Tax code for vouchers is given, which is sent to Avalara.'
         );
         
         $this->addStringField(
             self::DISPATCH_ATTR_TABLE,
             self::TAXCODE_FIELD,
             'Avalara Tax Code',
-            'Hier wird der Avalara Tax-Code für den Versand angegeben, der an Avalara übersendet wird.',
+            'This is the Avalara Tax code for the shipment sent to Avalara. Leave empty to use default.',
             ShippingFactory::TAXCODE
         );
         
