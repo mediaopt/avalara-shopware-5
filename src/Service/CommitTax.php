@@ -58,7 +58,6 @@ class CommitTax extends AbstractService
             $this->updateOrderAttributes($order, $taxResult);
             $adapter->getLogger()->info('Order ' . $order->getId() . ' has been commited with docCode: ' . $taxResult->code);
         } catch (\Exception $e) {
-            die();
             $adapter->getLogger()->error('Commiting order to Avalara failed: '. $e->getMessage());
             throw new \Exception('Avalara: Update order call failed: ' . $e->getMessage());
         }
