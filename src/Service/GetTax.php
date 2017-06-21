@@ -22,9 +22,7 @@ class GetTax extends AbstractService
     public function calculate(CreateTransactionModel $model)
     {
         $client = $this->getAdapter()->getAvaTaxClient();
-        $response = $client->createTransaction(null, $model);
-
-        return $response;
+        return $client->createTransaction(null, $model);
     }
     
     /**
