@@ -1,5 +1,6 @@
 <?php
 
+
 class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Backend_ExtJs
 {
     /**
@@ -35,12 +36,14 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
         try {
             $id = $this->Request()->getParam('id');
             $order = $this->getAvalaraOrder($id);
-            $this->commitOrder($order);
+            /* @var $service \Shopware\Plugins\MoptAvalara\Service\CommitTax */
+            $service = $this->getAdapter()->getService('CommitTax');
+            $service->commitOrder($order);
             $this->resetUpdateFlag($order);
             
             $this->View()->assign([
                 'success' => true,
-                'message' => 'Avalara: order has been updated.'
+                'message' => 'Avalara: order has been commited to Avalara.'
             ]);
         } catch (\Exception $e) {
             $this->View()->assign([
@@ -85,45 +88,14 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             throw new \Exception('Avalara: invalid order.');
         }
 
-        if (!$order->getAttribute()->getMoptAvalaraTransactionType()) {
+        if (!$transactionType = $order->getAttribute()->getMoptAvalaraTransactionType()) {
             $adapter->getLogger()->error('Avalara: order with id: ' . $id . ' is not registered with Avalara.');
             throw new \Exception('Avalara: order is not registered with Avalara.');
         }
         
         return $order;
     }
-    
-    /**
-     *
-     * @param \Shopware\Models\Order\Order $order
-     * @return boolean
-     */
-    protected function commitOrder(\Shopware\Models\Order\Order $order)
-    {
-        $adapter = $this->getAdapter();
-        try {
-            $docCommitEnabled = $adapter->getPluginConfig(Form::DOC_COMMIT_ENABLED_FIELD);
-            if (!$docCommitEnabled) {
-                throw new \Exception('Doc commit is not enabled.');
-            }
-            
-            $model = $adapter
-                ->getFactory('InvoiceTransactionModelFactory')
-                ->build($order)
-            ;
-            /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
-            $service = $adapter->getService('GetTax');
-            if (!$response = $service->calculate($model)) {
-                 throw new \Exception('No result on order commiting to Avalara.');
-            }
-            $adapter->getLogger()->info('Order ' . $order->getId() . ' has been commited with docCode: ' . $response->code);
-            $this->updateOrder($order, $response);
-        } catch (\Exception $e) {
-            $adapter->getLogger()->error('Commiting order to Avalara failed: '. $e->getMessage());
-            throw new \Exception('Avalara: Update order call failed: ' . $e->getMessage());
-        }
-    }
-    
+
     /**
      *
      * @param \Shopware\Models\Order\Order $order
@@ -134,49 +106,11 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
         $order->getAttribute()->setMoptAvalaraOrderChanged(0);
         Shopware()->Models()->persist($order);
         Shopware()->Models()->flush();
-    }
-    
-    /**
-     *
-     * @param \Shopware\Models\Order\Order $order
-     * @param \stdClass $response
-     * @return boolean
-     */
-    protected function updateOrder(\Shopware\Models\Order\Order $order, $response)
-    {
-        $attr = $order->getAttribute();
-        $attr->setMoptAvalaraDocCode($response->code);
-        $attr->setMoptAvalaraTransactionType(\Avalara\DocumentType::C_SALESINVOICE);
         
-        /*@var $detail Shopware\Models\Order\Detail */
-        foreach ($order->getDetails() as $detail) {
-            $taxRate = $this->getTaxRateForOrderDetail($detail, $response);
-            $detail->setTax(null);
-            $detail->setTaxRate($taxRate);
-        }
-        $order->calculateInvoiceAmount();
-        Shopware()->Models()->persist($order);
-        Shopware()->Models()->flush();
+        $adapter = $this->getAdapter();
+        $adapter->getLogger()->info('Order ' . $order->getId() . ' has been unflagged.');
     }
-    
-    /**
-     *
-     * @param \Shopware\Models\Order\Detail $detail
-     * @param \stdClass $taxInformation
-     * @return float
-     * @throws \Exception
-     */
-    protected function getTaxRateForOrderDetail(\Shopware\Models\Order\Detail $detail, $taxInformation)
-    {
-        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
-        $service = $this->getAdapter()->getService('GetTax');
-        if ($taxRate = $service->getTaxRateForOrderBasketId($detail->getId(), $taxInformation)) {
-            return $taxRate;
-        }
 
-        throw new \Exception('Avalara: no tax information found.');
-    }
-    
     /**
      *
      * @return \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface
