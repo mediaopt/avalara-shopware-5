@@ -86,8 +86,11 @@ class ShippingFactory extends AbstractFactory
      */
     public function isShippingInsured($id)
     {
-        $shippingEntity = $this->getShippingEntity($id);
+        if (!$id) {
+            return false;
+        }
         
+        $shippingEntity = $this->getShippingEntity($id);
         if (!$shippingEntity || !$attr = $shippingEntity->getAttribute()) {
             return false;
         }
@@ -102,8 +105,11 @@ class ShippingFactory extends AbstractFactory
      */
     public function isShippingExpress($id)
     {
-        $shippingEntity = $this->getShippingEntity($id);
+        if (!$id) {
+            return false;
+        }
         
+        $shippingEntity = $this->getShippingEntity($id);
         if (!$shippingEntity || !$attr = $shippingEntity->getAttribute()) {
             return false;
         }
