@@ -9,6 +9,8 @@ use Shopware\Plugins\MoptAvalara\LandedCost\LandedCostRequestParams;
 
 class CheckoutSubscriber extends AbstractSubscriber
 {
+    const SCALE = 2;
+    
     /**
      * return array with all subsribed events
      *
@@ -194,10 +196,11 @@ class CheckoutSubscriber extends AbstractSubscriber
             return;
         }
         //abfangen voucher mode==2 strict=1 => eigene TaxRate zuweisen aus Avalara Response
-        $taxRate = ((float)$session->MoptAvalaraGetTaxResult->totalTax / (float)$session->MoptAvalaraGetTaxResult->totalTaxable) * 100;
+        $taxResult = $session->MoptAvalaraGetTaxResult;
+        $taxRate = bcdiv((float)$taxResult->totalTax, (float)$taxResult->totalTaxable, self::SCALE);
 
         $config = Shopware()->Config();
-        $config['sDISCOUNTTAX'] = number_format($taxRate, 2);
+        $config['sDISCOUNTTAX'] = bcmul($taxRate, 100, self::SCALE);
         $config['sTAXAUTOMODE'] = false;
     }
     

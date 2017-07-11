@@ -13,6 +13,7 @@ use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
  */
 class GetTax extends AbstractService
 {
+    const SCALE = 2;
     const IMPORT_FEES_LINE = 'ImportFees';
     const IMPORT_DUTIES_LINE = 'ImportDuties';
     
@@ -53,9 +54,9 @@ class GetTax extends AbstractService
         if (!$taxLine = $this->getTaxLineForOrderBasketId($taxResult, $id)) {
             return 0;
         }
-        $taxRate = ((float)$taxLine->tax / (float)$taxLine->taxableAmount) * 100;
+        $taxRate = bcdiv((float)$taxLine->tax, (float)$taxLine->taxableAmount, self::SCALE);
         
-        return number_format($taxRate, 2);
+        return bcmul($taxRate, 100, self::SCALE);
     }
     
     /**
@@ -69,7 +70,7 @@ class GetTax extends AbstractService
         $landedCostLineNumbers = [self::IMPORT_DUTIES_LINE, self::IMPORT_FEES_LINE];
         foreach ($taxResult->lines as $line) {
             if (in_array($line->lineNumber, $landedCostLineNumbers)) {
-                $totalLandedCost += ($line->lineAmount + $line->tax);
+                $totalLandedCost = bcadd($totalLandedCost, bcadd($line->lineAmount, $line->tax, self::SCALE), self::SCALE);
             }
         }
 
@@ -85,7 +86,7 @@ class GetTax extends AbstractService
     {
         foreach ($taxResult->lines as $line) {
             if (InsuranceFactory::ARTICLE_ID === $line->lineNumber) {
-                return $line->lineAmount + $line->tax;
+                return bcadd($line->lineAmount, $line->tax, self::SCALE);
             }
         }
 
@@ -100,7 +101,7 @@ class GetTax extends AbstractService
     {
         foreach ($taxResult->lines as $line) {
             if (ShippingFactory::ARTICLE_ID === $line->lineNumber) {
-                return $line->lineAmount + $line->tax;
+                return bcadd($line->lineAmount, $line->tax, self::SCALE);
             }
         }
 
