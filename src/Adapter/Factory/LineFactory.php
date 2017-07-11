@@ -176,7 +176,11 @@ class LineFactory extends AbstractFactory
         if ($position['modus'] != LineFactory::MODUS_VOUCHER || empty($position['articleID'])) {
             return true;
         }
-        $voucher = Shopware()->Models()->getRepository('\Shopware\Models\Voucher\Voucher')->find($position['articleID']);
+        $voucher = Shopware()
+            ->Models()
+            ->getRepository('\Shopware\Models\Voucher\Voucher')
+            ->find($position['articleID'])
+        ;
         
         return !$voucher || !$voucher->getStrict();
     }
