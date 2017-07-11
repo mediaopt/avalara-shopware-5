@@ -161,11 +161,6 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
         $subscribers[] = new SubscriberNamespace\CheckoutSubscriber($this);
         $subscribers[] = new SubscriberNamespace\BasketSubscriber($this);
         $subscribers[] = new SubscriberNamespace\BackendOrderUpdateSubscriber($this);
-        /** 
-         * @todo load and save attributes
-         * @see https://developers.shopware.com/developers-guide/attribute-system/#add-your-field-and-load-the-data
-         */
-        //$subscribers[] = new SubscriberNamespace\BackendAttributesSubscriber($this);
 
         foreach ($subscribers as $subscriber) {
             $this->Application()->Events()->addSubscriber($subscriber);
