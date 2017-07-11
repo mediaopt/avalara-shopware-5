@@ -135,6 +135,7 @@ class LineFactory extends AbstractFactory
         foreach ($article->getCategories() as $category) {
             if ($categoryHsCode = $category->getAttribute()->getMoptAvalaraHscode()) {
                 $params->{LandedCostRequestParams::LANDED_COST_HTSCODE} = $categoryHsCode;
+                break;
             }
         }
 
