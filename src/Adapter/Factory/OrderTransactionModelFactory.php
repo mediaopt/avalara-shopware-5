@@ -96,11 +96,18 @@ class OrderTransactionModelFactory extends AbstractTransactionModelFactory
 
     /**
      *
-     * @return int
+     * @return int|null
      */
     protected function getShippingId()
     {
-        return Shopware()->Session()->sOrderVariables['sDispatch']['id'];
+        if (!$orderVars = $this->getOrderVariables()) {
+            return null;
+        }
+        
+        return (isset($orderVars['sDispatch']) && isset($orderVars['sDispatch']['id']))
+            ? $orderVars['sDispatch']['id']
+            : null
+        ;
     }
     
     /**
@@ -109,11 +116,23 @@ class OrderTransactionModelFactory extends AbstractTransactionModelFactory
      */
     protected function getShippingPrice()
     {
-        if (empty(Shopware()->Session()->sOrderVariables['sBasket']['sShippingcostsNet'])) {
+        if (!$orderVars = $this->getOrderVariables()) {
             return null;
         }
-        
-        return Shopware()->Session()->sOrderVariables['sBasket']['sShippingcostsNet'];
+
+        return (isset($orderVars['sBasket']) && isset($orderVars['sBasket']['sShippingcostsNet']))
+            ? $orderVars['sBasket']['sShippingcostsNet']
+            : null
+        ;
+    }
+    
+    /**
+     *
+     * @return array
+     */
+    protected function getOrderVariables()
+    {
+        return Shopware()->Session()->sOrderVariables;
     }
     
     /**
