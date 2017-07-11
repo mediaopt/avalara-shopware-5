@@ -40,9 +40,9 @@ class BasketSubscriber extends AbstractSubscriber
         $service = $adapter->getService('GetTax');
         $landedCost = $service->getLandedCost($taxResult);
         $insurance = $service->getInsuranceCost($taxResult);
-        $totalMagnifier = $landedCost + $insurance;
+        $customsDuties = $landedCost + $insurance;
 
-        $newBasket['moptAvalaraAmountMagnifier'] = $totalMagnifier;
+        $newBasket['moptAvalaraCustomsDuties'] = $customsDuties;
         $newBasket['moptAvalaraLandedCost'] = $landedCost;
         $newBasket['moptAvalaraInsuranceCost'] = $insurance;
         
