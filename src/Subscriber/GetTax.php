@@ -41,7 +41,7 @@ class GetTax extends AbstractSubscriber
         /* @var $session Enlight_Components_Session_Namespace */
         $session = Shopware()->Session();
         $adapter = $this->getAdapter();
-        
+
         /* @var $model \Avalara\CreateTransactionModel */
         $model = $adapter->getFactory('TransactionModelFactory')->build(
             DocumentType::C_SALESORDER,
@@ -79,22 +79,18 @@ class GetTax extends AbstractSubscriber
      */
     protected function isGetTaxCall(CreateTransactionModel $model)
     {
-        $taxEnabled = $this
-            ->getAdapter()
-            ->getPluginConfig(FormCreator::TAX_ENABLED_FIELD)
-        ;
-        if (!$taxEnabled) {
+        if (!$this->taxEnabled()) {
             return false;
         }
 
 
         /* @var $session Enlight_Components_Session_Namespace */
         $session = Shopware()->Session();
-
+        
         if (!$session->MoptAvalaraGetTaxRequestHash) {
             return true;
         }
-
+        
         if ($session->MoptAvalaraGetTaxRequestHash != $this->getHashFromRequest($model)) {
             return true;
         }
@@ -110,8 +106,7 @@ class GetTax extends AbstractSubscriber
     {
         /* @var $session Enlight_Components_Session_Namespace */
         $session = Shopware()->Session();
-
-        if (empty($session->MoptAvalaraGetTaxResult)) {
+        if (empty($session->MoptAvalaraGetTaxResult) || !$this->taxEnabled()) {
             return;
         }
         
@@ -126,10 +121,6 @@ class GetTax extends AbstractSubscriber
             if ('checkout' == $controller && 'confirm' == $action) {
                 $msg = 'No tax information for basket-position ' . $args->get('id');
                 $adapter->getLogger()->error($msg);
-                
-                //@todo Check if we should remove this
-                //customer should not be warning if avalara is not working.
-                //throw new \Exception($msg);
             }
 
             //proceed with shopware standard
@@ -299,8 +290,8 @@ class GetTax extends AbstractSubscriber
 
         foreach ($data['lines'] as $key => $line) {
             unset($data['lines'][$key]['itemCode']);
-            unset($data['lines'][$key]['amount']);
-
+            $data['lines'][$key]['amount'] = number_format($line['amount'], 0);
+            
             //remove shipping costs (shipping information is not in session on first getTax call)
             if ($line['itemCode'] == 'shipping') {
                 unset($data['lines'][$key]);
@@ -333,7 +324,7 @@ class GetTax extends AbstractSubscriber
         /* @var $session Enlight_Components_Session_Namespace */
         $session = Shopware()->Session();
 
-        if (empty($session->MoptAvalaraGetTaxResult)) {
+        if (empty($session->MoptAvalaraGetTaxResult) || !$this->taxEnabled()) {
             return;
         }
 
@@ -359,7 +350,7 @@ class GetTax extends AbstractSubscriber
         /* @var $session Enlight_Components_Session_Namespace */
         $session = Shopware()->Session();
 
-        if (empty($session->MoptAvalaraGetTaxResult)) {
+        if (empty($session->MoptAvalaraGetTaxResult) || !$this->taxEnabled()) {
             return;
         }
 
@@ -379,7 +370,7 @@ class GetTax extends AbstractSubscriber
         /* @var $session Enlight_Components_Session_Namespace */
         $session = Shopware()->Session();
 
-        if (empty($session->MoptAvalaraGetTaxResult)) {
+        if (empty($session->MoptAvalaraGetTaxResult) || !$this->taxEnabled()) {
             return;
         }
         
@@ -410,4 +401,15 @@ class GetTax extends AbstractSubscriber
         $config['sVOUCHERTAX'] = $taxRate;
     }
 
+    /**
+     * 
+     * @return bool
+     */
+    private function taxEnabled()
+    {
+        return $this
+            ->getAdapter()
+            ->getPluginConfig(FormCreator::TAX_ENABLED_FIELD)
+        ;
+    }
 }
