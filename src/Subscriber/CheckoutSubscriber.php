@@ -161,14 +161,13 @@ class CheckoutSubscriber extends AbstractSubscriber
     public function onAfterAdminGetPremiumDispatch(\Enlight_Hook_HookArgs $args)
     {
         $return = $args->getReturn();
-        
+        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
+        $service = $this->getAdapter()->getService('GetTax');
         $session = $this->getSession();
-        if (empty($session->MoptAvalaraGetTaxResult)) {
+        if (empty($session->MoptAvalaraGetTaxResult) || !$service->isGetTaxEnabled()) {
             return;
         }
 
-        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
-        $service = $this->getAdapter()->getService('GetTax');
         $taxRate = $service->getTaxRateForOrderBasketId($session->MoptAvalaraGetTaxResult, ShippingFactory::ARTICLE_ID);
         
         if (!$taxRate) {
@@ -187,8 +186,10 @@ class CheckoutSubscriber extends AbstractSubscriber
      */
     public function onBeforeSBasketSGetBasket(\Enlight_Hook_HookArgs $args)
     {
+        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
+        $service = $this->getAdapter()->getService('GetTax');
         $session = $this->getSession();
-        if (empty($session->MoptAvalaraGetTaxResult)) {
+        if (empty($session->MoptAvalaraGetTaxResult) || !$service->isGetTaxEnabled()) {
             return;
         }
 
@@ -212,7 +213,9 @@ class CheckoutSubscriber extends AbstractSubscriber
     public function onBeforeBasketSAddVoucher(\Enlight_Hook_HookArgs $args)
     {
         $session = $this->getSession();
-        if (empty($session->MoptAvalaraGetTaxResult)) {
+        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
+        $service = $this->getAdapter()->getService('GetTax');
+        if (empty($session->MoptAvalaraGetTaxResult) || !$service->isGetTaxEnabled()) {
             return;
         }
         
@@ -236,8 +239,6 @@ class CheckoutSubscriber extends AbstractSubscriber
         }
         
         //get tax rate for voucher
-        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
-        $service = $this->getAdapter()->getService('GetTax');
         $taxRate = $service->getTaxRateForOrderBasketId($session->MoptAvalaraGetTaxResult, LineFactory::ARTICLEID_VOUCHER);
         
         $config = Shopware()->Config();
@@ -251,12 +252,17 @@ class CheckoutSubscriber extends AbstractSubscriber
      */
     private function setOrderAttributes(\Shopware\Models\Order\Order $order, $taxRequest)
     {
+        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
+        $service = $this->getAdapter()->getService('GetTax');
+        if (!$service->isGetTaxEnabled()) {
+            return;
+        }
+        
         $incoterms = isset($taxRequest->parameters->{LandedCostRequestParams::LANDED_COST_INCOTERMS})
             ? $taxRequest->parameters->{LandedCostRequestParams::LANDED_COST_INCOTERMS}
             : null
         ;
-        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
-        $service = $this->getAdapter()->getService('GetTax');
+
         $session = $this->getSession();
         $landedCost = $service->getLandedCost($session->MoptAvalaraGetTaxResult);
 

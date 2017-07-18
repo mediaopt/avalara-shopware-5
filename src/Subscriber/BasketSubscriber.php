@@ -31,13 +31,13 @@ class BasketSubscriber extends AbstractSubscriber
         $session = $this->getSession();
         $newBasket = $args->getReturn();
         $adapter = $this->getAdapter();
-
-        if(!$taxResult = $session->MoptAvalaraGetTaxResult) {
-            return $newBasket;
-        }
-        
         /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
         $service = $adapter->getService('GetTax');
+        $taxResult = $session->MoptAvalaraGetTaxResult;
+        if(!$taxResult || !$service->isLandedCostEnabled()) {
+            return $newBasket;
+        }
+
         $landedCost = $service->getLandedCost($taxResult);
         $insurance = $service->getInsuranceCost($taxResult);
         $customsDuties = $landedCost + $insurance;
@@ -100,14 +100,18 @@ class BasketSubscriber extends AbstractSubscriber
      */
     public function onGetPriceForUpdateArticle(\Enlight_Event_EventArgs $args)
     {
+        $adapter = $this->getAdapter();
+        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
+        $service = $adapter->getService('GetTax');
+        if (!$service->isGetTaxEnabled()) {
+            return;
+        }
+        
         $session = $this->getSession();
         if (!$taxResult = $session->MoptAvalaraGetTaxResult) {
             return;
         }
 
-        $adapter = $this->getAdapter();
-        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
-        $service = $adapter->getService('GetTax');
         $taxRate = $service->getTaxRateForOrderBasketId($taxResult, $args->get('id'));
         
         if (null === $taxRate) {

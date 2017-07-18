@@ -160,12 +160,9 @@ abstract class AbstractTransactionModelFactory extends AbstractFactory
     protected function getTransactionParameters()
     {
         $params = new \stdClass();
-        
-        $landedCostEnabled = $this
-            ->getAdapter()
-            ->getPluginConfig(Form::LANDEDCOST_ENABLED_FIELD)
-        ;
-        if (!$landedCostEnabled) {
+        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
+        $service = $this->getAdapter()->getService('GetTax');
+        if (!$service->isLandedCostEnabled()) {
             return $params;
         }
         
