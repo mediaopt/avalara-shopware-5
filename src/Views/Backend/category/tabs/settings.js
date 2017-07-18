@@ -1,5 +1,6 @@
-//{namespace name="backend/mopt_avalara/category/view/category/tabs"}
-//{block name="backend/category/view/tabs/settings" append}
+// {namespace name="backend/mopt_avalara/category/view/category/tabs"}
+// {block name="backend/category/view/tabs/settings"}
+// {$smarty.block.parent}
 Ext.define('Shopware.apps.moptAvalara.Category.view.category.tabs.settings', {
     override: 'Shopware.apps.Category.view.category.tabs.Settings',
     /**
@@ -26,4 +27,4 @@ Ext.define('Shopware.apps.moptAvalara.Category.view.category.tabs.settings', {
         });
     }
 });
-//{/block}
+// {/block}

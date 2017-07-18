@@ -1,4 +1,5 @@
-//{block name="backend/order/view/list/list" append}
+// {block name="backend/order/view/list/list"}
+// {$smarty.block.parent}
 Ext.define('Shopware.apps.moptAvalara.Order.view.list.List', {
     override: 'Shopware.apps.Order.view.list.List',
     
@@ -50,4 +51,4 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.list.List', {
         return output;
     }
 });
-//{/block}
+// {/block}

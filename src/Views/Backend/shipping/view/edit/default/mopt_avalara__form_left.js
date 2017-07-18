@@ -1,5 +1,6 @@
-//{namespace name="backend/mopt_avalara/shipping/view/shipping/edit/default"}
-//{block name="backend/shipping/view/edit/default/form_left" append}
+// {namespace name="backend/mopt_avalara/shipping/view/shipping/edit/default"}
+// {block name="backend/shipping/view/edit/default/form_left"}
+// {$smarty.block.parent}
 Ext.define('Shopware.apps.moptAvalara.Shipping.view.edit.default.FormLeft', {
     override: 'Shopware.apps.Shipping.view.edit.default.FormLeft',
     extend: 'Ext.form.field.Text',
@@ -22,4 +23,4 @@ Ext.define('Shopware.apps.moptAvalara.Shipping.view.edit.default.FormLeft', {
         });
     }
 });
-//{/block}
+// {/block}
