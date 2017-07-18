@@ -1,5 +1,6 @@
-//{namespace name="backend/mopt_avalara/customer/view/customer/detail"}
-//{block name="backend/customer/view/detail/billing" append}
+// {namespace name="backend/mopt_avalara/customer/view/customer/detail"}
+// {block name="backend/customer/view/detail/billing"}
+// {$smarty.block.parent}
 Ext.define('Shopware.apps.moptAvalara.Customer.view.detail.Billing', {
     override: 'Shopware.apps.Customer.view.detail.Billing',
     extend: 'Ext.form.field.Text',
@@ -22,4 +23,4 @@ Ext.define('Shopware.apps.moptAvalara.Customer.view.detail.Billing', {
         });
     }
 });
-//{/block}
+// {/block}

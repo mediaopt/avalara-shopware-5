@@ -1,5 +1,6 @@
-//{namespace name="backend/mopt_avlara/article/view/article/detail"}
-//{block name="backend/article/view/detail/base" append}
+// {namespace name="backend/mopt_avlara/article/view/article/detail"}
+// {block name="backend/article/view/detail/base"}
+// {$smarty.block.parent}
 Ext.define('Shopware.apps.moptAvalara.Article.view.detail.Base', {
     override: 'Shopware.apps.Article.view.detail.Base',
     /**
@@ -33,4 +34,4 @@ Ext.define('Shopware.apps.moptAvalara.Article.view.detail.Base', {
         });
     }
 });
-//{/block}
+// {/block}

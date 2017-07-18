@@ -14,7 +14,8 @@
 {/block}
                         
 {* Add LandedCost and Incurance line *}
-{block name='frontend_checkout_cart_footer_field_labels_shipping' append}
+{block name='frontend_checkout_cart_footer_field_labels_shipping'}
+    {$smarty.block.parent}
     {if $sBasket.moptAvalaraInsuranceCost > 0.0 }
         <li class="list--entry block-group entry--dhl">
             <div class="entry--label block">

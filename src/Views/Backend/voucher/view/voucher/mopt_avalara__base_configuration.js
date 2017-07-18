@@ -1,5 +1,6 @@
-//{namespace name="backend/mopt_avalara/voucher/view/voucher/base_configuration"}
-//{block name="backend/voucher/view/voucher/base_configuration" append}
+// {namespace name="backend/mopt_avalara/voucher/view/voucher/base_configuration"}
+// {block name="backend/voucher/view/voucher/base_configuration"}
+// {$smarty.block.parent}
 Ext.define('Shopware.apps.moptAvalara.Voucher.view.voucher.BaseConfiguration', {
     override: 'Shopware.apps.Voucher.view.voucher.BaseConfiguration',
     extend: 'Ext.form.field.Text',
@@ -22,4 +23,4 @@ Ext.define('Shopware.apps.moptAvalara.Voucher.view.voucher.BaseConfiguration', {
         });
     }
 });
-//{/block}
+// {/block}

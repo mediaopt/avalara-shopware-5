@@ -1,5 +1,6 @@
-//{namespace name="backend/mopt_avalara/order/view/order/detail"}
-//{block name="backend/order/view/detail/window" append}
+// {namespace name="backend/mopt_avalara/order/view/order/detail"}
+// {block name="backend/order/view/detail/window"}
+// {$smarty.block.parent}
 Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
     override: 'Shopware.apps.Order.view.detail.Window',
     extend: 'Ext.form.Panel',
@@ -209,4 +210,4 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
         });
     }
 });
-//{/block}
+// {/block}
