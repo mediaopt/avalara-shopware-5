@@ -171,7 +171,7 @@ class CheckoutSubscriber extends AbstractSubscriber
         $taxRate = $service->getTaxRateForOrderBasketId($session->MoptAvalaraGetTaxResult, ShippingFactory::ARTICLE_ID);
         
         if (!$taxRate) {
-            return;
+            return $return;
         }
         $return['tax_calculation'] = true;
         $return['tax_calculation_value'] = $taxRate;
@@ -240,7 +240,9 @@ class CheckoutSubscriber extends AbstractSubscriber
         
         //get tax rate for voucher
         $taxRate = $service->getTaxRateForOrderBasketId($session->MoptAvalaraGetTaxResult, LineFactory::ARTICLEID_VOUCHER);
-        
+        if (!$taxRate) {
+            return;
+        }
         $config = Shopware()->Config();
         $config['sVOUCHERTAX'] = $taxRate;
     }

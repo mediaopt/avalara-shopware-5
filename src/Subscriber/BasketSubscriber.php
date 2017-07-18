@@ -104,26 +104,22 @@ class BasketSubscriber extends AbstractSubscriber
         /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
         $service = $adapter->getService('GetTax');
         if (!$service->isGetTaxEnabled()) {
-            return;
+            return $args->getReturn();
         }
         
         $session = $this->getSession();
         if (!$taxResult = $session->MoptAvalaraGetTaxResult) {
-            return;
+            return $args->getReturn();
         }
 
         $taxRate = $service->getTaxRateForOrderBasketId($taxResult, $args->get('id'));
         
-        if (null === $taxRate) {
+        if (!$taxRate) {
             //tax has to be present for all positions on checkout confirm
-            $action = $args->getRequest()->getActionName();
-            $controller = $args->getRequest()->getControllerName();
-            if ('checkout' == $controller && 'confirm' == $action) {
-                $msg = 'No tax information for basket-position ' . $args->get('id');
-                $adapter->getLogger()->error($msg);
-            }
+            $msg = 'No tax information for basket-position ' . $args->get('id');
+            $adapter->getLogger()->info($msg);
 
-            $args->getReturn();
+            return $args->getReturn();
         }
         
         $newPrice = $args->getReturn();
