@@ -117,9 +117,6 @@ class BasketSubscriber extends AbstractSubscriber
             if ('checkout' == $controller && 'confirm' == $action) {
                 $msg = 'No tax information for basket-position ' . $args->get('id');
                 $adapter->getLogger()->error($msg);
-                //@todo Check if we should remove this
-                //customer should not be warning if avalara is not working.
-                //throw new \Exception($msg);
             }
 
             $args->getReturn();
