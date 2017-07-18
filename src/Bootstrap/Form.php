@@ -2,6 +2,8 @@
 
 namespace Shopware\Plugins\MoptAvalara\Bootstrap;
 
+use Shopware\Models\Config\Element as FormElement;
+
 /**
  * Description of formCreator
  *
@@ -168,6 +170,7 @@ class Form
 
         $form->setElement('boolean', self::IS_LIVE_MODE_FIELD, [
             'label' => 'Live Modus',
+            'scope' => FormElement::SCOPE_SHOP
         ]);
 
         $form->setElement('text', self::ACCOUNT_NUMBER_FIELD, [
@@ -202,16 +205,19 @@ class Form
         $form->setElement('boolean', self::TAX_ENABLED_FIELD, [
             'label' => 'Enable Avalara SalesTax calculation',
             'description' => 'Choose, if you want to use the Avalara SalesTax Calculation.',
+            'scope' => FormElement::SCOPE_SHOP
         ]);
 
         $form->setElement('boolean', self::DOC_COMMIT_ENABLED_FIELD, [
             'label' => 'Enable document committing',
             'description' => 'Disable document committing will result that all calls will be done with DocType=SalesOrder and suppress any non-getTax calls(i.e.canceltax,postTax)',
+            'scope' => FormElement::SCOPE_SHOP
         ]);
         
         $form->setElement('boolean', self::LANDEDCOST_ENABLED_FIELD, [
             'label' => 'Enable Avalara Landed cost calculation',
             'description' => 'Choose, if you want to use the Avalara Landed cost calculation.',
+            'scope' => FormElement::SCOPE_SHOP
         ]);
 
         $form->setElement('select', self::INCOTERMS_FIELD, [
@@ -234,6 +240,7 @@ class Form
                 [self::DELIVERY_COUNTRY_CANADA, 'Canada only'],
                 [self::DELIVERY_COUNTRY_USA_AND_CANADA, 'USA & Canada']
             ],
+            'scope' => FormElement::SCOPE_SHOP
         ]);
 
         $form->setElement('select', self::LOG_LEVEL_FIELD, [
