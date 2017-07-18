@@ -128,7 +128,7 @@ class LineFactory extends AbstractFactory
      * @param array $position
      * @return bool
      */
-    protected static function isDiscountGlobal($position)
+    public static function isDiscountGlobal($position)
     {
         if ($position['modus'] != LineFactory::MODUS_VOUCHER) {
            return true; 
