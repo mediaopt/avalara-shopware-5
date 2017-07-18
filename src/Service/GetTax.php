@@ -115,7 +115,7 @@ class GetTax extends AbstractService
      * @return boolean
      * @todo: check country (?)
      */
-    public function isGetTaxCallAvalible(CreateTransactionModel $model, \Enlight_Components_Session_Namespace $session)
+    public function isGetTaxCallAvailable(CreateTransactionModel $model, \Enlight_Components_Session_Namespace $session)
     {
         $taxEnabled = $this
             ->getAdapter()
