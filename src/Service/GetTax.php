@@ -52,7 +52,7 @@ class GetTax extends AbstractService
     public function getTaxRateForOrderBasketId($taxResult, $id)
     {
         if (!$taxLine = $this->getTaxLineForOrderBasketId($taxResult, $id)) {
-            return 0;
+            return null;
         }
         $taxRate = bcdiv((float)$taxLine->tax, (float)$taxLine->taxableAmount, self::SCALE);
         
@@ -67,6 +67,9 @@ class GetTax extends AbstractService
     public function getLandedCost($taxResult)
     {
         $totalLandedCost = 0.0;
+        if (!$this->isLandedCostEnabled()) {
+            return $totalLandedCost;
+        }
         $landedCostLineNumbers = [self::IMPORT_DUTIES_LINE, self::IMPORT_FEES_LINE];
         foreach ($taxResult->lines as $line) {
             if (in_array($line->lineNumber, $landedCostLineNumbers)) {
@@ -117,11 +120,7 @@ class GetTax extends AbstractService
      */
     public function isGetTaxCallAvailable(CreateTransactionModel $model, \Enlight_Components_Session_Namespace $session)
     {
-        $taxEnabled = $this
-            ->getAdapter()
-            ->getPluginConfig(Form::TAX_ENABLED_FIELD)
-        ;
-        if (!$taxEnabled) {
+        if (!$this->isGetTaxEnabled()) {
             return false;
         }
 
@@ -134,6 +133,30 @@ class GetTax extends AbstractService
         }
 
         return false;
+    }
+    
+    /**
+     * 
+     * @return bool
+     */
+    public function isGetTaxEnabled()
+    {
+        return $this
+            ->getAdapter()
+            ->getPluginConfig(Form::TAX_ENABLED_FIELD)
+        ;
+    }
+    
+    /**
+     * 
+     * @return bool
+     */
+    public function isLandedCostEnabled()
+    {
+        return $this
+            ->getAdapter()
+            ->getPluginConfig(Form::LANDEDCOST_ENABLED_FIELD)
+        ;
     }
     
     /**

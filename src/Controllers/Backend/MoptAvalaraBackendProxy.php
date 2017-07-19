@@ -44,14 +44,13 @@ class Shopware_Controllers_Backend_MoptAvalaraBackendProxy extends Shopware_Cont
     private function testAvaTax()
     {
         $adapter = $this->getAdapter();
-        
-        $fileName = ($adapter->getPluginConfig(Form::LANDEDCOST_ENABLED_FIELD))
+        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
+        $service = $adapter->getService('GetTax');
+        $fileName = ($service->isLandedCostEnabled())
             ? 'testTaxAndLandedCostRequest.json'
             : 'testTaxRequest.json'
         ;
         $model = $this->loadMockData($fileName);
-        $client = $adapter->getAvaTaxClient();
-        
         $response = $adapter->getAvaTaxClient()->createTransaction(null, $model);
 
         if (is_string($response)) {
