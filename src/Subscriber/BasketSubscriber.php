@@ -56,7 +56,7 @@ class BasketSubscriber extends AbstractSubscriber
         ];
 
         foreach ($toAppend as $prop) {
-            $newBasket[$prop] = $this->addCostToValue($newBasket[$prop], $totalMagnifier);
+            $newBasket[$prop] = $this->addCostToValue($newBasket[$prop], $customsDuties);
         }
         
         return $newBasket;
