@@ -146,7 +146,7 @@ class AvalaraSDKAdapter implements AdapterInterface
         }
 
         //setup monolog
-        $this->logger = new \Monolog\Logger('mo_avalara');
+        $this->logger = new \Monolog\Logger('mopt_avalara');
         $logFileName = Form::LOG_FILE_NAME . Form::LOG_FILE_EXT;
         $streamHandler = new \Monolog\Handler\RotatingFileHandler(
             $this->getLogDir() . $logFileName,
