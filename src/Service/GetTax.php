@@ -51,7 +51,8 @@ class GetTax extends AbstractService
      */
     public function getTaxRateForOrderBasketId($taxResult, $id)
     {
-        if (!$taxLine = $this->getTaxLineForOrderBasketId($taxResult, $id)) {
+        $taxLine = $this->getTaxLineForOrderBasketId($taxResult, $id);
+        if (!$taxLine || !((float)$taxLine->taxableAmount)) {
             return null;
         }
         $taxRate = bcdiv((float)$taxLine->tax, (float)$taxLine->taxableAmount, self::SCALE);

@@ -192,12 +192,12 @@ class CheckoutSubscriber extends AbstractSubscriber
         if (empty($session->MoptAvalaraGetTaxResult) || !$service->isGetTaxEnabled()) {
             return;
         }
-
-        if (!$session->MoptAvalaraGetTaxResult->totalTaxable) {
-            return;
-        }
         //abfangen voucher mode==2 strict=1 => eigene TaxRate zuweisen aus Avalara Response
         $taxResult = $session->MoptAvalaraGetTaxResult;
+        if (!((float)$taxResult->totalTaxable)) {
+            return;
+        }
+        
         $taxRate = bcdiv((float)$taxResult->totalTax, (float)$taxResult->totalTaxable, self::SCALE);
 
         $config = Shopware()->Config();
