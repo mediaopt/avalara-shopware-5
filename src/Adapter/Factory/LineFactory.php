@@ -2,6 +2,7 @@
 
 namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
+use Shopware\Models\Article\Article;
 use Avalara\LineItemModel;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
 use Shopware\Plugins\MoptAvalara\LandedCost\LandedCostRequestParams;
@@ -125,31 +126,33 @@ class LineFactory extends AbstractFactory
             return $params;
         }
 
-        //directly assigned to article ?
-        if ($hsCode = $article->getAttribute()->getMoptAvalaraHscode()) {
+        if ($hsCode = $this->getHsCode($article)) {
             $params->{LandedCostRequestParams::LANDED_COST_HTSCODE} = $hsCode;
-            return $params;
-        }
-
-        //category assignment ?
-        foreach ($article->getCategories() as $category) {
-            if ($categoryHsCode = $category->getAttribute()->getMoptAvalaraHscode()) {
-                $params->{LandedCostRequestParams::LANDED_COST_HTSCODE} = $categoryHsCode;
-                break;
-            }
         }
 
         return $params;
     }
-
+    
     /**
-     *
-     * @param array $lineData
-     * @return bool
+     * 
+     * @param Article $article
+     * @return string
      */
-    protected function isTaxIncluded($lineData)
+    private function getHsCode(Article $article)
     {
-        return !$this->getTaxCode($lineData);
+        //directly assigned to article ?
+        if ($hsCode = $article->getAttribute()->getMoptAvalaraHscode()) {
+            return $hsCode;
+        }
+
+        //category assignment
+        foreach ($article->getCategories() as $category) {
+            if ($categoryHsCode = $category->getAttribute()->getMoptAvalaraHscode()) {
+                return $categoryHsCode;
+            }
+        }
+        
+        return null;
     }
 
     /**
