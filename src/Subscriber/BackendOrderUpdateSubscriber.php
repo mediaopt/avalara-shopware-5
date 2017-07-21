@@ -17,7 +17,6 @@ class BackendOrderUpdateSubscriber extends AbstractSubscriber
     {
         return [
             'Enlight_Controller_Action_PostDispatch_Backend_Order' => 'onPostDispatchBackendOrder',
-            'Enlight_Controller_Action_PostDispatch_Backend_Order_SavePosition' => 'onPostDispatchSavePosition',
         ];
     }
     
@@ -45,7 +44,30 @@ class BackendOrderUpdateSubscriber extends AbstractSubscriber
      * @param \Enlight_Event_EventArgs $args
      * @return void
      */
-    public function onPostDispatchSavePosition(\Enlight_Event_EventArgs $args)
+    protected function onPostDispatchSavePosition(\Enlight_Event_EventArgs $args)
+    {
+        $orderId = $args->getSubject()->Request()->getParam('orderId', null);
+        $this->updateOrderChanged($args, $orderId);
+    }
+    
+    /**
+     * 
+     * @param \Enlight_Event_EventArgs $args
+     * @return void
+     */
+    protected function onPostDispatchSave(\Enlight_Event_EventArgs $args)
+    {
+        $orderId = $args->getSubject()->Request()->getParam('id', null);
+        $this->updateOrderChanged($args, $orderId);
+    }
+    
+    /**
+     * 
+     * @param \Enlight_Event_EventArgs $args
+     * @param int $orderId
+     * @return null
+     */
+    private function updateOrderChanged(\Enlight_Event_EventArgs $args, $orderId)
     {
         $adapter = $this->getAdapter();
         $view = $args->getSubject()->View();
@@ -53,10 +75,8 @@ class BackendOrderUpdateSubscriber extends AbstractSubscriber
             return;
         }
         
-        //prevent shop duplication http://forum.shopware.com/programmierung-f56/nach-email-versand-in-sorder-wird-main-shop-dupliziert-t21650.html
+        //prevents shop duplication http://forum.shopware.com/programmierung-f56/nach-email-versand-in-sorder-wird-main-shop-dupliziert-t21650.html
         Shopware()->Models()->clear();
-        
-        $orderId = $args->getSubject()->Request()->getParam('orderId', null);
         $order = $adapter->getOrderById($orderId);
         $order->getAttribute()->setMoptAvalaraOrderChanged(1);
         Shopware()->Models()->persist($order);
