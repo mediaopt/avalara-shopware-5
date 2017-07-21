@@ -64,7 +64,7 @@ class Database
     
     /**
      * Extends attributes with DHL properties
-     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
+     * @return \Shopware\Plugins\MoptAvalara\Bootstrap\Database
      * @throws \Exception
      */
     public function install()
@@ -224,8 +224,10 @@ class Database
             self::VOUCHER_ATTR_TABLE,
             self::COUNTRIES_ATTR_TABLE,
         ]);
+        
+        return $this;
     }
-    
+
     /**
      * 
      * @param string $table
