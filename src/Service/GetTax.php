@@ -4,6 +4,7 @@ namespace Shopware\Plugins\MoptAvalara\Service;
 
 use Avalara\CreateTransactionModel;
 use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
+use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\InsuranceFactory;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
 
@@ -13,7 +14,6 @@ use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
  */
 class GetTax extends AbstractService
 {
-    const SCALE = 2;
     const IMPORT_FEES_LINE = 'ImportFees';
     const IMPORT_DUTIES_LINE = 'ImportDuties';
     
@@ -55,9 +55,9 @@ class GetTax extends AbstractService
         if (!$taxLine || !((float)$taxLine->taxableAmount)) {
             return null;
         }
-        $taxRate = bcdiv((float)$taxLine->tax, (float)$taxLine->taxableAmount, self::SCALE);
+        $taxRate = bcdiv((float)$taxLine->tax, (float)$taxLine->taxableAmount, AvalaraSDKAdapter::BCMATH_SCALE);
         
-        return bcmul($taxRate, 100, self::SCALE);
+        return bcmul($taxRate, 100, AvalaraSDKAdapter::BCMATH_SCALE);
     }
     
     /**
@@ -74,7 +74,15 @@ class GetTax extends AbstractService
         $landedCostLineNumbers = [self::IMPORT_DUTIES_LINE, self::IMPORT_FEES_LINE];
         foreach ($taxResult->lines as $line) {
             if (in_array($line->lineNumber, $landedCostLineNumbers)) {
-                $totalLandedCost = bcadd($totalLandedCost, bcadd($line->lineAmount, $line->tax, self::SCALE), self::SCALE);
+                $totalLandedCost = bcadd(
+                    $totalLandedCost, 
+                    bcadd(
+                        $line->lineAmount, 
+                        $line->tax, 
+                        AvalaraSDKAdapter::BCMATH_SCALE
+                    ), 
+                    AvalaraSDKAdapter::BCMATH_SCALE
+                );
             }
         }
 
@@ -90,7 +98,7 @@ class GetTax extends AbstractService
     {
         foreach ($taxResult->lines as $line) {
             if (InsuranceFactory::ARTICLE_ID === $line->lineNumber) {
-                return bcadd($line->lineAmount, $line->tax, self::SCALE);
+                return bcadd($line->lineAmount, $line->tax, AvalaraSDKAdapter::BCMATH_SCALE);
             }
         }
 
@@ -105,7 +113,7 @@ class GetTax extends AbstractService
     {
         foreach ($taxResult->lines as $line) {
             if (ShippingFactory::ARTICLE_ID === $line->lineNumber) {
-                return bcadd($line->lineAmount, $line->tax, self::SCALE);
+                return bcadd($line->lineAmount, $line->tax, AvalaraSDKAdapter::BCMATH_SCALE);
             }
         }
 

@@ -3,6 +3,7 @@
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
 use Avalara\DocumentType;
+use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
 use Shopware\Plugins\MoptAvalara\LandedCost\LandedCostRequestParams;
@@ -198,10 +199,10 @@ class CheckoutSubscriber extends AbstractSubscriber
             return;
         }
         
-        $taxRate = bcdiv((float)$taxResult->totalTax, (float)$taxResult->totalTaxable, self::SCALE);
+        $taxRate = bcdiv((float)$taxResult->totalTax, (float)$taxResult->totalTaxable, AvalaraSDKAdapter::BCMATH_SCALE);
 
         $config = Shopware()->Config();
-        $config['sDISCOUNTTAX'] = bcmul($taxRate, 100, self::SCALE);
+        $config['sDISCOUNTTAX'] = bcmul($taxRate, 100, AvalaraSDKAdapter::BCMATH_SCALE);
         $config['sTAXAUTOMODE'] = false;
     }
     

@@ -14,6 +14,8 @@ use Avalara\AvaTaxClient;
  */
 class AvalaraSDKAdapter implements AdapterInterface
 {
+    const BCMATH_SCALE = 8;
+    
     const SERVICE_NAME = 'AvalaraSdkAdapter';
     
     const PRODUCTION_ENV = 'production';
