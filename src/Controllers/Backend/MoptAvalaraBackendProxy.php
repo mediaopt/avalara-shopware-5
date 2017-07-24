@@ -1,9 +1,17 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 
 /**
- * $Id: $
+ * 
+ * @extends Shopware_Controllers_Backend_ExtJs
+ * @author derksen mediaopt GmbH
  */
 class Shopware_Controllers_Backend_MoptAvalaraBackendProxy extends Shopware_Controllers_Backend_ExtJs
 {

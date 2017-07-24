@@ -1,14 +1,20 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Service;
 
 use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 use Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface;
-use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
 
 /**
- * Description of CommitTax
- *
+ * 
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Service
  */
 class CommitTax extends AbstractService
 {

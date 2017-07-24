@@ -1,6 +1,15 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
 
+/**
+ * @extends Shopware_Controllers_Backend_ExtJs
+ * @author derksen mediaopt GmbH
+ */
 class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Backend_ExtJs
 {
     /**

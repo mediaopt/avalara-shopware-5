@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Bootstrap;
 
 use Shopware\Bundle\AttributeBundle\Service\CrudService;
@@ -9,8 +15,9 @@ use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
 
 /**
  * This class will update attributes in DB
- *
- * @author bubnov
+ * 
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Bootstrap
  */
 class Database
 {

@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
 use Avalara\LineItemModel;
@@ -11,8 +17,11 @@ use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 use Shopware\Plugins\MoptAvalara\LandedCost\LandedCostRequestParams;
 
 /**
- * Factory to create CreateTransactionModel from the bucket
  *
+ * Factory to create CreateTransactionModel from a basket/order
+ *
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Adapter\Factory
  */
 abstract class AbstractTransactionModelFactory extends AbstractFactory
 {

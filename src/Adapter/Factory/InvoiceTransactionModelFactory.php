@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
 use Avalara\CreateTransactionModel;
@@ -9,9 +15,12 @@ use Shopware\Models\Order\Order;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
 
 /**
- * Factory to create CreateTransactionModel from the order
- * Will return a model ready to be commited to Avalara
  *
+ * Factory to create CreateTransactionModel from the order.
+ * Will return a model ready to be commited to Avalara.
+ * 
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Adapter\Factory
  */
 class InvoiceTransactionModelFactory extends AbstractTransactionModelFactory
 {

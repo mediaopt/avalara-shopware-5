@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 use Shopware\Plugins\MoptAvalara\Bootstrap\Database;
 use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
@@ -8,8 +14,9 @@ use Shopware\Plugins\MoptAvalara\Subscriber as SubscriberNamespace;
 /**
  * this class configures:
  * installment, uninstallment, updates, hooks, events, payment methods
- *
+ * 
  * @extends Shopware_Components_Plugin_Bootstrap
+ * @author derksen mediaopt GmbH
  */
 class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components_Plugin_Bootstrap
 {

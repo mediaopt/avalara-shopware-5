@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Logger;
 
 use GuzzleHttp\Event\RequestEvents;
@@ -11,7 +17,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
 /**
- * copy of GuzzleHttp\Subscriber\Log\LogSubscriber with slight changes (thx private properties...)
+ * Copy of GuzzleHttp\Subscriber\Log\LogSubscriber with slight changes (thx private properties...)
  *
  * Plugin class that will add request and response logging to an HTTP request.
  *
@@ -19,7 +25,10 @@ use Psr\Log\LogLevel;
  * template variable substitution.
  *
  * @see MessageLogger for a list of available template variable substitutions
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Logger
  */
+
 class LogSubscriber implements SubscriberInterface
 {
 

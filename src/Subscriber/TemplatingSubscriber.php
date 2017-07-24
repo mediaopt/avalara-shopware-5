@@ -1,10 +1,17 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
 /**
- * Description of Checkout
- *
+ * 
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Subscriber
  */
 class TemplatingSubscriber extends AbstractSubscriber
 {

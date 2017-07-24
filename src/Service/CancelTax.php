@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Service;
 
 use Avalara\VoidTransactionModel;
@@ -8,8 +14,9 @@ use Avalara\DocumentType;
 use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 
 /**
- * Description of CancelTax
- *
+ * 
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Service
  */
 class CancelTax extends AbstractService
 {

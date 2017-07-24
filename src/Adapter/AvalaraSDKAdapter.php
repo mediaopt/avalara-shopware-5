@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Adapter;
 
 use Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface;
@@ -11,6 +17,9 @@ use Avalara\AvaTaxClient;
 
 /**
  * This is the adaptor for avalara's API
+ * 
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Adapter\Factory
  */
 class AvalaraSDKAdapter implements AdapterInterface
 {

@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
 use Avalara\DocumentType;
@@ -8,6 +14,11 @@ use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
 use Shopware\Plugins\MoptAvalara\LandedCost\LandedCostRequestParams;
 
+/**
+ * 
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Subscriber
+ */
 class CheckoutSubscriber extends AbstractSubscriber
 {
     const SCALE = 2;

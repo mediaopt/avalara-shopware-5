@@ -1,12 +1,19 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Service;
 
 use Avalara\AddressLocationInfo;
 
 /**
- * Description of ValidateAddress
- *
+ * 
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Service
  */
 class ValidateAddress extends AbstractService
 {

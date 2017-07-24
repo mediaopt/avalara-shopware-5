@@ -1,13 +1,20 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Bootstrap;
 
 use Shopware\Models\Config\Element as FormElement;
 
 /**
- * Description of formCreator
- *
- * @author bubnov
+ * This class will represent the plugin config options
+ * 
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Bootstrap
  */
 class Form
 {

@@ -1,13 +1,20 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
 use Enlight\Event\SubscriberInterface;
 use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
 
 /**
- * Description of AbstractSubscriber
- *
+ * 
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Subscriber
  */
 abstract class AbstractSubscriber implements SubscriberInterface
 {

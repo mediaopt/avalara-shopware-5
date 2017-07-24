@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Logger;
 
 use GuzzleHttp\Message\MessageInterface;
@@ -34,6 +40,9 @@ use GuzzleHttp\Message\ResponseInterface;
  * - {res_headers}:  Response headers
  * - {req_body}:     Request body
  * - {res_body}:     Response body
+ *
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Logger
  */
 class Formatter
 {
