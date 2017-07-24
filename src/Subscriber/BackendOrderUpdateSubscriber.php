@@ -24,6 +24,7 @@ class BackendOrderUpdateSubscriber extends AbstractSubscriber
     {
         return [
             'Enlight_Controller_Action_PostDispatch_Backend_Order' => 'onPostDispatchBackendOrder',
+            'Enlight_Controller_Action_PreDispatch_Backend_Order' => 'onPreDispatchBackendOrder',
         ];
     }
     
@@ -44,6 +45,54 @@ class BackendOrderUpdateSubscriber extends AbstractSubscriber
         
         $fnc = 'onPostDispatch' . ucfirst($action);
         $this->$fnc($args);
+    }
+    
+    /**
+     * 
+     * @param \Enlight_Event_EventArgs $args
+     * @return void
+     */
+    public function onPreDispatchBackendOrder(\Enlight_Event_EventArgs $args)
+    {
+        $request = $args->getSubject()->Request();
+        $action = $request->getActionName();
+        if ($action !== 'loadStores') {
+            return;
+        }
+
+        $orderId = $request->getParam('orderId', null);
+        $adapter = $this->getAdapter();
+        
+        if (!$orderId) {
+            return;
+        }
+        if (!$order = $adapter->getOrderById($orderId)) {
+            return;
+        }
+        if (!$attr = $order->getAttribute()) {
+            return;
+        }
+        
+        if ($attr->getMoptAvalaraTransactionType() || !$attr->getMoptAvalaraDocCode()) {
+            return;
+        }
+
+        $transaction = $adapter->getTransactionByDocCode($attr->getMoptAvalaraDocCode());
+        if ($transaction === null) {
+            $status = \Avalara\DocumentType::C_SALESORDER;
+        } elseif ($transaction->status === 'Cancelled') {
+            $status = \Avalara\VoidReasonCode::C_DOCVOIDED;
+        } elseif ($transaction->status === 'Committed') {
+            $status = \Avalara\DocumentType::C_SALESINVOICE;
+        }
+
+        $order
+            ->getAttribute()
+            ->setMoptAvalaraTransactionType($status)
+        ;
+        
+        Shopware()->Models()->persist($order);
+        Shopware()->Models()->flush();
     }
     
     /**

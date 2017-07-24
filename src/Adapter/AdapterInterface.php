@@ -70,4 +70,11 @@ interface AdapterInterface
      * @return \Shopware\Models\Order\Order
      */
     public function getOrderByNumber($orderNumber);
+    
+    /**
+     * 
+     * @param string $docCode
+     * @return \stdClass
+     */
+    public function getTransactionByDocCode($docCode);
 }
