@@ -4,6 +4,33 @@
 Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
     override: 'Shopware.apps.Order.view.detail.Window',
     extend: 'Ext.form.Panel',
+    
+    /**
+     * Contains all snippets for the view component
+     * @object
+     */
+    avalaraSnippets: {
+        resetUpdateFlag: "{s namespace='frontend/MoptAvalara/messages' name='resetUpdateFlag'}Reset update flag{/s}",
+        commitOrder: "{s namespace='frontend/MoptAvalara/messages' name='commitOrder'}Commit order to Avalara{/s}",
+        cancelCommitOrder: "{s namespace='frontend/MoptAvalara/messages' name='cancelCommitOrder'}Cancel Tax{/s}",
+        actions: "{s namespace='frontend/MoptAvalara/messages' name='actions'}Actions{/s}",
+        information: "{s namespace='frontend/MoptAvalara/messages' name='information'}Information{/s}",
+        docCode: "{s namespace='frontend/MoptAvalara/messages' name='docCode'}Document code{/s}",
+        transactionStatus: "{s namespace='frontend/MoptAvalara/messages' name='transactionStatus'}Transaction status{/s}",
+        incoterms: "{s namespace='frontend/MoptAvalara/messages' name='incoterms'}Incoterms{/s}",
+        landedCost: "{s namespace='frontend/MoptAvalara/messages' name='landedCost'}Customs duties and fees{/s}",
+        exemptionCode: "{s namespace='frontend/MoptAvalara/messages' name='exemptionCode'}Exemption code{/s}",
+        success: '{s name=success}success{/s}',
+        error: '{s name=error}error{/s}'
+    },
+    
+    avalaraUrls: {
+        loadData: '{url controller=AttributeData action=loadData}',
+        resetUpdateFlag: '{url controller=MoptAvalara action=resetUpdateFlag}',
+        commitOrder: '{url controller=MoptAvalara action=commitOrder}',
+        cancelOrder: '{url controller=MoptAvalara action=cancelOrder}'
+    },
+    
     /**
      * @Override
      * Creates the main tab panel which displays the different tabs for the order sections.
@@ -28,7 +55,7 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
             landedCost = ''
         ;
         Ext.Ajax.request({
-            url: '{url controller=AttributeData action=loadData}',
+            url: me.avalaraUrls.loadData,
             params: {
                 _foreignKey: me.record.get('id'),
                 _table: 's_order_attributes'
@@ -44,7 +71,7 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
         });
 
         Ext.Ajax.request({
-            url: '{url controller=AttributeData action=loadData}',
+            url: me.avalaraUrls.loadData,
             params: {
                 _foreignKey: userId,
                 _table: 's_user_attributes'
@@ -82,11 +109,11 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
         var me = this;
         var items = [{
             xtype: 'button',
-            text: 'Reset update flag',
+            text: me.avalaraSnippets.resetUpdateFlag,
             width: 130,
             handler: function () {
                 Ext.Ajax.request({
-                    url: '{url controller="MoptAvalara" action="resetUpdateFlag"}',
+                    url: me.avalaraUrls.resetUpdateFlag,
                     method: 'POST',
                     params: { id: me.record.get('id')},
                     headers: { 'Accept': 'application/json'},
@@ -94,7 +121,7 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
                     {
                         var jsonData = Ext.JSON.decode(response.responseText);
                         Shopware.Notification.createGrowlMessage(
-                                (jsonData.success ? '{s name=success}success{/s}' : '{s name=error}error{/s}'), 
+                                jsonData.success ? me.avalaraSnippets.success : me.avalaraSnippets.error, 
                                 jsonData.message, 
                                 'Avalara');
                     }
@@ -107,11 +134,11 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
             case 'SalesOrder':
                 items.push({
                     xtype: 'button',
-                    text: 'Commit order to Avalara',
+                    text: me.avalaraSnippets.commitOrder,
                     width: 130,
                     handler: function () {
                         Ext.Ajax.request({
-                            url: '{url controller="MoptAvalara" action="commitOrder"}',
+                            url: me.avalaraUrls.commitOrder,
                             method: 'POST',
                             params: { id: me.record.get('id')},
                             headers: { 'Accept': 'application/json'},
@@ -119,7 +146,7 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
                             {
                                 var jsonData = Ext.JSON.decode(response.responseText);
                                 Shopware.Notification.createGrowlMessage(
-                                        (jsonData.success ? '{s name=success}success{/s}' : '{s name=error}error{/s}'), 
+                                        jsonData.success ? me.avalaraSnippets.success : me.avalaraSnippets.error,
                                         jsonData.message, 
                                         'Avalara');
                             }
@@ -132,11 +159,11 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
             case 'SalesInvoice':
                 items.push({
                     xtype: 'button',
-                    text: 'Cancel Tax',
+                    text: me.avalaraSnippets.cancelCommitOrder,
                     width: 130,
                     handler: function () {
                         Ext.Ajax.request({
-                            url: '{url controller="MoptAvalara" action="cancelOrder"}',
+                            url: me.avalaraUrls.cancelOrder,
                             method: 'POST',
                             params: { id: me.record.get('id')},
                             headers: { 'Accept': 'application/json'},
@@ -144,7 +171,7 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
                             {
                                 var jsonData = Ext.JSON.decode(response.responseText);
                                 Shopware.Notification.createGrowlMessage(
-                                        (jsonData.success ? '{s name=success}success{/s}' : '{s name=error}error{/s}'), 
+                                        jsonData.success ? me.avalaraSnippets.success : me.avalaraSnippets.error,
                                         jsonData.message, 
                                         'Avalara');
                             }
@@ -153,10 +180,16 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
                     }
                 });
                 break;
+            
+            case 'DocVoided':
+                break;
+                
+            default: 
+                
         }
         
         return Ext.create('Ext.form.Panel', {
-            title: 'Actions',
+            title: me.avalaraSnippets.actions,
             items: items,
             width: '45%',
             height: 130,
@@ -169,36 +202,37 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
     },
     
     createInformationPanel: function (exemptionCode, transactionType, incoterms, docCode, landedCost) {
+        var me = this;
         return Ext.create('Ext.form.Panel', {
-            title: 'Information',
+            title: me.avalaraSnippets.information,
             items: [
                 {
                     xtype: 'displayfield',
-                    fieldLabel: 'Document code',
+                    fieldLabel: me.avalaraSnippets.docCode,
                     value: docCode ? docCode : '-',
                     labelWidth: 170
                 },
                 {
                     xtype: 'displayfield',
-                    fieldLabel: 'Transaction status',
+                    fieldLabel: me.avalaraSnippets.transactionStatus,
                     value: transactionType ? transactionType : '-',
                     labelWidth: 170
                 },
                 {
                     xtype: 'displayfield',
-                    fieldLabel: 'Incoterms',
+                    fieldLabel: me.avalaraSnippets.incoterms,
                     value: incoterms ? incoterms : '-',
                     labelWidth: 170
                 },
                 {
                     xtype: 'displayfield',
-                    fieldLabel: 'Customs duties and fees',
+                    fieldLabel: me.avalaraSnippets.landedCost,
                     value: landedCost ? landedCost : '-',
                     labelWidth: 170
                 },
                 {
                     xtype: 'displayfield',
-                    fieldLabel: 'Exemption code',
+                    fieldLabel: me.avalaraSnippets.exemptionCode,
                     value: exemptionCode ? exemptionCode : '-',
                     labelWidth: 170
                 }
