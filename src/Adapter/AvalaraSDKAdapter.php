@@ -314,4 +314,19 @@ class AvalaraSDKAdapter implements AdapterInterface
                 return Formatter::DEBUG;
         }
     }
+    
+    /**
+     * 
+     * @param string $docCode
+     * @return \stdClass
+     */
+    public function getTransactionByDocCode($docCode)
+    {
+        $companyCode = $this->getPluginConfig(Form::COMPANY_CODE_FIELD);
+        
+        return $this
+            ->getAvaTaxClient()
+            ->getTransactionByCode($companyCode, $docCode, '')
+        ;
+    }
 }
