@@ -51,7 +51,7 @@ class TemplatingSubscriber extends AbstractSubscriber
         if ($args->getRequest()->getActionName() === 'load') {
             $view->extendsTemplate('Backend/order/tabs/avalara_tab.js');
             $view->extendsTemplate('Backend/order/view/list/mopt_avalara__list.js');
-            $view->extendsTemplate('Backend/order/model/billing_attribute.js');
+            $view->extendsTemplate('Backend/order/model/mopt_avalara__billing_attribute.js');
             $view->extendsTemplate('Backend/order/model/mopt_avalara__attribute.js');
         }
     }
