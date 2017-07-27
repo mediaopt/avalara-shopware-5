@@ -1,11 +1,21 @@
 <?php
+
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
 use Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface;
 
 /**
- * Description of AbstractFactory
  *
+ * Abstract factory to generate requests to the AvalaraSDK
+ * 
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Adapter\Factory
  */
 abstract class AbstractFactory
 {
@@ -28,7 +38,7 @@ abstract class AbstractFactory
     protected $pluginConfig = null;
     
     /**
-     * 
+     *
      * @param AdapterInterface $adapter
      */
     public function __construct(AdapterInterface $adapter)
@@ -37,16 +47,16 @@ abstract class AbstractFactory
     }
     
     /**
-     * 
+     *
      * @return \Avalara\AvaTaxClient
      */
     public function getSdk()
     {
-        return $this->adapter->getClient();
+        return $this->adapter->getAvaTaxClient();
     }
 
     /**
-     * 
+     *
      * @return AdapterInterface
      */
     public function getAdapter()
@@ -55,7 +65,7 @@ abstract class AbstractFactory
     }
 
     /**
-     * 
+     *
      * @return array
      */
     protected function getUserData()
@@ -67,7 +77,7 @@ abstract class AbstractFactory
     }
     
     /**
-     * 
+     *
      * @return array
      */
     protected function getPluginConfig($key)

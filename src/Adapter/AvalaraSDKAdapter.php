@@ -1,20 +1,30 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Adapter;
 
 use Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface;
 use Shopware_Plugins_Backend_MoptAvalara_Bootstrap;
 use Shopware\Plugins\MoptAvalara\Logger\Formatter;
 use Shopware\Plugins\MoptAvalara\Logger\LogSubscriber;
-use Shopware\Plugins\MoptAvalara\Form\FormCreator;
+use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 use Avalara\AvaTaxClient;
 
 /**
- * Description of Main
- *
+ * This is the adaptor for avalara's API
+ * 
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Adapter\Factory
  */
 class AvalaraSDKAdapter implements AdapterInterface
 {
+    const BCMATH_SCALE = 8;
+    
     const SERVICE_NAME = 'AvalaraSdkAdapter';
     
     const PRODUCTION_ENV = 'production';
@@ -26,12 +36,14 @@ class AvalaraSDKAdapter implements AdapterInterface
     const SEVICES_NAMESPACE = '\Shopware\Plugins\MoptAvalara\Service\\';
     
     const FACTORY_NAMESPACE = '\Shopware\Plugins\MoptAvalara\Adapter\Factory\\';
+    
+    const LANDED_COST_LOG_FORMAT = '>>>>>>>> %s %s %s <<<<<<<< %s %s %s';
 
     /**
      *
      * @var \Avalara\AvaTaxClient
      */
-    protected $client = null;
+    protected $avaTaxClient = null;
     
     /**
      *
@@ -52,7 +64,13 @@ class AvalaraSDKAdapter implements AdapterInterface
     protected $pluginVersion;
     
     /**
-     * 
+     *
+     * @var LogSubscriber
+     */
+    private $logSubscriber;
+    
+    /**
+     *
      * @param string $pluginName
      * @param string $pluginVersion
      */
@@ -64,7 +82,7 @@ class AvalaraSDKAdapter implements AdapterInterface
     
     /**
      * return factory
-     * 
+     *
      * @param string $type
      * @return AbstractFactory
      */
@@ -90,34 +108,46 @@ class AvalaraSDKAdapter implements AdapterInterface
     /**
      * @return \Avalara\AvaTaxClient
      */
-    public function getClient()
+    public function getAvaTaxClient()
     {
-        if ($this->client !== null) {
-            return $this->client;
+        if ($this->avaTaxClient !== null) {
+            return $this->avaTaxClient;
         }
 
         $avaClient = new AvaTaxClient(
-            $this->pluginName, 
-            $this->pluginVersion, 
-            $this->getMachineName(), 
+            $this->pluginName,
+            $this->pluginVersion,
+            $this->getMachineName(),
             $this->getSDKEnv()
         );
         
-        $accountNumber = $this->getPluginConfig(FormCreator::ACCOUNT_NUMBER_FIELD);
-        $licenseKey = $this->getPluginConfig(FormCreator::LICENSE_KEY_FIELD);
+        $accountNumber = $this->getPluginConfig(Form::ACCOUNT_NUMBER_FIELD);
+        $licenseKey = $this->getPluginConfig(Form::LICENSE_KEY_FIELD);
         $avaClient->withSecurity($accountNumber, $licenseKey);
-        $this->client = $avaClient;
-        
+        $this->avaTaxClient = $avaClient;
+
         // Attach a handler to log all requests
-        $formatter = new Formatter($this->getFormatterTemplate());
-        $subscriber = new LogSubscriber($this->getLogger(), $formatter);
-        $avaClient->getHttpClient()->getEmitter()->attach($subscriber);
+        $avaClient->getHttpClient()->getEmitter()->attach($this->getLogSubscriber());
         
-        return $this->client;
+        return $this->avaTaxClient;
     }
     
     /**
-     * lazy load logger
+     * Lazy load of the LogSubscriber
+     * @return LogSubscriber
+     */
+    public function getLogSubscriber()
+    {
+        if (null === $this->logSubscriber) {
+            $formatter = new Formatter($this->getFormatterTemplate());
+            $this->logSubscriber = new LogSubscriber($this->getLogger(), $formatter);
+        }
+        
+        return $this->logSubscriber;
+    }
+    
+    /**
+     * Lazy load logger
      * @return \Monolog\Logger
      */
     public function getLogger()
@@ -127,8 +157,8 @@ class AvalaraSDKAdapter implements AdapterInterface
         }
 
         //setup monolog
-        $this->logger = new \Monolog\Logger('mo_avalara');
-        $logFileName = FormCreator::LOG_FILE_NAME . FormCreator::LOG_FILE_EXT;
+        $this->logger = new \Monolog\Logger('mopt_avalara');
+        $logFileName = Form::LOG_FILE_NAME . Form::LOG_FILE_EXT;
         $streamHandler = new \Monolog\Handler\RotatingFileHandler(
             $this->getLogDir() . $logFileName,
             $this->getMaxFiles(),
@@ -140,7 +170,7 @@ class AvalaraSDKAdapter implements AdapterInterface
     }
     
     /**
-     * 
+     *
      * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
      */
     public function getBootstrap()
@@ -165,13 +195,35 @@ class AvalaraSDKAdapter implements AdapterInterface
         
         return null;
     }
+    
+    /**
+     * 
+     * @param int $id
+     * @return \Shopware\Models\Order\Order
+     */
+    public function getOrderById($id)
+    {
+        $respository = Shopware()->Models()->getRepository('Shopware\Models\Order\Order');
+        return $respository->find($id);
+    }
+
+    /**
+     * 
+     * @param int $orderNumber
+     * @return \Shopware\Models\Order\Order
+     */
+    public function getOrderByNumber($orderNumber)
+    {
+        $respository = Shopware()->Models()->getRepository('Shopware\Models\Order\Order');
+        return $respository->findOneByNumber($orderNumber);
+    }
 
     /**
      * @return string
      */
     private function getSDKEnv()
     {
-        if ($this->getPluginConfig(FormCreator::IS_LIVE_MODE_FIELD)) {
+        if ($this->getPluginConfig(Form::IS_LIVE_MODE_FIELD)) {
             return self::PRODUCTION_ENV;
         }
         
@@ -201,7 +253,7 @@ class AvalaraSDKAdapter implements AdapterInterface
      */
     protected function getMaxFiles()
     {
-        if ($rotationDays = $this->getPluginConfig(FormCreator::LOG_ROTATION_DAYS_FIELD)) {
+        if ($rotationDays = $this->getPluginConfig(Form::LOG_ROTATION_DAYS_FIELD)) {
             return $rotationDays;
         }
 
@@ -216,7 +268,7 @@ class AvalaraSDKAdapter implements AdapterInterface
     {
         $logLevel = 'ERROR';
         
-        if ($overrideLogLevel = $this->getPluginConfig(FormCreator::LOG_LEVEL_FIELD)) {
+        if ($overrideLogLevel = $this->getPluginConfig(Form::LOG_LEVEL_FIELD)) {
             $logLevel = $overrideLogLevel;
         }
         
@@ -233,7 +285,7 @@ class AvalaraSDKAdapter implements AdapterInterface
     }
 
     /**
-     * 
+     *
      * @param string $messageFormat
      * @return type
      */
@@ -261,5 +313,20 @@ class AvalaraSDKAdapter implements AdapterInterface
             default:
                 return Formatter::DEBUG;
         }
+    }
+    
+    /**
+     * 
+     * @param string $docCode
+     * @return \stdClass
+     */
+    public function getTransactionByDocCode($docCode)
+    {
+        $companyCode = $this->getPluginConfig(Form::COMPANY_CODE_FIELD);
+        
+        return $this
+            ->getAvaTaxClient()
+            ->getTransactionByCode($companyCode, $docCode, '')
+        ;
     }
 }

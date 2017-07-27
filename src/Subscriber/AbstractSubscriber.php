@@ -1,13 +1,20 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
 use Enlight\Event\SubscriberInterface;
 use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
 
 /**
- * Description of AbstractSubscriber
- *
+ * 
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Subscriber
  */
 abstract class AbstractSubscriber implements SubscriberInterface
 {
@@ -24,13 +31,13 @@ abstract class AbstractSubscriber implements SubscriberInterface
     private $adapter;
     
     /**
-     * 
+     *
      * @param \Shopware\Components\Form\Container
      */
     private $container;
     
     /**
-     * 
+     *
      * @param \Shopware_Plugins_Backend_MoptAvalara_Bootstrap $bootstrap
      */
     public function __construct(\Shopware_Plugins_Backend_MoptAvalara_Bootstrap $bootstrap)
@@ -44,7 +51,7 @@ abstract class AbstractSubscriber implements SubscriberInterface
     abstract public static function getSubscribedEvents();
     
     /**
-     * 
+     *
      * @return \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface
      */
     protected function getAdapter()
@@ -57,7 +64,7 @@ abstract class AbstractSubscriber implements SubscriberInterface
     }
     
     /**
-     * 
+     *
      * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
      */
     protected function getBootstrap()
@@ -66,7 +73,7 @@ abstract class AbstractSubscriber implements SubscriberInterface
     }
     
     /**
-     * 
+     *
      * @return \Shopware\Components\Form\Container
      */
     protected function getContainer()
@@ -76,5 +83,14 @@ abstract class AbstractSubscriber implements SubscriberInterface
         }
         
         return $this->container;
+    }
+    
+    /**
+     *
+     * @return \Enlight_Components_Session_Namespace
+     */
+    protected function getSession()
+    {
+        return $this->getContainer()->get('session');
     }
 }

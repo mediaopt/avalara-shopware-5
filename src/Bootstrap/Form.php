@@ -1,17 +1,29 @@
 <?php
 
-namespace Shopware\Plugins\MoptAvalara\Form;
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
+namespace Shopware\Plugins\MoptAvalara\Bootstrap;
+
+use Shopware\Models\Config\Element as FormElement;
 
 /**
- * Description of formCreator
- *
- * @author bubnov
+ * This class will represent the plugin config options
+ * 
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Bootstrap
  */
-class FormCreator {
-    
+class Form
+{
+    /**
+     * Field names
+     */
     const LOGGER_DEFAULT_ROTATING_DAYS = 7;
     
-    const LOG_FILE_NAME = 'mo_avalara';
+    const LOG_FILE_NAME = 'mopt_avalara';
 
     const LOG_FILE_EXT = '.log';
     
@@ -26,6 +38,10 @@ class FormCreator {
     const TAX_ENABLED_FIELD = 'mopt_avalara__tax_enabled';
     
     const DOC_COMMIT_ENABLED_FIELD = 'mopt_avalara__doc_commit_enabled';
+
+    const LANDEDCOST_ENABLED_FIELD = 'mopt_avalara__landedcost_enabled';
+    
+    const INCOTERMS_FIELD = 'mopt_avalara__incoterms';
     
     const ADDRESS_VALIDATION_COUNTRIES_FIELD = 'mopt_avalara_addressvalidation_countries';
     
@@ -47,13 +63,24 @@ class FormCreator {
     
     const ORIGIN_COUNTRY_FIELD = 'mopt_avalara__origin_address__country';
     
+    
+    /**
+     * Values and options
+     */
     const DELIVERY_COUNTRY_NO_VALIDATION = 1;
-    
     const DELIVERY_COUNTRY_USA = 2;
-    
     const DELIVERY_COUNTRY_CANADA = 3;
-    
     const DELIVERY_COUNTRY_USA_AND_CANADA = 4;
+    
+    /**
+     * Incoterms
+     */
+    const INCOTERMS_DEFAULT = 'default';
+    const INCOTERMS_DEFAULT_LABEL = 'default';
+    const INCOTERMS_DAP = 'DAP';
+    const INCOTERMS_DAP_LABEL = 'Delivered at Place (DAP)';
+    const INCOTERMS_DDP = 'DDP';
+    const INCOTERMS_DDP_LABEL = 'Delivered Duty Paid (DDP)';
     
     /**
      *
@@ -62,10 +89,11 @@ class FormCreator {
     private $bootstrap;
     
     /**
-     * 
+     *
      * @param \Shopware_Plugins_Backend_MoptAvalara_Bootstrap $bootstrap
      */
-    public function __construct(\Shopware_Plugins_Backend_MoptAvalara_Bootstrap $bootstrap) {
+    public function __construct(\Shopware_Plugins_Backend_MoptAvalara_Bootstrap $bootstrap)
+    {
         $this->bootstrap = $bootstrap;
     }
 
@@ -85,7 +113,7 @@ class FormCreator {
             $countries[] = [$line['code'], ucfirst(strtolower($line['name']))];
         }
         
-        usort($countries, function($a, $b) {
+        usort($countries, function ($a, $b) {
             return ($a[1] > $b[1])
                 ? 1
                 : -1
@@ -115,7 +143,7 @@ class FormCreator {
             $regions[] = [$line['code'], ucfirst(strtolower($line['name']))];
         }
         
-        usort($regions, function($a, $b) {
+        usort($regions, function ($a, $b) {
             return ($a[1] > $b[1])
                 ? 1
                 : -1
@@ -128,7 +156,7 @@ class FormCreator {
     /**
      * Will create all plugin config forms and fields
      */
-    public function createForms()
+    public function create()
     {
         $form = $this->bootstrap->Form();
         $parent = $this->bootstrap->Forms()->findOneBy(['name' => 'Frontend']);
@@ -149,6 +177,7 @@ class FormCreator {
 
         $form->setElement('boolean', self::IS_LIVE_MODE_FIELD, [
             'label' => 'Live Modus',
+            'scope' => FormElement::SCOPE_SHOP
         ]);
 
         $form->setElement('text', self::ACCOUNT_NUMBER_FIELD, [
@@ -183,13 +212,31 @@ class FormCreator {
         $form->setElement('boolean', self::TAX_ENABLED_FIELD, [
             'label' => 'Enable Avalara SalesTax calculation',
             'description' => 'Choose, if you want to use the Avalara SalesTax Calculation.',
+            'scope' => FormElement::SCOPE_SHOP
         ]);
 
         $form->setElement('boolean', self::DOC_COMMIT_ENABLED_FIELD, [
             'label' => 'Enable document committing',
             'description' => 'Disable document committing will result that all calls will be done with DocType=SalesOrder and suppress any non-getTax calls(i.e.canceltax,postTax)',
+            'scope' => FormElement::SCOPE_SHOP
+        ]);
+        
+        $form->setElement('boolean', self::LANDEDCOST_ENABLED_FIELD, [
+            'label' => 'Enable Avalara Landed cost calculation',
+            'description' => 'Choose, if you want to use the Avalara Landed cost calculation.',
+            'scope' => FormElement::SCOPE_SHOP
         ]);
 
+        $form->setElement('select', self::INCOTERMS_FIELD, [
+            'label' => 'Default incoterms for Landed cost',
+            'description' => 'Terms of sale. Used to determine buyer obligations for a landed cost.',
+            'value' => self::INCOTERMS_DAP,
+            'store' => [
+                [self::INCOTERMS_DAP, self::INCOTERMS_DAP_LABEL],
+                [self::INCOTERMS_DDP, self::INCOTERMS_DDP_LABEL],
+            ],
+        ]);
+        
         $form->setElement('select', self::ADDRESS_VALIDATION_COUNTRIES_FIELD, [
             'label' => 'Address-validation for following countries',
             'description' => 'Choose the delivery countries, which should be covered by the Avalara Tax Calculation',
@@ -200,6 +247,7 @@ class FormCreator {
                 [self::DELIVERY_COUNTRY_CANADA, 'Canada only'],
                 [self::DELIVERY_COUNTRY_USA_AND_CANADA, 'USA & Canada']
             ],
+            'scope' => FormElement::SCOPE_SHOP
         ]);
 
         $form->setElement('select', self::LOG_LEVEL_FIELD, [
@@ -342,36 +390,6 @@ class FormCreator {
             }'
         ]);
 
-        $form->setElement('button', 'mopt_avalara__log', [
-            'label' => 'Download logfile',
-            'maxWidth' => '150',
-            'handler' => 'function (){
-                var token = Ext.CSRFService.getToken();
-                var url = "' . $downloadUrlCall . '?__csrf_token=" + token;
-
-                var manualDownloadForm = new Ext.form.Panel({
-                  width: 400,
-                  bodyPadding: 5,
-                  title: "Avalara",
-                  floating: true,
-                  closable : true,
-                  draggable : true,
-                  items: [
-                    {  
-                      bodyPadding: 5,
-                      title: "Log",
-                      html: "The module has to be active to download the logfile.<br />'
-                . '<div class=\"sprite-drive-download\" style=\"width: 25px; height: 25px; float: left;\">&nbsp;</div>'
-                . '<div style=\"float: left;\"><a href=\'" + url + "\'  target=\'_blank\'>Download</a></div>"
-                    } 
-                  ]
-                });
-                manualDownloadForm.show();
-            }',
-        ]);
-
-
-
         //set positions
         $elements = [
             'mopt_avalara__fieldset__credentials',
@@ -382,6 +400,8 @@ class FormCreator {
             'mopt_avalara__fieldset__configuration',
             self::TAX_ENABLED_FIELD,
             self::DOC_COMMIT_ENABLED_FIELD,
+            self::LANDEDCOST_ENABLED_FIELD,
+            self::INCOTERMS_FIELD,
             self::ADDRESS_VALIDATION_COUNTRIES_FIELD,
             self::LOG_LEVEL_FIELD,
             self::LOG_ROTATION_DAYS_FIELD,
@@ -405,10 +425,11 @@ class FormCreator {
     }
     
     /**
-     * 
+     *
      * @return \Shopware\Components\Routing\Context
      */
-    private function getContext() {
+    private function getContext()
+    {
         $container = Shopware()->Container();
         /** @var \Shopware\Models\Shop\Repository $repository */
         $repository = $container->get('models')->getRepository(\Shopware\Models\Shop\Shop::class);

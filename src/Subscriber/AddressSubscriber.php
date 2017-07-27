@@ -1,20 +1,27 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
-use Shopware\Plugins\MoptAvalara\Form\FormCreator;
+use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 use Avalara\AddressLocationInfo;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\AddressFactory;
 
 /**
- * Description of Checkout
- *
+ * 
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Subscriber
  */
-class AddressCheck extends AbstractSubscriber
+class AddressSubscriber extends AbstractSubscriber
 {
     /**
      * return array with all subsribed events
-     * 
+     *
      * @return array
      */
     public static function getSubscribedEvents()
@@ -26,13 +33,12 @@ class AddressCheck extends AbstractSubscriber
     }
 
     /**
-     * perform address check 
+     * perform address check
      * @param \Shopware\Plugins\MoptAvalara\Subscriber\Enlight_Event_EventArgs $args
      */
     public function onBeforeCheckoutConfirm(\Enlight_Event_EventArgs $args)
     {
-        /* @var $session Enlight_Components_Session_Namespace */
-        $session = $this->getContainer()->get('session');
+        $session = $this->getSession();
         $adapter = $this->getAdapter();
         $address = $adapter->getFactory('AddressFactory')->buildDeliveryAddress();
 
@@ -53,7 +59,7 @@ class AddressCheck extends AbstractSubscriber
             if ($changes = $service->getAddressChanges($address, $response)) {
                 $args->getSubject()->forward('edit', 'address', null, [
                     'MoptAvalaraAddressChanges' => $changes,
-                    'sTarget' => 'checkout', 
+                    'sTarget' => 'checkout',
                     'id' => $activeShippingAddressId
                 ]);
                 
@@ -72,18 +78,16 @@ class AddressCheck extends AbstractSubscriber
      */
     protected function isAddressToBeValidated(AddressLocationInfo $address)
     {
-        /*@var $session Enlight_Components_Session_Namespace */
-        $session = $this->getContainer()->get('session');
-        
+        $session = $this->getSession();
         if (!$this->isCountryForDelivery($address->country)) {
             return false;
         }
         
-        if(!$session->MoptAvalaraCheckedAddress) {
+        if (!$session->MoptAvalaraCheckedAddress) {
             return true;
         }
         
-        if($session->MoptAvalaraCheckedAddress != $this->getAddressHash($address)) {
+        if ($session->MoptAvalaraCheckedAddress != $this->getAddressHash($address)) {
             return true;
         }
 
@@ -91,7 +95,7 @@ class AddressCheck extends AbstractSubscriber
     }
     
     /**
-     * 
+     *
      * @param string $country
      * @return bool
      */
@@ -99,29 +103,29 @@ class AddressCheck extends AbstractSubscriber
     {
         $countriesForDelivery = $this
             ->getAdapter()
-            ->getPluginConfig(FormCreator::ADDRESS_VALIDATION_COUNTRIES_FIELD)
+            ->getPluginConfig(Form::ADDRESS_VALIDATION_COUNTRIES_FIELD)
         ;
 
         switch ($countriesForDelivery) {
-            case FormCreator::DELIVERY_COUNTRY_NO_VALIDATION:
+            case Form::DELIVERY_COUNTRY_NO_VALIDATION:
                 return false;
-            case FormCreator::DELIVERY_COUNTRY_USA:
-                if($country == AddressFactory::COUNTRY_CODE__US) {
+            case Form::DELIVERY_COUNTRY_USA:
+                if ($country == AddressFactory::COUNTRY_CODE__US) {
                     return true;
                 }
                 break;
-            case FormCreator::DELIVERY_COUNTRY_CANADA:
-                if($country == AddressFactory::COUNTRY_CODE__CA) {
+            case Form::DELIVERY_COUNTRY_CANADA:
+                if ($country == AddressFactory::COUNTRY_CODE__CA) {
                     return true;
                 }
                 break;
-            case FormCreator::DELIVERY_COUNTRY_USA_AND_CANADA:
+            case Form::DELIVERY_COUNTRY_USA_AND_CANADA:
                 $usaAndCanada = [
                     AddressFactory::COUNTRY_CODE__CA,
                     AddressFactory::COUNTRY_CODE__US
                 ];
                 
-                if(in_array($country, $usaAndCanada)) {
+                if (in_array($country, $usaAndCanada)) {
                     return true;
                 }
                 break;
@@ -134,7 +138,8 @@ class AddressCheck extends AbstractSubscriber
      * get hash of given address
      * @param \Avalara\AddressLocationInfo $address
      */
-    protected function getAddressHash(AddressLocationInfo $address) {
+    protected function getAddressHash(AddressLocationInfo $address)
+    {
         return md5(serialize($address));
     }
 
@@ -180,7 +185,7 @@ class AddressCheck extends AbstractSubscriber
 
     /**
      * add error message
-     * 
+     *
      * @param \Shopware\Plugins\MoptAvalara\Subscriber\Enlight_View_Default $view
      */
     protected function addErrorMessage(\Enlight_View_Default $view)

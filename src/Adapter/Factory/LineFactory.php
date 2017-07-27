@@ -1,26 +1,37 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
+use Shopware\Models\Article\Article;
 use Avalara\LineItemModel;
+use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
+use Shopware\Plugins\MoptAvalara\LandedCost\LandedCostRequestParams;
 
 /**
- * Factory to create \Avalara\LineItemModel
  *
+ * Factory to create \Avalara\LineItemModel
+ * 
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Adapter\Factory
  */
 class LineFactory extends AbstractFactory
 {
     const MODUS_VOUCHER = 2;
     const MODUS_BASKET_DISCOUNT = 3;
     const MODUS_DISCOUNT = 4;
-    
-    const ARTICLEID__SHIPPING = 'shipping';
-    const ARTICLEID__VOUCHER = 'voucher';
+
+    const ARTICLEID_VOUCHER = 'voucher';
 
     /**
      * build Line-model based on passed in lineData
-     * 
+     *
      * @param mixed $lineData
      * @return \Avalara\LineItemModel
      */
@@ -29,46 +40,41 @@ class LineFactory extends AbstractFactory
         $line = new LineItemModel();
         $line->number = $lineData['id'];
         $line->itemCode = $lineData['id'];
-        $line->amount = $this->getParamAmount($lineData);
+        $line->amount = $this->getAmount($lineData);
         $line->quantity = $lineData['quantity'];
         $line->description = $lineData['articlename'];
-        $line->taxCode = $this->getParamTaxCode($lineData);
-        $line->discounted = $this->isNeitherVoucherNorShipping($lineData);
-        $line->taxIncluded = $this->getParamIsTaxIncluded($lineData, $line);
+        $line->taxCode = $this->getTaxCode($lineData);
+        $line->discounted = self::isNotVoucher($lineData);
+        $line->taxIncluded = false;
+        $line->parameters = $this->getParams($lineData);
 
         return $line;
     }
 
-    protected function getParamAmount($lineData)
+    /**
+     *
+     * @param array $lineData
+     * @return float
+     */
+    protected function getAmount($lineData)
     {
-        if ($this->isShipping($lineData) && $this->getParamIsTaxIncluded($lineData)) {
-            return $lineData['brutprice'];
-        }
-
-        $price = $lineData['netprice'] * $lineData['quantity'];
-        return $price;
+        $price = (float)str_replace(',', '.', $lineData['netprice']);
+        
+        return bcmul($price, (float)$lineData['quantity'], AvalaraSDKAdapter::BCMATH_SCALE);
     }
 
-    protected function getParamTaxCode($lineData)
+    /**
+     *
+     * @param array $lineData
+     * @return string
+     */
+    protected function getTaxCode($lineData)
     {
         $articleId = $lineData['articleID'];
-        if ($lineData['modus'] == self::MODUS_VOUCHER){
-            $voucherRepository = Shopware()
-                ->Models()
-                ->getRepository('\Shopware\Models\Voucher\Voucher')
-            ;
-            $voucher = $voucherRepository->find($articleId);
-            return $voucher->getAttribute()->getMoptAvalaraTaxcode();
+        if ($voucherTaxCode = $this->getVoucherTaxCode($articleId, $lineData['modus'])) {
+            return $voucherTaxCode;
         }
         
-        //shipping could have his own TaxCode
-        if ($this->isShipping($lineData)) {
-            $dispatchobject = Shopware()->Models()->getRepository('Shopware\Models\Dispatch\Dispatch')->find($lineData['dispatchID']);
-            if ($dispatchobject->getAttribute()) {
-                $taxCode = $dispatchobject->getAttribute()->getMoptAvalaraTaxcode();
-                return $taxCode;
-            }
-        }
         //load model
         if (!$article = Shopware()->Models()->getRepository('Shopware\Models\Article\Article')->find($articleId)) {
             return null;
@@ -88,52 +94,106 @@ class LineFactory extends AbstractFactory
 
         return null;
     }
-
-    /*
-     * if line is a Shipping without a TaxCode, overwrite Amount[netPrice] with [brutprice] and set TaxIncluded  
+    
+    /**
+     *
+     * @param int $id
+     * @param int $modus
+     * @return string
      */
-
-    protected function getParamIsTaxIncluded($lineData)
+    private function getVoucherTaxCode($id, $modus)
     {
-        return $this->isShipping($lineData) && !$this->getParamTaxCode($lineData);
+        if (self::MODUS_VOUCHER !== $modus) {
+            return null;
+        }
+        
+        $voucherRepository = Shopware()
+            ->Models()
+            ->getRepository('\Shopware\Models\Voucher\Voucher')
+        ;
+        if (!$voucher = $voucherRepository->find($id)) {
+            return null;
+        }
+
+        return $voucher->getAttribute()->getMoptAvalaraTaxcode();
     }
 
-    protected function isShipping($lineData)
+    /**
+     * Will setup AvaTax.LandedCost.HTSCode
+     * @param array $lineData
+     * @return \stdClass
+     */
+    protected function getParams($lineData)
     {
-        return $lineData['id'] == self::ARTICLEID__SHIPPING;
-    }
+        $articleId = $lineData['articleID'];
+        $params = new \stdClass();
+        if (self::MODUS_VOUCHER == $lineData['modus']) {
+            return $params;
+        }
+        
+        //load model
+        if (!$article = Shopware()->Models()->getRepository('Shopware\Models\Article\Article')->find($articleId)) {
+            return $params;
+        }
 
-    protected function isNeitherVoucherNorShipping($lineData)
-    {
-        //voucher has modus 2
-        return $lineData['modus'] !== self::MODUS_VOUCHER && !$this->isShipping($lineData);
+        if ($hsCode = $this->getHsCode($article)) {
+            $params->{LandedCostRequestParams::LANDED_COST_HTSCODE} = $hsCode;
+        }
+
+        return $params;
     }
     
     /**
      * 
+     * @param Article $article
+     * @return string
+     */
+    private function getHsCode(Article $article)
+    {
+        //directly assigned to article ?
+        if ($hsCode = $article->getAttribute()->getMoptAvalaraHscode()) {
+            return $hsCode;
+        }
+
+        //category assignment
+        foreach ($article->getCategories() as $category) {
+            if ($categoryHsCode = $category->getAttribute()->getMoptAvalaraHscode()) {
+                return $categoryHsCode;
+            }
+        }
+        
+        return null;
+    }
+
+    /**
+     *
      * @param int $modus
      * @return bool
      */
     public static function isDiscount($modus)
     {
         return in_array($modus, [
-            self::MODUS_VOUCHER, 
-            self::MODUS_BASKET_DISCOUNT, 
+            self::MODUS_VOUCHER,
+            self::MODUS_BASKET_DISCOUNT,
             self::MODUS_DISCOUNT,
         ]);
     }
-    
+
     /**
-     * 
+     *
      * @param array $position
      * @return bool
      */
-    protected static function isDiscountGlobal($position)
+    public static function isNotVoucher($position)
     {
-        if ($position['modus'] != LineFactory::MODUS_VOUCHER) {
-           return true; 
+        if ($position['modus'] != LineFactory::MODUS_VOUCHER || empty($position['articleID'])) {
+            return true;
         }
-        $voucher = Shopware()->Models()->getRepository('\Shopware\Models\Voucher\Voucher')->find($position['articleID']);
+        $voucher = Shopware()
+            ->Models()
+            ->getRepository('\Shopware\Models\Voucher\Voucher')
+            ->find($position['articleID'])
+        ;
         
         return !$voucher || !$voucher->getStrict();
     }

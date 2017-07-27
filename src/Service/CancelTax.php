@@ -1,31 +1,68 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Service;
 
 use Avalara\VoidTransactionModel;
-use Shopware\Plugins\MoptAvalara\Form\FormCreator;
+use Avalara\VoidReasonCode;
+use Avalara\DocumentType;
+use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 
 /**
- * Description of CancelTax
- *
+ * 
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Service
  */
 class CancelTax extends AbstractService
 {
     /**
-     * 
-     * @param string $docCode
-     * @param string $cancelCode
+     *
+     * @param \Shopware\Models\Order\Order $order
      * @return \stdClass
      */
-    public function cancel($docCode, $cancelCode)
+    public function cancel(\Shopware\Models\Order\Order $order)
     {
-        $client = $this->getAdapter()->getClient();
-        $companyCode = $this->getAdapter()->getPluginConfig(FormCreator::COMPANY_CODE_FIELD);
-        
-        $model = new VoidTransactionModel();
-        $model->code = $cancelCode;
-        $response = $client->voidTransaction($companyCode, $docCode, $model);
-        
-        return $response;
+        $adapter = $this->getAdapter();
+        try {
+            $docCode = $order->getAttribute()->getMoptAvalaraDocCode();
+            $transactionType = $order->getAttribute()->getMoptAvalaraTransactionType();
+            
+            if (DocumentType::C_SALESINVOICE !== $transactionType) {
+                throw new \Exception('Cannot cancel not commited transaction.');
+            }
+            
+            if (empty($docCode)) {
+                throw new \Exception('Cannot cancel transaction with empty DocCode');
+            }
+            $client = $this->getAdapter()->getAvaTaxClient();
+            $companyCode = $this->getAdapter()->getPluginConfig(Form::COMPANY_CODE_FIELD);
+
+            $model = new VoidTransactionModel();
+            $model->code = VoidReasonCode::C_DOCVOIDED;
+            if (!$response = $client->voidTransaction($companyCode, $docCode, $model)) {
+                throw new \Exception('Empty response from Avalara on void transaction ' . $docCode);
+            }
+
+            $order
+                ->getAttribute()
+                ->setMoptAvalaraTransactionType(\Avalara\VoidReasonCode::C_DOCVOIDED)
+            ;
+            Shopware()->Models()->persist($order);
+            Shopware()->Models()->flush();
+
+            $adapter
+                ->getLogger()
+                ->info('Order with docCode: ' . $docCode . ' has been voided')
+            ;
+
+        } catch (\Exception $e) {
+            $adapter->getLogger()->error('CancelTax call failed: ' . $e->getMessage());
+            throw new \Exception('Avalara: Cancel Tax call failed: ' . $e->getMessage());
+        }
     }
 }

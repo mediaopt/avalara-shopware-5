@@ -1,17 +1,24 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
 /**
- * Description of Checkout
- *
+ * 
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Subscriber
  */
-class Templating extends AbstractSubscriber
+class TemplatingSubscriber extends AbstractSubscriber
 {
 
     /**
      * return array with all subsribed events
-     * 
+     *
      * @return array
      */
     public static function getSubscribedEvents()
@@ -44,7 +51,7 @@ class Templating extends AbstractSubscriber
         if ($args->getRequest()->getActionName() === 'load') {
             $view->extendsTemplate('Backend/order/tabs/avalara_tab.js');
             $view->extendsTemplate('Backend/order/view/list/mopt_avalara__list.js');
-            $view->extendsTemplate('Backend/order/model/billing_attribute.js');
+            $view->extendsTemplate('Backend/order/model/mopt_avalara__billing_attribute.js');
             $view->extendsTemplate('Backend/order/model/mopt_avalara__attribute.js');
         }
     }

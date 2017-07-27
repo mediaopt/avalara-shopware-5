@@ -1,18 +1,25 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Service;
 
 use Avalara\AddressLocationInfo;
 
 /**
- * Description of ValidateAddress
- *
+ * 
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Service
  */
 class ValidateAddress extends AbstractService
 {
     /**
      * Ignore any difference in this address parts
-     * @var array 
+     * @var array
      */
     private static $ignoreAddressParts = [
         'region',
@@ -21,17 +28,17 @@ class ValidateAddress extends AbstractService
     ];
     
     /**
-     * 
+     *
      * @param \Avalara\AddressLocationInfo $address
      * @return \stdClass
      */
     public function validate(AddressLocationInfo $address)
     {
-        return $this->getAdapter()->getClient()->resolveAddressPost($address);
+        return $this->getAdapter()->getAvaTaxClient()->resolveAddressPost($address);
     }
 
     /**
-     * 
+     *
      * @param \Avalara\AddressLocationInfo $checkedAddress
      * @param \stdClass $response
      * @return array
@@ -58,5 +65,4 @@ class ValidateAddress extends AbstractService
 
         return $changes;
     }
-
 }

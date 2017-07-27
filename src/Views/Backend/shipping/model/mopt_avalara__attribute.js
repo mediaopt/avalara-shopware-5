@@ -1,3 +1,7 @@
-//{block name="backend/shipping/model/attribute/fields" append}
+// {block name="backend/shipping/model/attribute/fields"}
+// {$smarty.block.parent}
     { name:'moptAvalaraTaxcode', type:'string'},
-//{/block}
+    { name:'moptAvalaraHscode', type:'string'},
+    { name:'moptAvalaraExpressShipping', type:'checkbox'},
+    { name:'moptAvalaraInsured', type:'checkbox'},
+// {/block}

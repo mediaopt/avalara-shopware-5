@@ -1,17 +1,24 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
 /**
- * Description of Checkout
- *
+ * 
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Subscriber
  */
-class TaxCodes extends AbstractSubscriber
+class BackendAttributesSubscriber extends AbstractSubscriber
 {
 
     /**
      * return array with all subsribed events
-     * 
+     *
      * @return array
      */
     public static function getSubscribedEvents()
@@ -25,12 +32,13 @@ class TaxCodes extends AbstractSubscriber
 
     /**
      * extend backend category editing
-     * 
+     *
      * @param Enlight_Event_EventArgs $args
      */
     public function onPostDispatchBackendCategory(\Enlight_Event_EventArgs $args)
     {
-        $args->getSubject()->View()->addTemplateDir($this->getBootstrap()->Path() . 'Views/');
+        $view = $args->getSubject()->View();
+        $view->addTemplateDir($this->getBootstrap()->Path() . 'Views/');
         if ($args->getRequest()->getActionName() === 'load') {
             $args->getSubject()->View()->extendsTemplate('Backend/category/model/attribute.js');
             $args->getSubject()->View()->extendsTemplate('Backend/category/tabs/settings.js');
@@ -39,7 +47,7 @@ class TaxCodes extends AbstractSubscriber
 
     /**
      *  extend backend article editing
-     * 
+     *
      * @param Enlight_Event_EventArgs $args
      */
     public function onPostDispatchBackendArticle(\Enlight_Event_EventArgs $args)
@@ -61,5 +69,4 @@ class TaxCodes extends AbstractSubscriber
             $view->extendsTemplate('Backend/shipping/model/mopt_avalara__attribute.js');
         }
     }
-
 }

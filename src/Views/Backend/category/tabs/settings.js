@@ -1,11 +1,13 @@
-//{namespace name="backend/mopt_avalara/category/view/category/tabs"}
-//{block name="backend/category/view/tabs/settings" append}
+// {namespace name="backend/mopt_avalara/category/view/category/tabs"}
+// {block name="backend/category/view/tabs/settings"}
+// {$smarty.block.parent}
 Ext.define('Shopware.apps.moptAvalara.Category.view.category.tabs.settings', {
     override: 'Shopware.apps.Category.view.category.tabs.Settings',
     /**
      * @Override
      */
-    getItems: function () {
+    getItems: function () 
+    {
         var me = this;
         var result = me.callParent(arguments);
         result.push(me.getCategoryMapping());
@@ -21,9 +23,15 @@ Ext.define('Shopware.apps.moptAvalara.Category.view.category.tabs.settings', {
             items: [{
                     xtype: 'textfield',
                     fieldLabel: 'Taxcode',
-                    name: 'attribute[moptAvalaraTaxcode]',
-                }]
+                    name: 'attribute[moptAvalaraTaxcode]'
+                },
+                {
+                    xtype: 'textfield',
+                    fieldLabel: 'Harmonized Classification Code (hsCode)',
+                    name: 'attribute[moptAvalaraHscode]'
+                }
+            ]
         });
     }
 });
-//{/block}
+// {/block}

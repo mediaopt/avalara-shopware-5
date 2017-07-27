@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Logger;
 
 use GuzzleHttp\Event\RequestEvents;
@@ -11,15 +17,18 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
 /**
- * copy of GuzzleHttp\Subscriber\Log\LogSubscriber with slight changes (thx private properties...)
- * 
+ * Copy of GuzzleHttp\Subscriber\Log\LogSubscriber with slight changes (thx private properties...)
+ *
  * Plugin class that will add request and response logging to an HTTP request.
  *
  * The log plugin uses a message formatter that allows custom messages via
  * template variable substitution.
  *
  * @see MessageLogger for a list of available template variable substitutions
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Logger
  */
+
 class LogSubscriber implements SubscriberInterface
 {
 
@@ -29,7 +38,17 @@ class LogSubscriber implements SubscriberInterface
     /** @var Formatter Formatter used to format log messages */
     protected $formatter;
     
+    /**
+     *
+     * @var int
+     */
     protected $timestampBefore;
+    
+    /**
+     *
+     * @var \GuzzleHttp\Message\Response
+     */
+    protected $lastResponseWithError;
 
     /**
      * @param LoggerInterface|callable|resource|null $logger Logger used to log
@@ -48,6 +67,10 @@ class LogSubscriber implements SubscriberInterface
         $this->formatter = $formatter instanceof Formatter ? $formatter : new Formatter($formatter);
     }
 
+    /**
+     *
+     * @return array
+     */
     public function getEvents()
     {
         return [
@@ -57,49 +80,82 @@ class LogSubscriber implements SubscriberInterface
         ];
     }
 
+    /**
+     *
+     * @param CompleteEvent $event
+     */
     public function onComplete(CompleteEvent $event)
     {
         $this->logger->log(
-                substr($event->getResponse()->getStatusCode(), 0, 1) == '2' ? LogLevel::INFO : LogLevel::WARNING, $this->formatter->format(
-                        $event->getRequest(), $event->getResponse(), null, [
+            substr($event->getResponse()->getStatusCode(), 0, 1) == '2' ? LogLevel::INFO : LogLevel::WARNING,
+            $this->formatter->format(
+                $event->getRequest(),
+                $event->getResponse(),
+                null,
+                [
                             'processingTime' => $this->getProcessingTime(),
                         ]
-                ), [
+            ),
+            [
             'request' => $event->getRequest(),
             'response' => $event->getResponse()
                 ]
         );
     }
 
+    /**
+     *
+     * @param ErrorEvent $event
+     */
     public function onError(ErrorEvent $event)
     {
         $this->formatter->setTemplate(\GuzzleHttp\Subscriber\Log\Formatter::DEBUG);
         $ex = $event->getException();
-        $this->logger->log
-                (LogLevel::CRITICAL, $this->formatter->format(
-                        $event->getRequest(), $event->getResponse(), $ex, [
-                            'processingTime' => $this->getProcessingTime(),
-                        ]
-                ), [
-            'request' => $event->getRequest(),
-            'response' => $event->getResponse(),
-            'exception' => $ex
+        $this->logger->log(
+            LogLevel::CRITICAL,
+            $this->formatter->format(
+                $event->getRequest(),
+                $event->getResponse(),
+                $ex,
+                [
+                    'processingTime' => $this->getProcessingTime(),
                 ]
+            ),
+            [
+                'request' => $event->getRequest(),
+                'response' => $event->getResponse(),
+                'exception' => $ex
+            ]
         );
+        
+        $this->lastResponseWithError = $event->getResponse();
         $this->formatter->resetTemplate();
     }
     
     /**
-     * set timestamp
+     *
+     * @return \GuzzleHttp\Message\Response
+     */
+    public function getLastResponseWithError()
+    {
+        return $this->lastResponseWithError;
+    }
+    
+    /**
+     * Will set last timestamp
+     * @param BeforeEvent $event
      */
     public function onBefore(BeforeEvent $event)
     {
         $this->timestampBefore = microtime(true);
     }
     
+    /**
+     *
+     * @return int
+     */
     protected function getProcessingTime()
     {
         return number_format(microtime(true) - $this->timestampBefore, 2);
     }
-
 }

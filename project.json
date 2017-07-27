@@ -9,7 +9,6 @@
     "pathToModule": "src",
     "compatibility": {
         "minimumVersion": "5.2.0",
-        "maximumVersion": "5.2.20",
         "blacklist": [
         ]
     }

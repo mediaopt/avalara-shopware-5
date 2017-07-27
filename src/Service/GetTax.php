@@ -1,38 +1,49 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Service;
 
 use Avalara\CreateTransactionModel;
-use Avalara\DocumentType;
+use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
+use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
+use Shopware\Plugins\MoptAvalara\Adapter\Factory\InsuranceFactory;
+use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
 
 /**
- * Description of GetTax
- *
+ * 
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Service
  */
 class GetTax extends AbstractService
 {
+    const IMPORT_FEES_LINE = 'ImportFees';
+    const IMPORT_DUTIES_LINE = 'ImportDuties';
+    
     /**
-     * 
-     * @param \Avalara\CreateTransactionModel $model
+     *
+     * @param CreateTransactionModel $model
      * @return \stdClass
      */
     public function calculate(CreateTransactionModel $model)
     {
-        $client = $this->getAdapter()->getClient();
-        $response = $client->createTransaction(null, $model);
-
-        return $response;
+        $client = $this->getAdapter()->getAvaTaxClient();
+        return $client->createTransaction(null, $model);
     }
     
     /**
      * get tax ammount from avalara response
+     * @param \stdClass $taxResult
      * @param string|int $id
-     * @param \stdClass $taxInformation
      * @return float
      */
-    public function getTaxForOrderBasketId($id, $taxInformation)
+    public function getTaxForOrderBasketId($taxResult, $id)
     {
-        if (!$taxLineInformation = $this->getTaxLineForOrderBasketId($id, $taxInformation)) {
+        if (!$taxLineInformation = $this->getTaxLineForOrderBasketId($taxResult, $id)) {
             return 0;
         }
 
@@ -41,33 +52,201 @@ class GetTax extends AbstractService
     
     /**
      * get tax rate from avalara response
+     * @param \stdClass $taxResult
      * @param string|int $id
-     * @param \stdClass $taxInformation
      * @return float
      */
-    public function getTaxRateForOrderBasketId($id, $taxInformation)
+    public function getTaxRateForOrderBasketId($taxResult, $id)
     {
-        if (!$taxLine = $this->getTaxLineForOrderBasketId($id, $taxInformation)) {
-            return 0;
+        $taxLine = $this->getTaxLineForOrderBasketId($taxResult, $id);
+        if (!$taxLine || !((float)$taxLine->taxableAmount)) {
+            return null;
+        }
+        $taxRate = bcdiv((float)$taxLine->tax, (float)$taxLine->taxableAmount, AvalaraSDKAdapter::BCMATH_SCALE);
+        
+        return bcmul($taxRate, 100, AvalaraSDKAdapter::BCMATH_SCALE);
+    }
+    
+    /**
+     * get LandedCost from avalara response
+     * @param \stdClass $taxResult
+     * @return float
+     */
+    public function getLandedCost($taxResult)
+    {
+        $totalLandedCost = 0.0;
+        if (!$this->isLandedCostEnabled()) {
+            return $totalLandedCost;
+        }
+        $landedCostLineNumbers = [self::IMPORT_DUTIES_LINE, self::IMPORT_FEES_LINE];
+        foreach ($taxResult->lines as $line) {
+            if (in_array($line->lineNumber, $landedCostLineNumbers)) {
+                $totalLandedCost = bcadd(
+                    $totalLandedCost, 
+                    bcadd(
+                        $line->lineAmount, 
+                        $line->tax, 
+                        AvalaraSDKAdapter::BCMATH_SCALE
+                    ), 
+                    AvalaraSDKAdapter::BCMATH_SCALE
+                );
+            }
         }
 
-        return ((float)$taxLine->tax / (float)$taxLine->taxableAmount) * 100;
+        return $totalLandedCost;
+    }
+    
+    /**
+     * Get insurance cost  from avalara response
+     * @param \stdClass $taxResult
+     * @return float
+     */
+    public function getInsuranceCost($taxResult)
+    {
+        foreach ($taxResult->lines as $line) {
+            if (InsuranceFactory::ARTICLE_ID === $line->lineNumber) {
+                return bcadd($line->lineAmount, $line->tax, AvalaraSDKAdapter::BCMATH_SCALE);
+            }
+        }
+
+        return 0.0;
+    }
+    /**
+     * Get shipping cost from avalara response
+     * @param \stdClass $taxResult
+     * @return float
+     */
+    public function getShippingCost($taxResult)
+    {
+        foreach ($taxResult->lines as $line) {
+            if (ShippingFactory::ARTICLE_ID === $line->lineNumber) {
+                return bcadd($line->lineAmount, $line->tax, AvalaraSDKAdapter::BCMATH_SCALE);
+            }
+        }
+
+        return 0.0;
+    }
+    
+    /**
+     * check if getTax call has to be made
+     * @param \Avalara\CreateTransactionModel $model
+     * @param 
+     * @return boolean
+     * @todo: check country (?)
+     */
+    public function isGetTaxCallAvailable(CreateTransactionModel $model, \Enlight_Components_Session_Namespace $session)
+    {
+        if (!$this->isGetTaxEnabled()) {
+            return false;
+        }
+
+        if (!$session->MoptAvalaraGetTaxResult || !$session->MoptAvalaraGetTaxRequestHash) {
+            return true;
+        }
+
+        if ($session->MoptAvalaraGetTaxRequestHash !== $this->getHashFromRequest($model)) {
+            return true;
+        }
+
+        return false;
+    }
+    
+    /**
+     * 
+     * @return bool
+     */
+    public function isGetTaxEnabled()
+    {
+        return $this
+            ->getAdapter()
+            ->getPluginConfig(Form::TAX_ENABLED_FIELD)
+        ;
+    }
+    
+    /**
+     * 
+     * @return bool
+     */
+    public function isLandedCostEnabled()
+    {
+        return $this
+            ->getAdapter()
+            ->getPluginConfig(Form::LANDEDCOST_ENABLED_FIELD)
+        ;
+    }
+    
+    /**
+     * get hash from request to compare calculate & commit call
+     * unset changing fields during both calls
+     *
+     * @param \Avalara\CreateTransactionModel $model
+     * @return string
+     */
+    public function getHashFromRequest(CreateTransactionModel $model)
+    {
+        $data = $this->objectToArray($model);
+        $data['discount'] = number_format($data['discount'], 0);
+        unset($data['type']);
+        unset($data['date']);
+        unset($data['commit']);
+        
+        //Normalize floats
+        foreach ($data['lines'] as $key => $line) {
+            $data['lines'][$key]['amount'] = number_format($line['amount'], 0);
+        }
+
+        return md5(json_encode($data));
+    }
+    
+    /**
+     *
+     * @param \stdClass | string $data
+     * @return \stdClass
+     */
+    public function generateTaxResultFromResponse($data)
+    {
+        if (is_string($data) || !is_object($data)) {
+            throw new \Exception($data);
+        }
+        $result = new \stdClass();
+        $result->totalTaxable = $data->totalTaxable;
+        $result->totalTax = $data->totalTax;
+        $result->lines = $data->lines;
+        
+        return $result;
     }
 
     /**
      * get tax line info from avalara response
+     * @param \stdClass $taxResult
      * @param string|int $id
-     * @param \stdClass $taxInformation
-     * @return \stdClass
+     * @return \stdClass | null
      */
-    private function getTaxLineForOrderBasketId($id, $taxInformation)
+    private function getTaxLineForOrderBasketId($taxResult, $id)
     {
-        foreach ($taxInformation->lines as $taxLine) {
+        foreach ($taxResult->lines as $taxLine) {
             if ($id == $taxLine->lineNumber && $taxLine->tax) {
                 return $taxLine;
             }
         }
 
         return null;
+    }
+
+    /**
+     *
+     * @param \stdClass $object
+     * @return array
+     */
+    protected function objectToArray($object)
+    {
+        $data = (array)$object;
+        foreach ($data as $key => $value) {
+            if (is_object($value) || is_array($value)) {
+                $data[$key] = $this->objectToArray($value);
+            }
+        }
+        
+        return $data;
     }
 }
