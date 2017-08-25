@@ -8,6 +8,8 @@
 
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
+use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
+
 /**
  * 
  * @author derksen mediaopt GmbH
@@ -52,7 +54,8 @@ class BasketSubscriber extends AbstractSubscriber
         $newBasket['moptAvalaraCustomsDuties'] = $customsDuties;
         $newBasket['moptAvalaraLandedCost'] = $landedCost;
         $newBasket['moptAvalaraInsuranceCost'] = $insurance;
-        
+        $newBasket['AmountWithoutLandedCost'] = $newBasket['Amount'];
+
         $toAppend = [
             'Amount',
             'AmountNet',
@@ -83,9 +86,28 @@ class BasketSubscriber extends AbstractSubscriber
         
         if (is_string($value)) {
             $float = (float)str_replace(',', '.', $value);
-            return str_replace('.', ',', (string)($float + $cost));
+            return str_replace('.', ',', (string)(bcadd($float, $cost, AvalaraSDKAdapter::BCMATH_SCALE)));
         }
         return $value += $cost;
+    }
+    
+    /**
+     * 
+     * @param mixed $value
+     * @param float $cost
+     * @return mixed
+     */
+    private function subCostFromValue($value, $cost)
+    {
+        if (!$value) {
+            return $value;
+        }
+        
+        if (is_string($value)) {
+            $float = (float)str_replace(',', '.', $value);
+            return str_replace('.', ',', (string)(bcsub($float, $cost, AvalaraSDKAdapter::BCMATH_SCALE)));
+        }
+        return $value -= $cost;
     }
     
     /**
@@ -98,7 +120,8 @@ class BasketSubscriber extends AbstractSubscriber
         if (!preg_match('#^mopt_avalara__(.+)$#', $taxId, $matches)) {
             return;
         }
-        return $matches[1];
+
+        return (float)$matches[1];
     }
     
     /**
@@ -107,29 +130,30 @@ class BasketSubscriber extends AbstractSubscriber
      */
     public function onGetPriceForUpdateArticle(\Enlight_Event_EventArgs $args)
     {
+        $newPrice = $args->getReturn();
         $adapter = $this->getAdapter();
+        
         /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
         $service = $adapter->getService('GetTax');
         if (!$service->isGetTaxEnabled()) {
-            return $args->getReturn();
+            return $newPrice;
         }
         
         $session = $this->getSession();
         if (!$taxResult = $session->MoptAvalaraGetTaxResult) {
-            return $args->getReturn();
+            return $newPrice;
         }
-
-        $taxRate = $service->getTaxRateForOrderBasketId($taxResult, $args->get('id'));
         
-        if (!$taxRate) {
+        $taxRate = $service->getTaxRateForOrderBasketId($taxResult, $args->get('id'));
+
+        if (null === $taxRate) {
             //tax has to be present for all positions on checkout confirm
             $msg = 'No tax information for basket-position ' . $args->get('id');
             $adapter->getLogger()->info($msg);
 
-            return $args->getReturn();
+            return $newPrice;
         }
         
-        $newPrice = $args->getReturn();
         $newPrice['taxID'] = 'mopt_avalara__' . $taxRate;
         $newPrice['tax_rate'] = $taxRate;
         $newPrice['tax'] = $service->getTaxForOrderBasketId($taxResult, $args->get('id'));

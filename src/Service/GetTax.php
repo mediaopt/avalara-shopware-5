@@ -192,7 +192,7 @@ class GetTax extends AbstractService
         
         //Normalize floats
         foreach ($data['lines'] as $key => $line) {
-            $data['lines'][$key]['amount'] = number_format($line['amount'], 0);
+            $data['lines'][$key]['amount'] = number_format($line['amount'], 2);
         }
 
         return md5(json_encode($data));
