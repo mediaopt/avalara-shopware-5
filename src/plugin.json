@@ -1,5 +1,5 @@
 {
-  "version": "2.0.0",
+  "version": "2.1.0",
   "author": "derksen mediaopt GmbH",
   "label": "Avalara",
   "description": "<p><img src=\"data:image/png;base64,%s\" /></p> <p style=\"font-size:12px; font-weight: bold;\">For more information visit <a href=\"https://www.mediaopt.de\">www.mediaopt.de</a></p><p><a href=\"https://projects.mediaopt.de/projects/mopt-twl/wiki/User_Manual_EN\" target=\"_blank\">User Manual</a></p>",
@@ -12,6 +12,7 @@
     "update": true
   },
   "changelog": {
+    "2.1.0": "LandedCost feature has bee implemented",
     "2.0.0": "Folder structure has been changed",
     "1.1.0": "Compatibility to Shopware 5.2"
   },
