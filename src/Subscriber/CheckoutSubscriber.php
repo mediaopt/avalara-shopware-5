@@ -21,8 +21,6 @@ use Shopware\Plugins\MoptAvalara\LandedCost\LandedCostRequestParams;
  */
 class CheckoutSubscriber extends AbstractSubscriber
 {
-    const SCALE = 2;
-    
     /**
      * return array with all subsribed events
      *

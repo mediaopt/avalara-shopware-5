@@ -13,6 +13,8 @@ use Avalara\AddressesModel;
 use Avalara\DocumentType;
 use Shopware\Models\Order\Order;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
+use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
+use Shopware\Models\Order\Detail;
 
 /**
  *
@@ -144,21 +146,33 @@ class InvoiceTransactionModelFactory extends AbstractTransactionModelFactory
 
     /**
      *
-     * @param \Shopware\Models\Order\Detail $detail
+     * @param Detail $detail
      * @return array
      */
-    private function convertOrderDetailToLineData(\Shopware\Models\Order\Detail $detail)
+    private function convertOrderDetailToLineData(Detail $detail)
     {
         $lineData = [];
         $lineData['id'] = $detail->getId();
         $lineData['ean'] = $detail->getEan();
         $lineData['quantity'] = $detail->getQuantity();
-        $lineData['netprice'] = $detail->getPrice();
+        $lineData['netprice'] = $this->getNetPrice($detail);
         $lineData['articlename'] = $detail->getArticleName();
         $lineData['articleID'] = $detail->getArticleId();
         $lineData['modus'] = $detail->getMode();
         
         return $lineData;
+    }
+    
+    /**
+     *
+     * @param Detail $detail
+     * @return float
+     */
+    protected function getNetPrice(Detail $detail)
+    {
+        $tax = 1.0 + (float)bcdiv($detail->getTaxRate(), 100, AvalaraSDKAdapter::BCMATH_SCALE);
+
+        return (float)bcdiv($detail->getPrice(), $tax, AvalaraSDKAdapter::BCMATH_SCALE);
     }
 
     /**

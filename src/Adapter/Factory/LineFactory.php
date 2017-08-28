@@ -81,20 +81,20 @@ class LineFactory extends AbstractFactory
         }
 
         //directly assigned to article ?
-        if ($taxCode = $article->getAttribute()->getMoptAvalaraTaxcode()) {
+        if ($taxCode = $this->getTaxCodeFromAttr($article->getAttribute())) {
             return $taxCode;
         }
 
         //category assignment ?
         foreach ($article->getCategories() as $category) {
-            if ($taxCode = $category->getAttribute()->getMoptAvalaraTaxcode()) {
+            if ($taxCode = $this->getTaxCodeFromAttr($category->getAttribute())) {
                 return $taxCode;
             }
         }
 
         return null;
     }
-    
+
     /**
      *
      * @param int $id
@@ -115,7 +115,7 @@ class LineFactory extends AbstractFactory
             return null;
         }
 
-        return $voucher->getAttribute()->getMoptAvalaraTaxcode();
+        return $this->getTaxCodeFromAttr($voucher->getAttribute());
     }
 
     /**
@@ -151,13 +151,13 @@ class LineFactory extends AbstractFactory
     private function getHsCode(Article $article)
     {
         //directly assigned to article ?
-        if ($hsCode = $article->getAttribute()->getMoptAvalaraHscode()) {
+        if ($hsCode = $this->getHsCodeFromAttr($article->getAttribute())) {
             return $hsCode;
         }
 
         //category assignment
         foreach ($article->getCategories() as $category) {
-            if ($categoryHsCode = $category->getAttribute()->getMoptAvalaraHscode()) {
+            if ($categoryHsCode = $this->getHsCodeFromAttr($category->getAttribute())) {
                 return $categoryHsCode;
             }
         }
@@ -196,5 +196,33 @@ class LineFactory extends AbstractFactory
         ;
         
         return !$voucher || !$voucher->getStrict();
+    }
+    
+    /**
+     * 
+     * @param Attribute $attr
+     * @return string
+     */
+    protected function getTaxCodeFromAttr($attr = null)
+    {
+        if (null === $attr) {
+            return null;
+        }
+        
+        return $attr->getMoptAvalaraTaxcode();
+    }
+    
+    /**
+     * 
+     * @param Attribute $attr
+     * @return string
+     */
+    protected function getHsCodeFromAttr($attr = null)
+    {
+        if (null === $attr) {
+            return null;
+        }
+        
+        return $attr->getMoptAvalaraHscode();
     }
 }
