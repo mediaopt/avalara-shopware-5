@@ -58,14 +58,14 @@ class LineFactory extends AbstractFactory
                 ->getRepository('\Shopware\Models\Voucher\Voucher')
             ;
             $voucher = $voucherRepository->find($articleId);
-            return $voucher->getAttribute()->getMoptAvalaraTaxcode();
+            return $this->getTaxCodeFromAttr($voucher->getAttribute());
         }
         
         //shipping could have his own TaxCode
         if ($this->isShipping($lineData)) {
             $dispatchobject = Shopware()->Models()->getRepository('Shopware\Models\Dispatch\Dispatch')->find($lineData['dispatchID']);
             if ($dispatchobject->getAttribute()) {
-                $taxCode = $dispatchobject->getAttribute()->getMoptAvalaraTaxcode();
+                $taxCode = $this->getTaxCodeFromAttr($dispatchobject->getAttribute());
                 return $taxCode;
             }
         }
@@ -75,13 +75,13 @@ class LineFactory extends AbstractFactory
         }
 
         //directly assigned to article ?
-        if ($taxCode = $article->getAttribute()->getMoptAvalaraTaxcode()) {
+        if ($taxCode = $this->getTaxCodeFromAttr($article->getAttribute())) {
             return $taxCode;
         }
 
         //category assignment ?
         foreach ($article->getCategories() as $category) {
-            if ($taxCode = $category->getAttribute()->getMoptAvalaraTaxcode()) {
+            if ($taxCode = $this->getTaxCodeFromAttr($category->getAttribute())) {
                 return $taxCode;
             }
         }
@@ -136,5 +136,19 @@ class LineFactory extends AbstractFactory
         $voucher = Shopware()->Models()->getRepository('\Shopware\Models\Voucher\Voucher')->find($position['articleID']);
         
         return !$voucher || !$voucher->getStrict();
+    }
+    
+    /**
+     * 
+     * @param Attribute $attr
+     * @return string
+     */
+    protected function getTaxCodeFromAttr($attr = null)
+    {
+        if (null === $attr) {
+            return null;
+        }
+        
+        return $attr->getMoptAvalaraTaxcode();
     }
 }
