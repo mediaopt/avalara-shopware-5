@@ -29,8 +29,12 @@ class CancelTax extends AbstractService
     {
         $adapter = $this->getAdapter();
         try {
-            $docCode = $order->getAttribute()->getMoptAvalaraDocCode();
-            $transactionType = $order->getAttribute()->getMoptAvalaraTransactionType();
+            if (!$attr = $order->getAttribute()) {
+                throw new \Exception('Cannot cancel an order without attributes.');
+            }
+            
+            $docCode = $attr->getMoptAvalaraDocCode();
+            $transactionType = $attr->getMoptAvalaraTransactionType();
             
             if (DocumentType::C_SALESINVOICE !== $transactionType) {
                 throw new \Exception('Cannot cancel not commited transaction.');

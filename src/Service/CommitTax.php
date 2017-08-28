@@ -47,7 +47,11 @@ class CommitTax extends AbstractService
             if (!$docCommitEnabled) {
                 throw new \Exception('Doc commit is not enabled.');
             }
-            $attr = $order->getAttribute();
+            
+            if (!$attr = $order->getAttribute()) {
+                throw new \Exception('Order has no attributes.');
+            }
+            
             if ($attr->getMoptAvalaraDocCode()) {
                 throw new \Exception('Order has already been commited to Avalara.');
             }
