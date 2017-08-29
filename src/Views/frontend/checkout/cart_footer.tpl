@@ -5,7 +5,7 @@
 {block name='frontend_checkout_cart_footer_field_labels_sum_value'}
     {if $sBasket.moptAvalaraCustomsDuties > 0.0 }
         <div class="entry--value block">
-            {$sBasket.AmountWithoutLandedCost|currency}{s name="Star" namespace="frontend/listing/box_article"}{/s}
+            {$sBasket.moptAvalaraAmountWithoutLandedCost|currency}{s name="Star" namespace="frontend/listing/box_article"}{/s}
         </div>
     {else}
         {$smarty.block.parent}

@@ -56,7 +56,7 @@ class BasketSubscriber extends AbstractSubscriber
         $newBasket['moptAvalaraCustomsDuties'] = $customsDuties;
         $newBasket['moptAvalaraLandedCost'] = $landedCost;
         $newBasket['moptAvalaraInsuranceCost'] = $insurance;
-        $newBasket['AmountWithoutLandedCost'] = $newBasket['Amount'];
+        $newBasket['moptAvalaraAmountWithoutLandedCost'] = $newBasket['Amount'];
 
         $toAppend = [
             'Amount',
