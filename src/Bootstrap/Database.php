@@ -70,7 +70,7 @@ class Database
     }
     
     /**
-     * Extends attributes with DHL properties
+     * Extends attributes with Avalara properties
      * @return \Shopware\Plugins\MoptAvalara\Bootstrap\Database
      * @throws \Exception
      */

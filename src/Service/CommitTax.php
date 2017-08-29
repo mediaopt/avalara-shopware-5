@@ -45,15 +45,15 @@ class CommitTax extends AbstractService
         try {
             $docCommitEnabled = $adapter->getPluginConfig(Form::DOC_COMMIT_ENABLED_FIELD);
             if (!$docCommitEnabled) {
-                throw new \Exception('Doc commit is not enabled.');
+                throw new \RuntimeException('Doc commit is not enabled.');
             }
             
             if (!$attr = $order->getAttribute()) {
-                throw new \Exception('Order has no attributes.');
+                throw new \RuntimeException('Order has no attributes.');
             }
             
             if ($attr->getMoptAvalaraDocCode()) {
-                throw new \Exception('Order has already been commited to Avalara.');
+                throw new \RuntimeException('Order has already been commited to Avalara.');
             }
             
             $model = $adapter
@@ -63,13 +63,13 @@ class CommitTax extends AbstractService
 
             $taxResult = $this->getTaxService->calculate($model);
             if (!$taxResult->code) {
-                 throw new \Exception('No docCode on order commiting to Avalara.');
+                 throw new \RuntimeException('No docCode on order commiting to Avalara.');
             }
             $this->updateOrderAttributes($order, $taxResult);
             $adapter->getLogger()->info('Order ' . $order->getId() . ' has been commited with docCode: ' . $taxResult->code);
         } catch (\Exception $e) {
             $adapter->getLogger()->error('Commiting order to Avalara failed: '. $e->getMessage());
-            throw new \Exception('Avalara: Update order call failed: ' . $e->getMessage());
+            throw new \RuntimeException('Avalara: Update order call failed: ' . $e->getMessage());
         }
     }
     

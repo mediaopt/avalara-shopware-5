@@ -170,9 +170,10 @@ class InvoiceTransactionModelFactory extends AbstractTransactionModelFactory
      */
     protected function getNetPrice(Detail $detail)
     {
-        $tax = 1.0 + (float)bcdiv($detail->getTaxRate(), 100, AvalaraSDKAdapter::BCMATH_SCALE);
-
-        return (float)bcdiv($detail->getPrice(), $tax, AvalaraSDKAdapter::BCMATH_SCALE);
+        $taxRate = bcdiv($detail->getTaxRate(), 100, AvalaraSDKAdapter::BCMATH_SCALE);
+        $taxRatePlusOne = bcadd($taxRate, 1.0, AvalaraSDKAdapter::BCMATH_SCALE);
+        
+        return (float)bcdiv($detail->getPrice(), $taxRatePlusOne, AvalaraSDKAdapter::BCMATH_SCALE);
     }
 
     /**

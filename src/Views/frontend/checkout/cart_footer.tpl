@@ -16,7 +16,7 @@
 {block name='frontend_checkout_cart_footer_field_labels_shipping'}
     {$smarty.block.parent}
     {if $sBasket.moptAvalaraInsuranceCost > 0.0 }
-        <li class="list--entry block-group entry--dhl">
+        <li class="list--entry block-group entry--avalara">
             <div class="entry--label block">
                 {s namespace='frontend/MoptAvalara/messages' name='insurance'}{/s}
             </div>
@@ -28,7 +28,7 @@
     {/if}
     
     {if $sBasket.moptAvalaraLandedCost > 0.0 }
-        <li class="list--entry block-group entry--dhl">
+        <li class="list--entry block-group entry--avalara">
             <div class="entry--label block">
                 {s namespace='frontend/MoptAvalara/messages' name='landedCost'}{/s}
             </div>

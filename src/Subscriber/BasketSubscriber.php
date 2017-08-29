@@ -32,7 +32,7 @@ class BasketSubscriber extends AbstractSubscriber
     }
 
     /**
-     * Updates totals with DHL delivery subcharge
+     * Updates totals with LandedCost subcharge
      * @param \Enlight_Event_EventArgs $args
      */
     public function onFilterBasket(\Enlight_Event_EventArgs $args)
@@ -104,10 +104,12 @@ class BasketSubscriber extends AbstractSubscriber
         }
         
         if (is_string($value)) {
-            $float = (float)str_replace(',', '.', $value);
-            return str_replace('.', ',', (string)(bcsub($float, $cost, AvalaraSDKAdapter::BCMATH_SCALE)));
+            $float = str_replace(',', '.', $value);
+            return str_replace('.', ',', bcsub($float, $cost, AvalaraSDKAdapter::BCMATH_SCALE));
         }
-        return $value -= $cost;
+        $subCost = $value - $cost;
+        
+        return $subCost;
     }
     
     /**

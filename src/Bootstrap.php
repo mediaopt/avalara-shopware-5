@@ -69,8 +69,8 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
      */
     public function install()
     {
-        // Check if bcmath extention (bcmul function) is avalible
-        if (!function_exists('bcmul')) {
+        // Check if bcmath extention is avalible
+        if (!extension_loaded('bcmath')) {
             throw new \RuntimeException('This plugin requires the bcmath PHP extension.');
         }
         

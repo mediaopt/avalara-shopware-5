@@ -205,11 +205,10 @@ class LineFactory extends AbstractFactory
      */
     protected function getTaxCodeFromAttr($attr = null)
     {
-        if (null === $attr) {
-            return null;
-        }
-        
-        return $attr->getMoptAvalaraTaxcode();
+        return null === $attr
+            ? $attr
+            : $attr->getMoptAvalaraTaxcode()
+        ;
     }
     
     /**
@@ -219,10 +218,9 @@ class LineFactory extends AbstractFactory
      */
     protected function getHsCodeFromAttr($attr = null)
     {
-        if (null === $attr) {
-            return null;
-        }
-        
-        return $attr->getMoptAvalaraHscode();
+        return null === $attr
+            ? null 
+            : $attr->getMoptAvalaraHscode()
+        ;
     }
 }
