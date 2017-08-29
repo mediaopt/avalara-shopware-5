@@ -87,8 +87,8 @@ class BasketSubscriber extends AbstractSubscriber
         }
         
         if (is_string($value)) {
-            $float = (float)str_replace(',', '.', $value);
-            return str_replace('.', ',', (string)(bcadd($float, $cost, AvalaraSDKAdapter::BCMATH_SCALE)));
+            $float = str_replace(',', '.', $value);
+            return str_replace('.', ',', (bcadd($float, $cost, AvalaraSDKAdapter::BCMATH_SCALE)));
         }
         return $value += $cost;
     }
