@@ -94,27 +94,6 @@ class BasketSubscriber extends AbstractSubscriber
     }
     
     /**
-     * 
-     * @param mixed $value
-     * @param float $cost
-     * @return mixed
-     */
-    private function subCostFromValue($value, $cost)
-    {
-        if (!$value) {
-            return $value;
-        }
-        
-        if (is_string($value)) {
-            $float = str_replace(',', '.', $value);
-            return str_replace('.', ',', bcsub($float, $cost, AvalaraSDKAdapter::BCMATH_SCALE));
-        }
-        $subCost = $value - $cost;
-        
-        return $subCost;
-    }
-    
-    /**
      * set tax rate
      * @param \Enlight_Hook_HookArgs $args
      * @return float|null
