@@ -17,6 +17,8 @@ use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
  */
 class BasketSubscriber extends AbstractSubscriber
 {
+    const TAX_ID = 'mopt_avalara__';
+    
     /**
      * return array with all subsribed events
      *
@@ -115,15 +117,16 @@ class BasketSubscriber extends AbstractSubscriber
     /**
      * set tax rate
      * @param \Enlight_Hook_HookArgs $args
+     * @return float|null
      */
     public function afterGetTaxRateByConditions(\Enlight_Hook_HookArgs $args)
     {
         $taxId = $args->get('taxId');
-        if (!preg_match('#^mopt_avalara__(.+)$#', $taxId, $matches)) {
-            return;
+        if (0 !== strpos($taxId, self::TAX_ID)) {
+            return null;
         }
 
-        return (float)$matches[1];
+        return (float)substr($taxId, strlen(self::TAX_ID));
     }
     
     /**
@@ -156,7 +159,7 @@ class BasketSubscriber extends AbstractSubscriber
             return $newPrice;
         }
         
-        $newPrice['taxID'] = 'mopt_avalara__' . $taxRate;
+        $newPrice['taxID'] = self::TAX_ID . $taxRate;
         $newPrice['tax_rate'] = $taxRate;
         $newPrice['tax'] = $service->getTaxForOrderBasketId($taxResult, $args->get('id'));
 
