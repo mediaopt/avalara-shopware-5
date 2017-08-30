@@ -8,6 +8,9 @@
 
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Shopware\Components\Theme\LessDefinition;
+
 /**
  * 
  * @author derksen mediaopt GmbH
@@ -26,6 +29,7 @@ class TemplatingSubscriber extends AbstractSubscriber
         return [
             'Enlight_Controller_Action_PostDispatch_Frontend' => 'onPostDispatchFrontend',
             'Enlight_Controller_Action_PostDispatch_Backend_Order' => 'onPostDispatchBackendOrder',
+            'Theme_Compiler_Collect_Plugin_Less' => 'addLessFiles',
         ];
     }
     
@@ -37,7 +41,6 @@ class TemplatingSubscriber extends AbstractSubscriber
     {
         $view = $args->getSubject()->View();
         $view->addTemplateDir($this->getBootstrap()->Path() . 'Views/');
-        $view->extendsTemplate('frontend/index/mopt_avalara__header.tpl');
     }
     
     /**
@@ -54,5 +57,21 @@ class TemplatingSubscriber extends AbstractSubscriber
             $view->extendsTemplate('Backend/order/model/mopt_avalara__billing_attribute.js');
             $view->extendsTemplate('Backend/order/model/mopt_avalara__attribute.js');
         }
+    }
+    
+    /**
+     * Provide the file collection for less
+     *
+     * @return \Doctrine\Common\Collections\ArrayCollection
+     */
+    public function addLessFiles()
+    {
+        $less = new LessDefinition(
+            [],
+            [$this->getBootstrap()->Path() . '/Views/frontend/_public/src/less/all.less'],
+            $this->getBootstrap()->Path()
+        );
+
+        return new ArrayCollection([$less]);
     }
 }
