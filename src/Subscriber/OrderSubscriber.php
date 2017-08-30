@@ -23,30 +23,23 @@ class OrderSubscriber extends AbstractSubscriber
     }
 
     /**
-     * Updates totals with DHL delivery subcharge
+     * Updates totals with Avalara subcharge
      * @param \Enlight_Event_EventArgs $args
      */
     public function onFilterOrders(\Enlight_Event_EventArgs $args)
     {
-        $getOrders = $args->getReturn();
-        $orderIds = [];
-        foreach ($getOrders as $orderData) {
-            $orderIds[] = $orderData['id'];
-        }
+        $orders = $args->getReturn();
+        $avalaraAttributes = $this->getAvalaraAttributes(array_column($orders, 'id'));
 
-        $avalaraAttributes = $this->getAvalaraAttributes($orderIds);
-
-        foreach ($getOrders as $i => $orderData) {
+        foreach ($orders as $i => $orderData) {
             $id = $orderData['id'];
-            if (!isset($avalaraAttributes[$id])) {
-                continue;
-            }
+
             $orderAttr = $avalaraAttributes[$id];
-            $getOrders[$i]['moptAvalaraLandedCost'] = (float)$orderAttr[Database::LANDEDCOST_FIELD];
-            $getOrders[$i]['moptAvalaraInsurance'] = (float)$orderAttr[Database::INSURANCE_FIELD];
+            $orders[$i]['moptAvalaraLandedCost'] = (float)$orderAttr[Database::LANDEDCOST_FIELD];
+            $orders[$i]['moptAvalaraInsurance'] = (float)$orderAttr[Database::INSURANCE_FIELD];
         }
 
-        return $getOrders;
+        return $orders;
     }
 
     /**
@@ -65,8 +58,13 @@ class OrderSubscriber extends AbstractSubscriber
             . ' FROM '. Database::ORDER_ATTR_TABLE
             . ' WHERE orderID IN ('.implode(', ', $orderIds).')'
         ;
-        $db = $this->getContainer()->get('db');
-        $attrs = $db->fetchAll($sql);
+
+        $attrs = $this
+            ->getContainer()
+            ->get('db')
+            ->fetchAll($sql)
+        ;
+        
         $avalaraAttributes = [];
         foreach ($attrs as $attr) {
             $orderID = $attr['orderID'];
