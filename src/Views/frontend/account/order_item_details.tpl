@@ -15,10 +15,10 @@
     {/if}
 {/block}
 
-{* Shopping costs *}
+{* Shipping costs *}
 {block name="frontend_account_order_item_shippingamount"}
     {$smarty.block.parent}
-    {if $offerPosition.moptAvalaraInsurance}
+    {if $offerPosition.moptAvalaraInsurance > 0.0}
         <p class="is--strong">
             {if $offerPosition.currency_position == "32"}
                 {$offerPosition.currency_html} {$offerPosition.moptAvalaraInsurance}
@@ -27,7 +27,7 @@
             {/if}
         </p>
     {/if}
-    {if $offerPosition.moptAvalaraLandedCost}
+    {if $offerPosition.moptAvalaraLandedCost > 0.0}
         <p class="is--strong">
             {if $offerPosition.currency_position == "32"}
                 {$offerPosition.currency_html} {$offerPosition.moptAvalaraLandedCost}
