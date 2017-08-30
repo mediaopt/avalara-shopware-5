@@ -147,7 +147,12 @@ class CheckoutSubscriber extends AbstractSubscriber
         }
 
         if (!$taxRequest = $session->MoptAvalaraGetTaxCommitRequest) {
-            $adapter->getLogger()->debug('MoptAvalaragetTaxCommitrequest is empty');
+            $adapter->getLogger()->debug('MoptAvalaraGetTaxCommitRequest is empty');
+            return;
+        }
+
+        if (!$taxResult = $session->MoptAvalaraGetTaxResult) {
+            $adapter->getLogger()->debug('MoptAvalaraGetTaxResult is empty');
             return;
         }
 
@@ -156,7 +161,7 @@ class CheckoutSubscriber extends AbstractSubscriber
             $this->getAdapter()->getLogger()->critical($msg);
             throw new \Exception($msg);
         }
-        $this->setOrderAttributes($order, $taxRequest);
+        $this->setOrderAttributes($order, $taxRequest, $taxResult);
         
         unset($session->MoptAvalaraGetTaxRequestHash);
         unset($session->MoptAvalaraGetTaxCommitRequest);
@@ -261,8 +266,9 @@ class CheckoutSubscriber extends AbstractSubscriber
      * 
      * @param \Shopware\Models\Order\Order $order
      * @param \stdClass $taxRequest
+     * @param \stdClass $taxResult
      */
-    private function setOrderAttributes(\Shopware\Models\Order\Order $order, $taxRequest)
+    private function setOrderAttributes(\Shopware\Models\Order\Order $order, $taxRequest, $taxResult)
     {
         /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
         $service = $this->getAdapter()->getService('GetTax');
@@ -277,10 +283,12 @@ class CheckoutSubscriber extends AbstractSubscriber
 
         $session = $this->getSession();
         $landedCost = $service->getLandedCost($session->MoptAvalaraGetTaxResult);
+        $insurance = $service->getInsuranceCost($taxResult);
 
         $order->getAttribute()->setMoptAvalaraTransactionType(DocumentType::C_SALESORDER);
         $order->getAttribute()->setMoptAvalaraIncoterms($incoterms);
         $order->getAttribute()->setMoptAvalaraLandedcost($landedCost);
+        $order->getAttribute()->setMoptAvalaraInsurance($insurance);
         
         Shopware()->Models()->persist($order);
         Shopware()->Models()->flush();
