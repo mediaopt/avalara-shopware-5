@@ -291,27 +291,13 @@ class FormCreator {
             'baseCls' => 'x-panel-header-default-top x-panel-header-default x-window-header-text-default',
         ]);
 
-        $context = $this->getContext();
-
-        $remoteUrlConnectionTest = Shopware()->Front()->Router()->assemble(
-            ["module" => "backend", "controller" => "MoptAvalaraBackendProxy", "action" => "getConnectionTest"],
-            $context
-        );
-
-        $downloadUrlCall = Shopware()->Front()->Router()->assemble(
-            ["module" => "backend", "controller" => "MoptAvalaraLog", "action" => "downloadLogfile"],
-            $context
-        );
-
         $form->setElement('button', 'mopt_avalara__license_check', [
             'label' => 'Connection-Test',
             'maxWidth' => '150',
             'handler' => 'function (){
-                var token = Ext.CSRFService.getToken();
-                var urlConnectionTest = "' . $remoteUrlConnectionTest . '?__csrf_token=" + token;
                 Ext.Ajax.request({
                    scope:this,
-                   url: urlConnectionTest,
+                   url: "{url module=backend controller=MoptAvalaraBackendProxy action=getConnectionTest}?__csrf_token=" + Ext.CSRFService.getToken(),
                    success: function(result,request) {
                    var jsonResponse = Ext.JSON.decode(result.responseText);
                    var successPrefixHtml = "<div class=\"sprite-tick-small\"  style=\"width: 25px; height: 25px; float: left;\">&nbsp;</div><div style=\"float: left;\">";
@@ -351,8 +337,7 @@ class FormCreator {
             'label' => 'Download logfile',
             'maxWidth' => '150',
             'handler' => 'function (){
-                var token = Ext.CSRFService.getToken();
-                var url = "' . $downloadUrlCall . '?__csrf_token=" + token;
+                var url = "{url module=backend controller=MoptAvalaraLog action=downloadLogfile}?__csrf_token=" + Ext.CSRFService.getToken();
 
                 var manualDownloadForm = new Ext.form.Panel({
                   width: 400,
