@@ -19,6 +19,7 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
         transactionStatus: "{s namespace='frontend/MoptAvalara/messages' name='transactionStatus'}Transaction status{/s}",
         incoterms: "{s namespace='frontend/MoptAvalara/messages' name='incoterms'}Incoterms{/s}",
         landedCost: "{s namespace='frontend/MoptAvalara/messages' name='landedCost'}Customs duties and fees{/s}",
+        insurance: "{s namespace='frontend/MoptAvalara/messages' name='insurance'}Insurance{/s}",
         exemptionCode: "{s namespace='frontend/MoptAvalara/messages' name='exemptionCode'}Exemption code{/s}",
         success: '{s name=success}success{/s}',
         error: '{s name=error}error{/s}'
@@ -52,7 +53,8 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
             docCode = '',
             transactionType = '',
             incoterms = '',
-            landedCost = ''
+            landedCost = 0,
+            insurance = 0
         ;
         Ext.Ajax.request({
             url: me.avalaraUrls.loadData,
@@ -67,6 +69,7 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
                 transactionType = response.data.__attribute_mopt_avalara_transaction_type;
                 incoterms = response.data.__attribute_mopt_avalara_incoterms;
                 landedCost = response.data.__attribute_mopt_avalara_landedcost;
+                insurance = response.data.__attribute_mopt_avalara_insurance;
             }
         });
 
@@ -85,7 +88,7 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
         
         var actionPanel = me.createActionPanel(transactionType);
         var itemsArray = [
-            me.createInformationPanel(exemptionCode, transactionType, incoterms, docCode, landedCost)
+            me.createInformationPanel(exemptionCode, transactionType, incoterms, docCode, landedCost, insurance)
         ];
         if (actionPanel) {
             itemsArray.push(actionPanel);
@@ -201,7 +204,7 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
         });
     },
     
-    createInformationPanel: function (exemptionCode, transactionType, incoterms, docCode, landedCost) {
+    createInformationPanel: function (exemptionCode, transactionType, incoterms, docCode, landedCost, insurance) {
         var me = this;
         return Ext.create('Ext.form.Panel', {
             title: me.avalaraSnippets.information,
@@ -232,13 +235,19 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
                 },
                 {
                     xtype: 'displayfield',
+                    fieldLabel: me.avalaraSnippets.insurance,
+                    value: insurance ? insurance : '-',
+                    labelWidth: 170
+                },
+                {
+                    xtype: 'displayfield',
                     fieldLabel: me.avalaraSnippets.exemptionCode,
                     value: exemptionCode ? exemptionCode : '-',
                     labelWidth: 170
                 }
             ],
             width: '50%',
-            height: 180,
+            height: 190,
             style: 'margin-right: 10px;',
             bodyPadding: '5px 10px'
         });
