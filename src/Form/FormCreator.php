@@ -297,7 +297,7 @@ class FormCreator {
             'handler' => 'function (){
                 Ext.Ajax.request({
                    scope:this,
-                   url: "{url module=backend controller=MoptAvalaraBackendProxy action=getConnectionTest}?__csrf_token=" + Ext.CSRFService.getToken(),
+                   url: "MoptAvalaraBackendProxy/getConnectionTest?__csrf_token=" + Ext.CSRFService.getToken(),
                    success: function(result,request) {
                    var jsonResponse = Ext.JSON.decode(result.responseText);
                    var successPrefixHtml = "<div class=\"sprite-tick-small\"  style=\"width: 25px; height: 25px; float: left;\">&nbsp;</div><div style=\"float: left;\">";
@@ -337,7 +337,7 @@ class FormCreator {
             'label' => 'Download logfile',
             'maxWidth' => '150',
             'handler' => 'function (){
-                var url = "{url module=backend controller=MoptAvalaraLog action=downloadLogfile}?__csrf_token=" + Ext.CSRFService.getToken();
+                var url = "MoptAvalaraLog/downloadLogfile?__csrf_token=" + Ext.CSRFService.getToken();
 
                 var manualDownloadForm = new Ext.form.Panel({
                   width: 400,
