@@ -11,6 +11,7 @@ namespace Shopware\Plugins\MoptAvalara\Subscriber;
 use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 use Avalara\AddressLocationInfo;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\AddressFactory;
+use Shopware_Plugins_Backend_MoptAvalara_Bootstrap as AvalaraBootstrap;
 
 /**
  * 
@@ -190,7 +191,11 @@ class AddressSubscriber extends AbstractSubscriber
      */
     protected function addErrorMessage(\Enlight_View_Default $view)
     {
-        $snippets = $this->getContainer()->get('snippets')->getNamespace('frontend/MoptAvalara/messages');
+        $snippets = $this
+            ->getContainer()
+            ->get('snippets')
+            ->getNamespace(AvalaraBootstrap::SNIPPETS_NAMESPACE)
+        ;
 
 
         $errorMessages = $view->getAssign('sErrorMessages');
