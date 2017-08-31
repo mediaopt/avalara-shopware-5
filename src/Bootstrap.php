@@ -21,8 +21,14 @@ use Shopware\Plugins\MoptAvalara\Mail as MailNamespace;
  */
 class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components_Plugin_Bootstrap
 {
+    /**
+     * @const string Plugin identifier
+     */
     const PLUGIN_NAME = 'MoptAvalara';
     
+    /**
+     * @const string
+     */
     const SNIPPETS_NAMESPACE = 'frontend/MoptAvalara/messages';
 
     /**
