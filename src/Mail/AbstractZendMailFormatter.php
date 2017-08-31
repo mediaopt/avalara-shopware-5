@@ -32,7 +32,7 @@ abstract class AbstractZendMailFormatter
     
     /**
      * 
-     * @param \DHLPaWunschpaket\Mail\Shopware_Components_TemplateMail $templateMailService
+     * @param \Shopware_Components_TemplateMail $templateMailService
      * @param \Shopware_Components_Config $config
      */
     public function __construct(\Shopware_Components_TemplateMail $templateMailService, \Shopware_Components_Config $config) {

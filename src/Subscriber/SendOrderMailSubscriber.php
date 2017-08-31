@@ -12,7 +12,7 @@ class SendOrderMailSubscriber extends AbstractSubscriber
 {
     /**
      *
-     * @var type \DHLPaWunschpaket\Mail\AbstractZendMailFormatter[]
+     * @var type AbstractZendMailFormatter[]
      */
     private $mailFormatters = [];
     
