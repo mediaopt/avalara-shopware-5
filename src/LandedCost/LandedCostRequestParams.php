@@ -16,8 +16,23 @@ namespace Shopware\Plugins\MoptAvalara\LandedCost;
  */
 interface LandedCostRequestParams
 {
+    /**
+     * @var string Param name to be used in Avalara request
+     */
     const LANDED_COST_INCOTERMS = 'AvaTax.LandedCost.Incoterms';
+    
+    /**
+     * @var string Param name to be used in Avalara request
+     */
     const LANDED_COST_SHIPPING_MODE = 'AvaTax.LandedCost.ShippingMode';
+    
+    /**
+     * @var string Param name to be used in Avalara request
+     */
     const LANDED_COST_HTSCODE = 'AvaTax.LandedCost.HTSCode';
+    
+    /**
+     * @var string Param name to be used in Avalara request
+     */
     const LANDED_COST_EXPRESS = 'AvaTax.LandedCost.Express';
 }

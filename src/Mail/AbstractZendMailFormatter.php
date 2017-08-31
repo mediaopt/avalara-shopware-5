@@ -3,35 +3,31 @@
 namespace Shopware\Plugins\MoptAvalara\Mail;
 
 use Shopware\Models\Mail\Mail;
-use Shopware\Plugins\MoptAvalara\Bootstrap\Database;
 use Shopware_Plugins_Backend_MoptAvalara_Bootstrap as AvalaraBootstrap;
 
 /**
  * Will update Mail html body based on shipping address attributes and delivery cost
  *
- * @author bubnov
+ * @author derksen mediaopt gmbh
  */
 abstract class AbstractZendMailFormatter
 {
     /**
-     * @const string Shipping tag in email template
+     * @var string Shipping tag in email template
      */
     const SHIPPING_COST_TAG = '{$sShippingCosts}';
    
     /**
-     *
      * @var \Shopware_Components_TemplateMail
      */
     protected $templateMailService;
     
     /**
-     *
      * @var \Shopware_Components_Config
      */
     private $config;
     
     /**
-     * 
      * @param \Shopware_Components_TemplateMail $templateMailService
      * @param \Shopware_Components_Config $config
      */
@@ -41,46 +37,60 @@ abstract class AbstractZendMailFormatter
     }
     
     /**
-     * Will format \Zend_Mail object
+     * Will format \Zend_Mail object with a template
      * @param \Zend_Mail $mail
-     * @param \Shopware\Models\Mail\Mail $mailModel
-     * @param array $context
+     * @param string $compiledTemplate
      */
-    abstract protected function formatMail(\Zend_Mail $mail, Mail $mailModel, $context = []);
+    abstract protected function formatMail(\Zend_Mail $mail, $compiledTemplate);
 
     /**
-     * 
+     * @param Mail $mailModel
+     * @param array $context
+     * @return string
+     */
+    abstract protected function getMailTemplate(Mail $mailModel);
+    
+    /**
      * @param \Zend_Mail $mail
      * @param array $context
      */
     public function updateMail(\Zend_Mail $mail, $context = [])
     {
+        $mailModel = $this->getMailModel();        
+        $template = $this->getMailTemplate($mailModel);
+        $templateUpdated = $this->addAvalaraDeliveryCost($template, $context);
+        
         $stringCompiler = $this->getStringCompiler();
         $stringCompiler->setContext($this->getCombinedContext($context));
+        $compiledTemplate = $stringCompiler->compileString($templateUpdated);
         
-        $mailModel = $this->getMailModel();
-        $this->formatMail($mail, $mailModel, $context);
+        $this->formatMail($mail, $compiledTemplate);
     }
     
     /**
-     * 
      * @param string $modelName
      * @return \Shopware\Models\Mail\Mail
      * @throws \Enlight_Exception
      */
     protected function getMailModel($modelName = 'sORDER') {
         /* @var $mailModel \Shopware\Models\Mail\Mail */
-        $mailModel = $this->templateMailService->getModelManager()->getRepository('Shopware\Models\Mail\Mail')->findOneBy(
-            ['name' => $modelName]
-        );
+        $mailModel = $this
+            ->templateMailService
+            ->getModelManager()
+            ->getRepository('Shopware\Models\Mail\Mail')
+            ->findOneBy(['name' => $modelName])
+        ;
         
         if (!$mailModel) {
             throw new \Enlight_Exception("Mail-Template with name '{$modelName}' could not be found.");
         }
         
         $isoCode = $this->getShop()->get('isocode');
-        $translationReader = $this->templateMailService->getTranslationReader();
-        $translation = $translationReader->read($isoCode, 'config_mails', $mailModel->getId());
+        $translation = $this
+            ->templateMailService
+            ->getTranslationReader()
+            ->read($isoCode, 'config_mails', $mailModel->getId())
+        ;
         $mailModel->setTranslation($translation);
         
         return $mailModel;
@@ -101,13 +111,23 @@ abstract class AbstractZendMailFormatter
             $defaultContext = [
                 'sConfig' => $this->config,
                 'sShop' => $this->config->get('shopName'),
-                'sShopURL' => $this->getShop()->getAlwaysSecure() ?
-                    'https://' . $this->getShop()->getSecureHost() . $this->getShop()->getSecureBasePath() :
-                    'http://' . $this->getShop()->getHost() . $this->getShop()->getBasePath(),
+                'sShopURL' => $this->getShopURL(),
             ];
         }
         
         return array_merge($defaultContext, $context);
+    }
+    
+    /**
+     * 
+     * @return string
+     */
+    private function getShopURL()
+    {
+        return $this->getShop()->getAlwaysSecure()
+            ? 'https://' . $this->getShop()->getSecureHost() . $this->getShop()->getSecureBasePath()
+            : 'http://' . $this->getShop()->getHost() . $this->getShop()->getBasePath()
+        ;
     }
     
     /**
@@ -144,32 +164,29 @@ abstract class AbstractZendMailFormatter
     }
     
     /**
-     * 
+     * Will add a delivery surcharge to existing shipping info
      * @param string $template
      * @param array $context
      * @return string
      */
     protected function addAvalaraDeliveryCost($template, $context = [])
     {
-        if (!$context['moptAvalaraCustomsDuties']) {
+        if ($context['moptAvalaraShippingCostSurcharge'] <= 0) {
             return $template;
         }
         
-        $subcharge = [];
-        if ($landedCost = $this->getLandedCostSubcharge($context)) {
-            $subcharge[] = $landedCost;
-        }
-        if ($incurance = $this->getIncuranceSubcharge($context)) {
-            $subcharge[] = $incurance;
-        }
+        $surcharges = [];
+        $surcharges[] = $this->getLandedCostSurcharge($context);
+        $surcharges[] = $this->getIncuranceSurcharge($context);
+        array_filter($surcharges);
         
-        $replace = sprintf(
+        $shippingInfo = sprintf(
             static::AVALARA_DELIVERY_COST_BLOCK, 
             self::SHIPPING_COST_TAG, 
-            implode(static::LINE_BREAK, $subcharge)
+            implode(static::LINE_BREAK, $surcharges)
         );
 
-        return str_replace(self::SHIPPING_COST_TAG, $replace, $template);
+        return str_replace(self::SHIPPING_COST_TAG, $shippingInfo, $template);
     }
     
     /**
@@ -178,12 +195,7 @@ abstract class AbstractZendMailFormatter
      * @return string
      */
     private function formatToPriceValue($value) {
-        return number_format(
-            $value,
-            2 ,
-            ',',
-            ''
-        );
+        return number_format($value, 2 , ',', '');
     }
     
     /**
@@ -191,9 +203,9 @@ abstract class AbstractZendMailFormatter
      * @param array $context
      * @return string
      */
-    private function getLandedCostSubcharge($context = []) {
+    private function getLandedCostSurcharge($context = []) {
         if (empty($context['moptAvalaraLandedCost'])) {
-            return null;
+            return '';
         }
         
         return $this->translateSnippet('landedCost') . ': ' . $this->formatToPriceValue($context['moptAvalaraLandedCost']) . ' ' . $context['sCurrency'];
@@ -204,9 +216,9 @@ abstract class AbstractZendMailFormatter
      * @param array $context
      * @return string
      */
-    private function getIncuranceSubcharge($context = []) {
+    private function getIncuranceSurcharge($context = []) {
         if (empty($context['moptAvalaraInsuranceCost'])) {
-            return null;
+            return '';
         }
         
         return $this->translateSnippet('insurance') . ': ' . $this->formatToPriceValue($context['moptAvalaraInsuranceCost']) . ' ' . $context['sCurrency'];

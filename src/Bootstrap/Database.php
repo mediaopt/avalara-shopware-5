@@ -22,29 +22,93 @@ use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
 class Database
 {
     /**
-     * Tables
+     * @var string Table to be updated
      */
     const CATEGORIES_ATTR_TABLE = 's_categories_attributes';
+    
+    /**
+     * @var string Table to be updated
+     */
     const ARTICLES_ATTR_TABLE = 's_articles_attributes';
+    
+    /**
+     * @var string Table to be updated
+     */
     const USER_ATTR_TABLE = 's_user_attributes';
+    
+    /**
+     * @var string Table to be updated
+     */
     const ORDER_ATTR_TABLE = 's_order_attributes';
+    
+    /**
+     * @var string Table to be updated
+     */
     const VOUCHER_ATTR_TABLE = 's_emarketing_vouchers_attributes';
+    
+    /**
+     * @var string Table to be updated
+     */
     const DISPATCH_ATTR_TABLE = 's_premium_dispatch_attributes';
+    
+    /**
+     * @var string Table to be updated
+     */
     const COUNTRIES_ATTR_TABLE = 's_core_countries_attributes';
     
     /**
-     * Attributes
+     * @var string Attribute to be created
      */
     const TAXCODE_FIELD = 'mopt_avalara_taxcode';
+    
+    /**
+     * @var string Attribute to be created
+     */
     const HSCODE_FIELD = 'mopt_avalara_hscode';
+    
+    /**
+     * @var string Attribute to be created
+     */
     const DOC_CODE_FIELD = 'mopt_avalara_doc_code';
+    
+    /**
+     * @var string Attribute to be created
+     */
     const EXEMPTION_CODE_FIELD = 'mopt_avalara_exemption_code';
+    
+    /**
+     * @var string Attribute to be created
+     */
     const ORDER_CHANGED_FIELD = 'mopt_avalara_order_changed';
+    
+    /**
+     * @var string Attribute to be created
+     */
     const INSURED_FIELD = 'mopt_avalara_insured';
+    
+    /**
+     * @var string Attribute to be created
+     */
     const EXPRESS_SHIPPING_FIELD = 'mopt_avalara_express_shipping';
+    
+    /**
+     * @var string Attribute to be created
+     */
     const INCOTERMS_FIELD = 'mopt_avalara_incoterms';
+    
+    /**
+     * @var string Attribute to be created
+     */
     const LANDEDCOST_FIELD = 'mopt_avalara_landedcost';
+    
+    /**
+     * @var string Attribute to be created
+     */
     const INSURANCE_FIELD = 'mopt_avalara_insurance';
+    
+    /**
+     * @var string Attribute to be created
+     */
     const TRANSACTION_TYPE_FIELD = 'mopt_avalara_transaction_type';
     
     /**

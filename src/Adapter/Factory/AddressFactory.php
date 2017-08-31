@@ -20,7 +20,14 @@ use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
  */
 class AddressFactory extends AbstractFactory
 {
+    /**
+     * @var string
+     */
     const COUNTRY_CODE__US = 'US';
+    
+    /**
+     * @var string
+     */
     const COUNTRY_CODE__CA = 'CA';
     
     /**

@@ -14,7 +14,6 @@ use Avalara\DocumentType;
 use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 
 /**
- * 
  * @author derksen mediaopt GmbH
  * @package Shopware\Plugins\MoptAvalara\Service
  */

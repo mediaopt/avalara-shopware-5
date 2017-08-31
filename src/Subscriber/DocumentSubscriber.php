@@ -9,20 +9,20 @@
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
 use Shopware\Plugins\MoptAvalara\Bootstrap\Database;
+use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
 use Shopware_Plugins_Backend_MoptAvalara_Bootstrap as AvalaraBootstrap;
 
 /**
- * Acts on PDF document creation for an order in backend
+ * Integrates the surcharges of Avalara into the PDF of the backend in the order.
  * @author derksen mediaopt GmbH
  * @package Shopware\Plugins\MoptAvalara\Subscriber
  */
 class DocumentSubscriber extends AbstractSubscriber
 {
-
     /**
      * return array with all subsribed events
      *
-     * @return array
+     * @return string[]
      */
     public static function getSubscribedEvents()
     {
@@ -39,7 +39,7 @@ class DocumentSubscriber extends AbstractSubscriber
     public function onBeforeRenderDocument(\Enlight_Hook_HookArgs $args)
     {
         $document = $args->getSubject();
-        $this->addCustomsDutiesToView($document);
+        $this->addShippingCostSurchargeToView($document);
         
         $this->updateDocument($document);
     }
@@ -47,14 +47,14 @@ class DocumentSubscriber extends AbstractSubscriber
     /**
      * @param \Shopware_Components_Document $document
      */
-    private function addCustomsDutiesToView(\Shopware_Components_Document $document)
+    private function addShippingCostSurchargeToView(\Shopware_Components_Document $document)
     {
         $orderSmartyObj = $document->_view->getVariable('Order');
         $orderData = $orderSmartyObj->value['_order'];
         
         $landedCost = $this->getLandedCostFromOrderData($orderData);
         $insurance = $this->getInsuranceFromOrderData($orderData);
-        $customsDuties = $landedCost + $insurance;
+        $shippingCostSurcharge = bcadd($landedCost, $insurance, AvalaraSDKAdapter::BCMATH_SCALE);
         
         $this
             ->fixTax($orderSmartyObj)
@@ -65,21 +65,30 @@ class DocumentSubscriber extends AbstractSubscriber
         $positions = array_chunk($orderSmartyObj->value['_positions'], $document->_document['pagebreak'], true);
         $document->_view->assign('Pages', $positions);
         
-        $orderSmartyObj->value['_amount'] += $customsDuties;
-        $orderSmartyObj->value['_amountNetto'] += $customsDuties;
+        $orderSmartyObj->value['_amount'] = $this->addCostToValue($orderSmartyObj->value['_amount'], $shippingCostSurcharge);
+        $orderSmartyObj->value['_amountNetto'] = $this->addCostToValue($orderSmartyObj->value['_amountNetto'], $shippingCostSurcharge);
         $orderSmartyObj->value['_moptAvalaraLandedCost'] += $landedCost;
         $orderSmartyObj->value['_moptAvalaraInsurance'] += $insurance;
     }
     
     /**
-     * Will update a document ammount value
+     * 
+     * @param mixed $value
+     * @param float $cost
+     * @return mixed
+     */
+    private function addCostToValue($value, $cost)
+    {
+        return bcadd($value, $cost, AvalaraSDKAdapter::BCMATH_SCALE);
+    }
+    
+    /**
+     * Method will update a document amount value
      * @param \Shopware_Components_Document $document
      */
     private function updateDocument(\Shopware_Components_Document $document)
     {
         $orderSmartyObj = $document->_view->getVariable('Order');
-        $orderData = $orderSmartyObj->value['_order'];
-
         $update = '
             UPDATE `s_order_documents` SET `amount` = ?
             WHERE orderID = ? LIMIT 1
@@ -88,13 +97,13 @@ class DocumentSubscriber extends AbstractSubscriber
         
         Shopware()->Db()->query($update, [
             $orderSmartyObj->value['_amount'],
-            $orderData['id'],
+            $orderSmartyObj->value['_order']['id'],
         ]);
     }
     
     /**
      * 
-     * @param array $orderData
+     * @param array $orderData Order params and values
      * @return float
      */
     private function getLandedCostFromOrderData($orderData = [])
@@ -108,7 +117,7 @@ class DocumentSubscriber extends AbstractSubscriber
     
     /**
      * 
-     * @param array $orderData
+     * @param array $orderData Order params and values
      * @return float
      */
     private function getInsuranceFromOrderData($orderData = [])
@@ -121,7 +130,7 @@ class DocumentSubscriber extends AbstractSubscriber
     }
     
     /**
-     * Will leave only 2 dec in tax
+     * Method will leave only 2 dec in tax
      * @param \Smarty_Variable $orderSmartyObj
      * @return DocumentSubscriber
      */
@@ -141,7 +150,7 @@ class DocumentSubscriber extends AbstractSubscriber
      */
     private function addPosition(\Smarty_Variable $orderSmartyObj, $value, $label)
     {
-        if (!$value) {
+        if ($value <= 0) {
             return $this;
         }
         

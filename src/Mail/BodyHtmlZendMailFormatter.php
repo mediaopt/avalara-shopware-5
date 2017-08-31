@@ -7,35 +7,35 @@ use Shopware\Models\Mail\Mail;
 /**
  * Will update Mail html body based on shipping address attributes and delivery cost
  *
- * @author bubnov
+ * @author derksen mediaopt gmbh
  */
 class BodyHtmlZendMailFormatter extends AbstractZendMailFormatter
 {
     /**
-     * @const string Shipping block in email template
+     * @var string Shipping block in email template
      */
     const AVALARA_DELIVERY_COST_BLOCK = '%s<br/>%s';
     
     /**
-     * @const string
+     * @var string
      */
     const LINE_BREAK = '<br/>';
+    
+    /**
+     * Will format \Zend_Mail object with a template
+     * @param \Zend_Mail $mail
+     * @param string $compiledTemplate
+     */
+    protected function formatMail(\Zend_Mail $mail, $compiledTemplate) {
+        $mail->setBodyHtml($compiledTemplate);
+    }
 
     /**
-     * Will format \Zend_Mail object
-     * @param \Zend_Mail $mail
-     * @param \Shopware\Models\Mail\Mail $mailModel
+     * @param Mail $mailModel
      * @param array $context
+     * @return string
      */
-    protected function formatMail(\Zend_Mail $mail, Mail $mailModel, $context = []) {
-        if (!$mailModel->isHtml()) {
-            return;
-        }
-        $stringCompiler = $this->getStringCompiler();
-        $htmlTemplate = $mailModel->getContentHtml();
-        $htmlTemplate = $this->addAvalaraDeliveryCost($htmlTemplate, $context);
-        
-        $html = $stringCompiler->compileString($htmlTemplate);
-        $mail->setBodyHtml($html);
+    protected function getMailTemplate(Mail $mailModel) {
+        return $mailModel->getContentHtml();
     }
 }

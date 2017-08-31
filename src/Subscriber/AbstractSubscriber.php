@@ -12,7 +12,6 @@ use Enlight\Event\SubscriberInterface;
 use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
 
 /**
- * 
  * @author derksen mediaopt GmbH
  * @package Shopware\Plugins\MoptAvalara\Subscriber
  */

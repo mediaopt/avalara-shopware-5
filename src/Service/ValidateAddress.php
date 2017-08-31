@@ -11,7 +11,6 @@ namespace Shopware\Plugins\MoptAvalara\Service;
 use Avalara\AddressLocationInfo;
 
 /**
- * 
  * @author derksen mediaopt GmbH
  * @package Shopware\Plugins\MoptAvalara\Service
  */

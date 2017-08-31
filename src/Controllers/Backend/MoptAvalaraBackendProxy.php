@@ -9,7 +9,6 @@
 use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 
 /**
- * 
  * @extends Shopware_Controllers_Backend_ExtJs
  * @author derksen mediaopt GmbH
  */

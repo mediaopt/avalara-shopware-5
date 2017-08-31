@@ -15,7 +15,6 @@ use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
 use Shopware\Plugins\MoptAvalara\LandedCost\LandedCostRequestParams;
 
 /**
- * 
  * @author derksen mediaopt GmbH
  * @package Shopware\Plugins\MoptAvalara\Subscriber
  */
@@ -24,7 +23,7 @@ class CheckoutSubscriber extends AbstractSubscriber
     /**
      * return array with all subsribed events
      *
-     * @return array
+     * @return string[]
      */
     public static function getSubscribedEvents()
     {

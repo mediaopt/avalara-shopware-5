@@ -23,10 +23,24 @@ use Shopware\Plugins\MoptAvalara\LandedCost\LandedCostRequestParams;
  */
 class LineFactory extends AbstractFactory
 {
+    /**
+     * @var int Voucher modus
+     */
     const MODUS_VOUCHER = 2;
+    
+    /**
+     * @var int Basket discount modus
+     */
     const MODUS_BASKET_DISCOUNT = 3;
+    
+    /**
+     * @var int Discount modus
+     */
     const MODUS_DISCOUNT = 4;
 
+    /**
+     * @var string Article ID for a voucher
+     */
     const ARTICLEID_VOUCHER = 'voucher';
 
     /**

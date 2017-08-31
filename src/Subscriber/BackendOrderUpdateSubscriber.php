@@ -9,7 +9,6 @@
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
 /**
- * 
  * @author derksen mediaopt GmbH
  * @package Shopware\Plugins\MoptAvalara\Subscriber
  */
@@ -18,7 +17,7 @@ class BackendOrderUpdateSubscriber extends AbstractSubscriber
     /**
      * return array with all subsribed events
      *
-     * @return array
+     * @return string[]
      */
     public static function getSubscribedEvents()
     {

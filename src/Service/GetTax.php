@@ -15,13 +15,19 @@ use Shopware\Plugins\MoptAvalara\Adapter\Factory\InsuranceFactory;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
 
 /**
- * 
  * @author derksen mediaopt GmbH
  * @package Shopware\Plugins\MoptAvalara\Service
  */
 class GetTax extends AbstractService
 {
+    /**
+     * @var string Item ID in Avalara response
+     */
     const IMPORT_FEES_LINE = 'ImportFees';
+    
+    /**
+     * @var string Item ID in Avalara response
+     */
     const IMPORT_DUTIES_LINE = 'ImportDuties';
     
     /**

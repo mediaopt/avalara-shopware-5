@@ -23,20 +23,44 @@ use Avalara\AvaTaxClient;
  */
 class AvalaraSDKAdapter implements AdapterInterface
 {
+    /**
+     * @var int Scale to be used in all bcmath calls
+     */
     const BCMATH_SCALE = 8;
     
+    /**
+     * @var string
+     */
     const SERVICE_NAME = 'AvalaraSdkAdapter';
     
+    /**
+     * @var string
+     */
     const PRODUCTION_ENV = 'production';
     
+    /**
+     * @var string
+     */
     const SANDBOX_ENV = 'sandbox';
     
+    /**
+     * @var string
+     */
     const MACHINE_NAME = 'localhost';
     
+    /**
+     * @var string
+     */
     const SEVICES_NAMESPACE = '\Shopware\Plugins\MoptAvalara\Service\\';
     
+    /**
+     * @var string
+     */
     const FACTORY_NAMESPACE = '\Shopware\Plugins\MoptAvalara\Adapter\Factory\\';
     
+    /**
+     * @var string
+     */
     const LANDED_COST_LOG_FORMAT = '>>>>>>>> %s %s %s <<<<<<<< %s %s %s';
 
     /**

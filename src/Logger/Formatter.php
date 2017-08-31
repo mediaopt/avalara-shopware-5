@@ -49,15 +49,30 @@ class Formatter
 
     /**
      * Apache Common Log Format.
-     * @link http://httpd.apache.org/docs/1.3/logs.html#common
      * @var string
      */
     const CLF = "{hostname} {req_header_User-Agent} - [{ts}] \"{method} {resource} {protocol}/{version}\" {code} {res_header_Content-Length}";
+    
+    /**
+     * Apache Common Log Format.
+     * @var string
+     */
     const DEBUG = "processing time: {processingTime}s\n>>>>>>>>\n{request}\n<<<<<<<<\n{response}\n--------\n{error}";
+    
+    /**
+     * Apache Common Log Format.
+     * @var string
+     */
     const SHORT = '[{ts}] "{method} {resource} {protocol}/{version}" {code}';
 
-    /** @var string Template used to format log messages */
+    /** 
+     * @var string Template used to format log messages
+     */
     protected $template;
+    
+    /** 
+     * @var string Standart template
+     */
     protected $standardTemplate;
 
     /**

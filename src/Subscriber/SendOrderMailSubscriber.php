@@ -3,6 +3,7 @@
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
 use Shopware\Plugins\MoptAvalara\Mail\AbstractZendMailFormatter;
+use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
 
 /**
  * Description of CheckoutSubscriber
@@ -12,7 +13,7 @@ class SendOrderMailSubscriber extends AbstractSubscriber
 {
     /**
      *
-     * @var type AbstractZendMailFormatter[]
+     * @var AbstractZendMailFormatter[]
      */
     private $mailFormatters = [];
     
@@ -30,7 +31,7 @@ class SendOrderMailSubscriber extends AbstractSubscriber
     /**
      * return array with all subsribed events
      *
-     * @return array
+     * @return string[]
      */
     public static function getSubscribedEvents()
     {
@@ -74,20 +75,20 @@ class SendOrderMailSubscriber extends AbstractSubscriber
         
         $landedCost = $service->getLandedCost($taxResult);
         $insurance = $service->getInsuranceCost($taxResult);
-        $customsDuties = $landedCost + $insurance;
+        $shippingCostSurcharge = bcadd($landedCost, $insurance, AvalaraSDKAdapter::BCMATH_SCALE);
 
-        $context['moptAvalaraCustomsDuties'] = 0;
+        $context['moptAvalaraShippingCostSurcharge'] = 0;
         $context['moptAvalaraLandedCost'] = 0;
         $context['moptAvalaraInsuranceCost'] = 0;
         
-        if (!$customsDuties) {
+        if ((float)$shippingCostSurcharge <= 0) {
             return $context;
         }
 
         /* @var $shop \Shopware\Models\Shop\DetachedShop */
         $shop = $this->getContainer()->get('Shop');
         $context['sShopURL'] = 'http://' . $shop->getHost() . $shop->getBasePath();
-        $context['moptAvalaraCustomsDuties'] = $customsDuties;
+        $context['moptAvalaraShippingCostSurcharge'] = $shippingCostSurcharge;
         $context['moptAvalaraLandedCost'] = $landedCost;
         $context['moptAvalaraInsuranceCost'] = $insurance;
 

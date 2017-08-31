@@ -14,7 +14,6 @@ use Shopware\Plugins\MoptAvalara\Adapter\Factory\AddressFactory;
 use Shopware_Plugins_Backend_MoptAvalara_Bootstrap as AvalaraBootstrap;
 
 /**
- * 
  * @author derksen mediaopt GmbH
  * @package Shopware\Plugins\MoptAvalara\Subscriber
  */
@@ -23,7 +22,7 @@ class AddressSubscriber extends AbstractSubscriber
     /**
      * return array with all subsribed events
      *
-     * @return array
+     * @return string[]
      */
     public static function getSubscribedEvents()
     {
