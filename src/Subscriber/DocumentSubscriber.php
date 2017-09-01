@@ -26,9 +26,9 @@ class DocumentSubscriber extends AbstractSubscriber
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             'Shopware_Components_Document::assignValues::after' => 'onBeforeRenderDocument',
-        );
+        ];
     }
     
     /**
