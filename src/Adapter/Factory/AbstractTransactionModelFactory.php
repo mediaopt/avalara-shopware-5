@@ -177,9 +177,7 @@ abstract class AbstractTransactionModelFactory extends AbstractFactory
         ;
         
         $countryIncoterm = $this->getIncoterm();
-        $params->{LandedCostRequestParams::LANDED_COST_INCOTERMS} = $countryIncoterm
-            ? $countryIncoterm
-            : $defaultIncoterms
+        $params->{LandedCostRequestParams::LANDED_COST_INCOTERMS} = $countryIncoterm ?: $defaultIncoterms
         ;
         
         $shippingFactory = $this->getShippingFactory();
