@@ -24,7 +24,7 @@ class Shopware_Controllers_Backend_MoptAvalaraBackendProxy extends Shopware_Cont
             /* @var $pingResponse \Avalara\PingResultModel */
             $pingResponse = $client->ping();
 
-            if (!($pingResponse instanceof \stdClass)) {
+            if (!is_object($pingResponse)) {
                 throw new \RuntimeException('Connection test failed: unknown error.');
             }
             if (empty($pingResponse->authenticated)) {
