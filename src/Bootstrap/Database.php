@@ -10,7 +10,6 @@ namespace Shopware\Plugins\MoptAvalara\Bootstrap;
 
 use Shopware\Bundle\AttributeBundle\Service\CrudService;
 use Shopware\Components\Model\ModelManager;
-use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
 
 /**
