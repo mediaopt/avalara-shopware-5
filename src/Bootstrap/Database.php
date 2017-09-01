@@ -140,122 +140,139 @@ class Database
      */
     public function install()
     {
-        $this->addStringField(
+        $this->addField(
             self::CATEGORIES_ATTR_TABLE,
             self::TAXCODE_FIELD,
+            'string',
             'Avalara Tax Code',
             'This is the Avalara Tax code of the category sent to Avalara.'
         );
         
-        $this->addStringField(
+        $this->addField(
             self::CATEGORIES_ATTR_TABLE,
             self::HSCODE_FIELD,
+            'string',
             'Avalara Harmonized Classification Code (hsCode)',
             'This is the Avalara Harmonized Classification Code (hsCode) of the article sent to Avalara.'
         );
         
-        $this->addStringField(
+        $this->addField(
             self::ARTICLES_ATTR_TABLE,
             self::TAXCODE_FIELD,
+            'string',
             'Avalara Tax Code',
             'This is the Avalara Tax code of the article sent to Avalara.'
         );
         
-        $this->addStringField(
+        $this->addField(
             self::ARTICLES_ATTR_TABLE,
             self::HSCODE_FIELD,
+            'string',
             'Avalara Harmonized Classification Code (hsCode)',
             'This is the Avalara Harmonized Classification Code (hsCode) of the article sent to Avalara.'
         );
         
-        $this->addStringField(
+        $this->addField(
             self::USER_ATTR_TABLE,
             self::EXEMPTION_CODE_FIELD,
+            'string',
             'Avalara Exemption Code',
             'Here is the exemption code for a use that can be tax-free for you.'
         );
         
-        $this->addStringField(
+        $this->addField(
             self::ORDER_ATTR_TABLE,
             self::DOC_CODE_FIELD,
+            'string',
             null, null, null,
             false
         );
         
-        $this->addStringField(
+        $this->addField(
             self::ORDER_ATTR_TABLE,
             self::TRANSACTION_TYPE_FIELD,
+            'string',
             null, null, null,
             false
         );
         
-        $this->addBoolField(
+        $this->addField(
             self::ORDER_ATTR_TABLE,
-            self::ORDER_CHANGED_FIELD, 
+            self::ORDER_CHANGED_FIELD,
+            'boolean',
             null, null, null, 
             false
         );
         
-        $this->addStringField(
+        $this->addField(
             self::ORDER_ATTR_TABLE,
-            self::LANDEDCOST_FIELD, 
+            self::LANDEDCOST_FIELD,
+            'float',
             null, null, null, 
             false
         );
         
-        $this->addStringField(
+        $this->addField(
             self::ORDER_ATTR_TABLE,
-            self::INSURANCE_FIELD, 
+            self::INSURANCE_FIELD,
+            'float',
             null, null, null, 
             false
         );
         
-        $this->addStringField(
+        $this->addField(
             self::ORDER_ATTR_TABLE,
             self::INCOTERMS_FIELD,
+            'string',
             null, null, null, 
             false
         );
         
-        $this->addBoolField(
+        $this->addField(
             self::ORDER_ATTR_TABLE,
             self::INSURED_FIELD,
+            'boolean',
             null, null, null, 
             false
         );
         
-        $this->addBoolField(
+        $this->addField(
             self::ORDER_ATTR_TABLE,
             self::EXPRESS_SHIPPING_FIELD,
+            'boolean',
             null, null, null, 
             false
         );
         
-        $this->addStringField(
+        $this->addField(
             self::VOUCHER_ATTR_TABLE,
             self::TAXCODE_FIELD,
+            'string',
             'Avalara Tax Code',
             'This is where the Avalara Tax code for vouchers is given, which is sent to Avalara.'
         );
         
-        $this->addStringField(
+        $this->addField(
             self::DISPATCH_ATTR_TABLE,
             self::TAXCODE_FIELD,
+            'string',
             'Avalara Tax Code',
             'This is the Avalara Tax code for the shipment sent to Avalara. Leave empty to use default.',
             ShippingFactory::TAXCODE
         );
         
-        $this->addBoolField(
+        $this->addField(
             self::DISPATCH_ATTR_TABLE,
             self::INSURED_FIELD,
+            'boolean',
             'Insurance 100%',
             'You can set if a delivery is completely insured.'
         );
         
-        $this->addBoolField(
+        $this->addField(
             self::DISPATCH_ATTR_TABLE,
             self::EXPRESS_SHIPPING_FIELD,
+            'boolean',
             'Express delivery',
             'You can set if this is an express delivery.'
         );
@@ -307,50 +324,21 @@ class Database
     }
 
     /**
-     * 
+     *
      * @param string $table
      * @param string $name
+     * @param string $type
      * @param string $label
      * @param string $descr
      * @param string $default
      * @param bool $displayInBackend
      */
-    private function addStringField($table, $name, $label = '', $descr = '', $default = null, $displayInBackend = true)
+    private function addField($table, $name, $type = 'string', $label = '', $descr = '', $default = null, $displayInBackend = true)
     {
         $this->crudService->update(
             $table,
             $name,
             'string',
-            [
-                'label' => $label,
-                'supportText' => $descr,
-                'helpText' => '',
-                'translatable' => false,
-                'displayInBackend' => $displayInBackend,
-                'position' => 10,
-                'defaultValue' => $default,
-                'custom' => true,
-            ],
-            null,
-            false,
-            $default
-        );
-    }
-    /**
-     * 
-     * @param string $table
-     * @param string $name
-     * @param string $label
-     * @param string $descr
-     * @param string $default
-     * @param bool $displayInBackend
-     */
-    private function addBoolField($table, $name, $label = '', $descr = '', $default = null, $displayInBackend = true)
-    {
-        $this->crudService->update(
-            $table,
-            $name,
-            'boolean',
             [
                 'label' => $label,
                 'supportText' => $descr,
