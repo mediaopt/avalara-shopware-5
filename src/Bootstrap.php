@@ -184,21 +184,22 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
         $subscribers[] = new SubscriberNamespace\BackendOrderUpdateSubscriber($this);
         $subscribers[] = new SubscriberNamespace\OrderSubscriber($this);
         $subscribers[] = new SubscriberNamespace\DocumentSubscriber($this);
-        
-        $this->addMailFormatterSubscriber($subscribers);
+
+        $subscribers = $this->addMailFormatterSubscriber($subscribers);
 
         array_map(
-            function($subscriber){
-                $this->Application()->Events()->addSubscriber($subscriber);
-            }, $subscribers
+            [$this->Application()->Events(), 'addSubscriber'],
+            $subscribers
         );
     }
     
     /**
      * 
      * @param \Enlight\Event\SubscriberInterface[] $subscribers
+     * @return \Enlight\Event\SubscriberInterface[]
      */
-    private function addMailFormatterSubscriber(&$subscribers = []) {
+    private function addMailFormatterSubscriber($subscribers = [])
+    {
         $templateMailService = $this->get('TemplateMail');
         $config = $this->get('config');
         
@@ -208,6 +209,8 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
             ->addMailFormatter(new MailNamespace\BodyTextZendMailFormatter($templateMailService, $config))
         ;
         $subscribers[] = $mailSubscriber;
+
+        return $subscribers;
     }
 
     /**
