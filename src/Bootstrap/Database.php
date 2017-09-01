@@ -123,7 +123,6 @@ class Database
     private $modelManager;
     
     /**
-     * 
      * @param CrudService $crudService
      * @param ModelManager $modelManager
      */

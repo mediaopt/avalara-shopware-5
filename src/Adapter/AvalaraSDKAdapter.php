@@ -217,7 +217,6 @@ class AvalaraSDKAdapter implements AdapterInterface
     }
     
     /**
-     * 
      * @param int $id
      * @return \Shopware\Models\Order\Order
      */
@@ -228,7 +227,6 @@ class AvalaraSDKAdapter implements AdapterInterface
     }
 
     /**
-     * 
      * @param int $orderNumber
      * @return \Shopware\Models\Order\Order
      */
@@ -323,7 +321,6 @@ class AvalaraSDKAdapter implements AdapterInterface
     }
     
     /**
-     * 
      * @param string $docCode
      * @return string
      */

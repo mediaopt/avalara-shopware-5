@@ -263,7 +263,6 @@ class CheckoutSubscriber extends AbstractSubscriber
     }
     
     /**
-     * 
      * @param Order $order
      * @param \stdClass $taxRequest
      * @param \stdClass $taxResult

@@ -157,7 +157,6 @@ class LineFactory extends AbstractFactory
     }
     
     /**
-     * 
      * @param Article $article
      * @return string
      */
@@ -212,7 +211,6 @@ class LineFactory extends AbstractFactory
     }
     
     /**
-     * 
      * @param Attribute $attr
      * @return string
      */
@@ -225,7 +223,6 @@ class LineFactory extends AbstractFactory
     }
     
     /**
-     * 
      * @param Attribute $attr
      * @return string
      */

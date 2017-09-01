@@ -140,7 +140,6 @@ class AddressFactory extends AbstractFactory
     }
     
     /**
-     * 
      * @param int $id
      * @return string
      */

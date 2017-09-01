@@ -96,7 +96,6 @@ abstract class AbstractZendMailFormatter
     }
     
     /**
-     * 
      * @param array $context
      * @return array
      */
@@ -118,7 +117,6 @@ abstract class AbstractZendMailFormatter
     }
     
     /**
-     * 
      * @return string
      */
     private function getShopURL()
@@ -130,7 +128,6 @@ abstract class AbstractZendMailFormatter
     }
     
     /**
-     * 
      * @return \Shopware\Models\Shop\Shop
      */
     protected function getShop()
@@ -139,7 +136,6 @@ abstract class AbstractZendMailFormatter
     }
     
     /**
-     * 
      * @return \Shopware_Components_StringCompiler
      */
     protected function getStringCompiler()
@@ -148,7 +144,6 @@ abstract class AbstractZendMailFormatter
     }
     
     /**
-     * 
      * @param string $snippet
      * @return string
      */
@@ -189,7 +184,6 @@ abstract class AbstractZendMailFormatter
     }
     
     /**
-     * 
      * @param float $value
      * @return string
      */
@@ -198,7 +192,6 @@ abstract class AbstractZendMailFormatter
     }
     
     /**
-     * 
      * @param array $context
      * @return string
      */
@@ -211,7 +204,6 @@ abstract class AbstractZendMailFormatter
     }
     
     /**
-     * 
      * @param array $context
      * @return string
      */

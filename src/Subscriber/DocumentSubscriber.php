@@ -32,7 +32,7 @@ class DocumentSubscriber extends AbstractSubscriber
     }
     
     /**
-     * extend shopware invoice template and assign paypal variables to view
+     * Extend shopware invoice template and assign Avalara variables to view
      * 
      * @param \Enlight_Hook_HookArgs $args
      */
@@ -72,7 +72,6 @@ class DocumentSubscriber extends AbstractSubscriber
     }
     
     /**
-     * 
      * @param mixed $value
      * @param float $cost
      * @return mixed
@@ -102,7 +101,6 @@ class DocumentSubscriber extends AbstractSubscriber
     }
     
     /**
-     * 
      * @param array $orderData Order params and values
      * @return float
      */
@@ -116,7 +114,6 @@ class DocumentSubscriber extends AbstractSubscriber
     }
     
     /**
-     * 
      * @param array $orderData Order params and values
      * @return float
      */
@@ -142,7 +139,6 @@ class DocumentSubscriber extends AbstractSubscriber
     }
     
     /**
-     * 
      * @param \Smarty_Variable $orderSmartyObj
      * @param float $value
      * @param string $label
@@ -172,7 +168,6 @@ class DocumentSubscriber extends AbstractSubscriber
     }
     
     /**
-     * 
      * @param string $snippet
      * @return string
      */

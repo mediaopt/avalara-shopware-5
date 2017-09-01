@@ -18,7 +18,6 @@ class SendOrderMailSubscriber extends AbstractSubscriber
     private $mailFormatters = [];
     
     /**
-     * 
      * @param AbstractZendMailFormatter $mailFormatter
      * @return SendOrderMailSubscriber
      */

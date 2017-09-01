@@ -157,7 +157,6 @@ class GetTax extends AbstractService
     }
     
     /**
-     * 
      * @return bool
      */
     public function isGetTaxEnabled()
@@ -169,7 +168,6 @@ class GetTax extends AbstractService
     }
     
     /**
-     * 
      * @return bool
      */
     public function isLandedCostEnabled()

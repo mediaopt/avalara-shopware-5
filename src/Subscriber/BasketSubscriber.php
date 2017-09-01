@@ -77,7 +77,6 @@ class BasketSubscriber extends AbstractSubscriber
     }
     
     /**
-     * 
      * @param mixed $value
      * @param float $cost
      * @return mixed
