@@ -6,7 +6,7 @@ use Shopware\Models\Mail\Mail;
 use Shopware_Plugins_Backend_MoptAvalara_Bootstrap as AvalaraBootstrap;
 
 /**
- * Will update Mail html body based on shipping address attributes and delivery cost
+ * This class will update Mail body based on shipping address attributes and delivery cost
  *
  * @author derksen mediaopt gmbh
  */
@@ -163,7 +163,7 @@ abstract class AbstractZendMailFormatter
     }
     
     /**
-     * Will add a delivery surcharge to existing shipping info
+     * This method will add a delivery surcharge to existing shipping info
      * @param string $template
      * @param array $context
      * @return string

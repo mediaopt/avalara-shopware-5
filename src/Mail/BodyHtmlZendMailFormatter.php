@@ -5,7 +5,7 @@ namespace Shopware\Plugins\MoptAvalara\Mail;
 use Shopware\Models\Mail\Mail;
 
 /**
- * Will update Mail html body based on shipping address attributes and delivery cost
+ * This class will update Mail html body based on shipping address attributes and delivery cost
  *
  * @author derksen mediaopt gmbh
  */
