@@ -322,7 +322,7 @@ class AvalaraSDKAdapter implements AdapterInterface
     
     /**
      * @param string $docCode
-     * @return string
+     * @return \stdClass
      */
     public function getTransactionByDocCode($docCode)
     {
