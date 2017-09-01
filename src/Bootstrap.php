@@ -185,11 +185,11 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
         $subscribers[] = new SubscriberNamespace\OrderSubscriber($this);
         $subscribers[] = new SubscriberNamespace\DocumentSubscriber($this);
 
-        $subscribers = $this->addMailFormatterSubscriber($subscribers);
+        $subscribersWithMailFormatters = $this->addMailFormatterSubscriber($subscribers);
 
         array_map(
             [$this->Application()->Events(), 'addSubscriber'],
-            $subscribers
+            $subscribersWithMailFormatters
         );
     }
     
