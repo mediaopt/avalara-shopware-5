@@ -170,16 +170,16 @@ abstract class AbstractZendMailFormatter
         if ($context['moptAvalaraShippingCostSurcharge'] <= 0) {
             return $template;
         }
-        
-        $surcharges = [];
-        $surcharges[] = $this->getLandedCostSurcharge($context);
-        $surcharges[] = $this->getIncuranceSurcharge($context);
-        $potentialSurcharges = array_filter($surcharges);
+
+        $potentialSurcharges = [];
+        $potentialSurcharges[] = $this->getLandedCostSurcharge($context);
+        $potentialSurcharges[] = $this->getIncuranceSurcharge($context);
+        $surcharges = array_filter($potentialSurcharges);
         
         $shippingInfo = sprintf(
             static::AVALARA_DELIVERY_COST_BLOCK, 
             self::SHIPPING_COST_TAG, 
-            implode(static::LINE_BREAK, $potentialSurcharges)
+            implode(static::LINE_BREAK, $surcharges)
         );
 
         return str_replace(self::SHIPPING_COST_TAG, $shippingInfo, $template);
