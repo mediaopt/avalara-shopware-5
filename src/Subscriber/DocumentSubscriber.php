@@ -67,8 +67,6 @@ class DocumentSubscriber extends AbstractSubscriber
         
         $orderSmartyObj->value['_amount'] = $this->addCostToValue($orderSmartyObj->value['_amount'], $shippingCostSurcharge);
         $orderSmartyObj->value['_amountNetto'] = $this->addCostToValue($orderSmartyObj->value['_amountNetto'], $shippingCostSurcharge);
-        $orderSmartyObj->value['_moptAvalaraLandedCost'] += $landedCost;
-        $orderSmartyObj->value['_moptAvalaraInsurance'] += $insurance;
     }
     
     /**
