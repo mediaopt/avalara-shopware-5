@@ -26,7 +26,8 @@ class BodyHtmlZendMailFormatter extends AbstractZendMailFormatter
      * @param \Zend_Mail $mail
      * @param string $compiledTemplate
      */
-    protected function formatMail(\Zend_Mail $mail, $compiledTemplate) {
+    protected function formatMail(\Zend_Mail $mail, $compiledTemplate)
+    {
         $mail->setBodyHtml($compiledTemplate);
     }
 
@@ -34,7 +35,8 @@ class BodyHtmlZendMailFormatter extends AbstractZendMailFormatter
      * @param Mail $mailModel
      * @return string
      */
-    protected function getMailTemplate(Mail $mailModel) {
+    protected function getMailTemplate(Mail $mailModel)
+    {
         return $mailModel->getContentHtml();
     }
 }

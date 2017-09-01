@@ -179,7 +179,8 @@ class InvoiceTransactionModelFactory extends AbstractTransactionModelFactory
     /**
      * @return string | null
      */
-    protected function getIncoterm() {
+    protected function getIncoterm()
+    {
         if (!$attr = $this->orderContext->getAttribute()) {
             return null;
         }

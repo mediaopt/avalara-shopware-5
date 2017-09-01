@@ -129,7 +129,8 @@ class DocumentSubscriber extends AbstractSubscriber
      * @param \Smarty_Variable $orderSmartyObj
      * @return DocumentSubscriber
      */
-    private function fixTax(\Smarty_Variable $orderSmartyObj) {
+    private function fixTax(\Smarty_Variable $orderSmartyObj)
+    {
         foreach ($orderSmartyObj->value['_positions'] as &$position) {
             $position['tax'] = number_format($position['tax'], 2);
         }

@@ -31,7 +31,8 @@ abstract class AbstractZendMailFormatter
      * @param \Shopware_Components_TemplateMail $templateMailService
      * @param \Shopware_Components_Config $config
      */
-    public function __construct(\Shopware_Components_TemplateMail $templateMailService, \Shopware_Components_Config $config) {
+    public function __construct(\Shopware_Components_TemplateMail $templateMailService, \Shopware_Components_Config $config)
+    {
         $this->templateMailService = $templateMailService;
         $this->config = $config;
     }
@@ -71,7 +72,8 @@ abstract class AbstractZendMailFormatter
      * @return \Shopware\Models\Mail\Mail
      * @throws \Enlight_Exception
      */
-    protected function getMailModel($modelName = 'sORDER') {
+    protected function getMailModel($modelName = 'sORDER')
+    {
         /* @var $mailModel \Shopware\Models\Mail\Mail */
         $mailModel = $this
             ->templateMailService
@@ -187,7 +189,8 @@ abstract class AbstractZendMailFormatter
      * @param float $value
      * @return string
      */
-    private function formatToPriceValue($value) {
+    private function formatToPriceValue($value)
+    {
         return number_format($value, 2 , ',', '');
     }
     
@@ -195,7 +198,8 @@ abstract class AbstractZendMailFormatter
      * @param array $context
      * @return string
      */
-    private function getLandedCostSurcharge($context = []) {
+    private function getLandedCostSurcharge($context = [])
+    {
         if (empty($context['moptAvalaraLandedCost'])) {
             return '';
         }
@@ -207,7 +211,8 @@ abstract class AbstractZendMailFormatter
      * @param array $context
      * @return string
      */
-    private function getIncuranceSurcharge($context = []) {
+    private function getIncuranceSurcharge($context = [])
+    {
         if (empty($context['moptAvalaraInsuranceCost'])) {
             return '';
         }
