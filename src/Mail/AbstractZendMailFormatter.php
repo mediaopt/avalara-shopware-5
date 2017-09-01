@@ -177,12 +177,12 @@ abstract class AbstractZendMailFormatter
         $surcharges = [];
         $surcharges[] = $this->getLandedCostSurcharge($context);
         $surcharges[] = $this->getIncuranceSurcharge($context);
-        array_filter($surcharges);
+        $potentialSurcharges = array_filter($surcharges);
         
         $shippingInfo = sprintf(
             static::AVALARA_DELIVERY_COST_BLOCK, 
             self::SHIPPING_COST_TAG, 
-            implode(static::LINE_BREAK, $surcharges)
+            implode(static::LINE_BREAK, $potentialSurcharges)
         );
 
         return str_replace(self::SHIPPING_COST_TAG, $shippingInfo, $template);
