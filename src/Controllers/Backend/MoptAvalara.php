@@ -14,7 +14,6 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
 {
     /**
      * Will cancel a transaction for an order
-     * @return void
      */
     public function cancelOrderAction()
     {
@@ -38,7 +37,6 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
     
     /**
      * Will commit transaction to Avalara
-     * @return void
      */
     public function commitOrderAction()
     {
@@ -63,8 +61,7 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
     }
     
     /**
-     *
-     * @return void
+     * Action to reset the "avalara update flag" for an order
      */
     public function resetUpdateFlagAction()
     {
