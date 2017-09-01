@@ -12,7 +12,6 @@ use Enlight\Event\SubscriberInterface;
 use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
 
 /**
- * 
  * @author derksen mediaopt GmbH
  * @package Shopware\Plugins\MoptAvalara\Subscriber
  */
@@ -44,12 +43,7 @@ abstract class AbstractSubscriber implements SubscriberInterface
     {
         $this->bootstrap = $bootstrap;
     }
-    
-    /**
-     * @return array
-     */
-    abstract public static function getSubscribedEvents();
-    
+
     /**
      *
      * @return \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface

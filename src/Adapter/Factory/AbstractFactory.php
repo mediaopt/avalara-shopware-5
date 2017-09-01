@@ -29,13 +29,13 @@ abstract class AbstractFactory
      *
      * @var array
      */
-    protected $userData = null;
+    protected $userData;
     
     /**
      *
      * @var array
      */
-    protected $pluginConfig = null;
+    protected $pluginConfig;
     
     /**
      *
@@ -77,7 +77,7 @@ abstract class AbstractFactory
     }
     
     /**
-     *
+     * @param string $key
      * @return array
      */
     protected function getPluginConfig($key)

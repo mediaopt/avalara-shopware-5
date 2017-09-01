@@ -9,10 +9,6 @@
 namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
 use Avalara\LineItemModel;
-use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
-use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
-use Shopware\Plugins\MoptAvalara\Adapter\Factory\InsuranceFactory;
-use Shopware\Plugins\MoptAvalara\Adapter\Factory\AddressFactory;
 use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 use Shopware\Plugins\MoptAvalara\LandedCost\LandedCostRequestParams;
 
@@ -58,7 +54,7 @@ abstract class AbstractTransactionModelFactory extends AbstractFactory
      * @param array $positions
      * @return LineItemModel[]
      */
-    protected function getLineModels($positions)
+    protected function getLineModels($positions = [])
     {
         $lineFactory = $this->getLineFactory();
         $lines = [];
@@ -164,7 +160,7 @@ abstract class AbstractTransactionModelFactory extends AbstractFactory
     
     /**
      *
-     * @return object
+     * @return \stdClass
      */
     protected function getTransactionParameters()
     {
@@ -181,14 +177,12 @@ abstract class AbstractTransactionModelFactory extends AbstractFactory
         ;
         
         $countryIncoterm = $this->getIncoterm();
-        $params->{LandedCostRequestParams::LANDED_COST_INCOTERMS} = ($countryIncoterm)
-            ? $countryIncoterm
-            : $defaultIncoterms
+        $params->{LandedCostRequestParams::LANDED_COST_INCOTERMS} = $countryIncoterm ?: $defaultIncoterms
         ;
         
         $shippingFactory = $this->getShippingFactory();
         $expressShip = $shippingFactory->isShippingExpress($this->getShippingId());
-        $params->{LandedCostRequestParams::LANDED_COST_EXPRESS} = (bool)$expressShip;
+        $params->{LandedCostRequestParams::LANDED_COST_EXPRESS} = $expressShip;
         
         return $params;
     }

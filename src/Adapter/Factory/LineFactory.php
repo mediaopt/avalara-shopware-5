@@ -11,7 +11,6 @@ namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 use Shopware\Models\Article\Article;
 use Avalara\LineItemModel;
 use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
-use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
 use Shopware\Plugins\MoptAvalara\LandedCost\LandedCostRequestParams;
 
 /**
@@ -23,10 +22,24 @@ use Shopware\Plugins\MoptAvalara\LandedCost\LandedCostRequestParams;
  */
 class LineFactory extends AbstractFactory
 {
+    /**
+     * @var int Voucher modus
+     */
     const MODUS_VOUCHER = 2;
+    
+    /**
+     * @var int Basket discount modus
+     */
     const MODUS_BASKET_DISCOUNT = 3;
+    
+    /**
+     * @var int Discount modus
+     */
     const MODUS_DISCOUNT = 4;
 
+    /**
+     * @var string Article ID for a voucher
+     */
     const ARTICLEID_VOUCHER = 'voucher';
 
     /**
@@ -144,7 +157,6 @@ class LineFactory extends AbstractFactory
     }
     
     /**
-     * 
      * @param Article $article
      * @return string
      */
@@ -176,7 +188,7 @@ class LineFactory extends AbstractFactory
             self::MODUS_VOUCHER,
             self::MODUS_BASKET_DISCOUNT,
             self::MODUS_DISCOUNT,
-        ]);
+        ], false);
     }
 
     /**
@@ -186,7 +198,7 @@ class LineFactory extends AbstractFactory
      */
     public static function isNotVoucher($position)
     {
-        if ($position['modus'] != LineFactory::MODUS_VOUCHER || empty($position['articleID'])) {
+        if ($position['modus'] != self::MODUS_VOUCHER || empty($position['articleID'])) {
             return true;
         }
         $voucher = Shopware()
@@ -199,7 +211,6 @@ class LineFactory extends AbstractFactory
     }
     
     /**
-     * 
      * @param Attribute $attr
      * @return string
      */
@@ -212,7 +223,6 @@ class LineFactory extends AbstractFactory
     }
     
     /**
-     * 
      * @param Attribute $attr
      * @return string
      */

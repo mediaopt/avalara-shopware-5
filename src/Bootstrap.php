@@ -10,6 +10,7 @@ use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 use Shopware\Plugins\MoptAvalara\Bootstrap\Database;
 use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
 use Shopware\Plugins\MoptAvalara\Subscriber as SubscriberNamespace;
+use Shopware\Plugins\MoptAvalara\Mail as MailNamespace;
 
 /**
  * this class configures:
@@ -20,7 +21,15 @@ use Shopware\Plugins\MoptAvalara\Subscriber as SubscriberNamespace;
  */
 class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components_Plugin_Bootstrap
 {
+    /**
+     * @var string Plugin identifier
+     */
     const PLUGIN_NAME = 'MoptAvalara';
+    
+    /**
+     * @var string
+     */
+    const SNIPPETS_NAMESPACE = 'frontend/MoptAvalara/messages';
 
     /**
      * get plugin capabilities
@@ -174,10 +183,34 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
         $subscribers[] = new SubscriberNamespace\BasketSubscriber($this);
         $subscribers[] = new SubscriberNamespace\BackendOrderUpdateSubscriber($this);
         $subscribers[] = new SubscriberNamespace\OrderSubscriber($this);
+        $subscribers[] = new SubscriberNamespace\DocumentSubscriber($this);
 
-        foreach ($subscribers as $subscriber) {
-            $this->Application()->Events()->addSubscriber($subscriber);
-        }
+        $subscribersWithMailFormatters = $this->addMailFormatterSubscriber($subscribers);
+
+        array_map(
+            [$this->Application()->Events(), 'addSubscriber'],
+            $subscribersWithMailFormatters
+        );
+    }
+    
+    /**
+     * 
+     * @param \Enlight\Event\SubscriberInterface[] $subscribers
+     * @return \Enlight\Event\SubscriberInterface[]
+     */
+    private function addMailFormatterSubscriber($subscribers = [])
+    {
+        $templateMailService = $this->get('TemplateMail');
+        $config = $this->get('config');
+        
+        $mailSubscriber = new SubscriberNamespace\SendOrderMailSubscriber($this);
+        $mailSubscriber
+            ->addMailFormatter(new MailNamespace\BodyHtmlZendMailFormatter($templateMailService, $config))
+            ->addMailFormatter(new MailNamespace\BodyTextZendMailFormatter($templateMailService, $config))
+        ;
+        $subscribers[] = $mailSubscriber;
+
+        return $subscribers;
     }
 
     /**

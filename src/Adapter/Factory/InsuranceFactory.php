@@ -18,7 +18,14 @@ use Avalara\LineItemModel;
  */
 class InsuranceFactory extends AbstractFactory
 {
+    /**
+     * @var string Article ID for insurance
+     */
     const ARTICLE_ID = 'Insurance';
+    
+    /**
+     * @var string Default Avalara taxcode for insurance
+     */
     const TAXCODE = 'FR070100';
 
     /**

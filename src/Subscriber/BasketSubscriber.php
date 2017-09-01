@@ -11,18 +11,20 @@ namespace Shopware\Plugins\MoptAvalara\Subscriber;
 use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
 
 /**
- * 
  * @author derksen mediaopt GmbH
  * @package Shopware\Plugins\MoptAvalara\Subscriber
  */
 class BasketSubscriber extends AbstractSubscriber
 {
+    /**
+     * @var string Temporary tax ID to be used on checkout process
+     */
     const TAX_ID = 'mopt_avalara__';
     
     /**
      * return array with all subsribed events
      *
-     * @return array
+     * @return string[]
      */
     public static function getSubscribedEvents()
     {
@@ -34,7 +36,7 @@ class BasketSubscriber extends AbstractSubscriber
     }
 
     /**
-     * Updates totals with LandedCost subcharge
+     * Updates totals with LandedCost surcharge
      * @param \Enlight_Event_EventArgs $args
      */
     public function onFilterBasket(\Enlight_Event_EventArgs $args)
@@ -51,9 +53,9 @@ class BasketSubscriber extends AbstractSubscriber
 
         $landedCost = $service->getLandedCost($taxResult);
         $insurance = $service->getInsuranceCost($taxResult);
-        $customsDuties = $landedCost + $insurance;
+        $shippingCostSurcharge = bcadd($landedCost, $insurance, AvalaraSDKAdapter::BCMATH_SCALE);
 
-        $newBasket['moptAvalaraCustomsDuties'] = $customsDuties;
+        $newBasket['moptAvalaraShippingCostSurcharge'] = $shippingCostSurcharge;
         $newBasket['moptAvalaraLandedCost'] = $landedCost;
         $newBasket['moptAvalaraInsuranceCost'] = $insurance;
         $newBasket['moptAvalaraAmountWithoutLandedCost'] = $newBasket['Amount'];
@@ -68,14 +70,13 @@ class BasketSubscriber extends AbstractSubscriber
         ];
 
         foreach ($toAppend as $prop) {
-            $newBasket[$prop] = $this->addCostToValue($newBasket[$prop], $customsDuties);
+            $newBasket[$prop] = $this->addCostToValue($newBasket[$prop], $shippingCostSurcharge);
         }
         
         return $newBasket;
     }
     
     /**
-     * 
      * @param mixed $value
      * @param float $cost
      * @return mixed
@@ -88,9 +89,10 @@ class BasketSubscriber extends AbstractSubscriber
         
         if (is_string($value)) {
             $float = str_replace(',', '.', $value);
-            return str_replace('.', ',', (bcadd($float, $cost, AvalaraSDKAdapter::BCMATH_SCALE)));
+            return str_replace('.', ',', bcadd($float, $cost, AvalaraSDKAdapter::BCMATH_SCALE));
         }
-        return $value + $cost;
+        
+        return (float)bcadd($value, $cost, AvalaraSDKAdapter::BCMATH_SCALE);
     }
     
     /**

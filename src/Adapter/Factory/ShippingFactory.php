@@ -11,13 +11,19 @@ namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 use Avalara\LineItemModel;
 
 /**
- * 
  * @author derksen mediaopt GmbH
  * @package Shopware\Plugins\MoptAvalara\Adapter\Factory
  */
 class ShippingFactory extends AbstractFactory
 {
+    /**
+     * @var string Article ID for a shipping
+     */
     const ARTICLE_ID = 'Shipping';
+    
+    /**
+     * @var string Avalara default taxcode for a voucher
+     */
     const TAXCODE = 'FR010000';
     
     /**
@@ -121,6 +127,6 @@ class ShippingFactory extends AbstractFactory
             return false;
         }
         
-        return $attr->getMoptAvalaraExpressShipping();
+        return (bool)$attr->getMoptAvalaraExpressShipping();
     }
 }

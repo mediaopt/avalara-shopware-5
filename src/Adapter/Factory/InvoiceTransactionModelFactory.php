@@ -12,7 +12,6 @@ use Avalara\CreateTransactionModel;
 use Avalara\AddressesModel;
 use Avalara\DocumentType;
 use Shopware\Models\Order\Order;
-use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
 use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
 use Shopware\Models\Order\Detail;
 
@@ -81,13 +80,14 @@ class InvoiceTransactionModelFactory extends AbstractTransactionModelFactory
     }
     
     /**
+     * @param array $positions
      * @return LineItemModel[]
      */
-    protected function getLineModels()
+    protected function getLineModels($positions = [])
     {
-        $positions = $this->getPositionsFromOrder($this->orderContext);
+        $orderPositions = $this->getPositionsFromOrder($this->orderContext);
 
-        return parent::getLineModels($positions);
+        return parent::getLineModels($orderPositions);
     }
     
     /**
@@ -104,7 +104,7 @@ class InvoiceTransactionModelFactory extends AbstractTransactionModelFactory
             }
             
             if (LineFactory::isNotVoucher($position)) {
-                $discount -= floatval($position['netprice']);
+                $discount -= (float)$position['netprice'];
             }
         }
 
@@ -179,7 +179,8 @@ class InvoiceTransactionModelFactory extends AbstractTransactionModelFactory
     /**
      * @return string | null
      */
-    protected function getIncoterm() {
+    protected function getIncoterm()
+    {
         if (!$attr = $this->orderContext->getAttribute()) {
             return null;
         }

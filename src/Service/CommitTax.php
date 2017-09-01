@@ -8,11 +8,13 @@
 
 namespace Shopware\Plugins\MoptAvalara\Service;
 
+use Avalara\DocumentType;
 use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 use Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface;
+use Shopware\Models\Order\Order;
+use Shopware\Models\Order\Detail;
 
 /**
- * 
  * @author derksen mediaopt GmbH
  * @package Shopware\Plugins\MoptAvalara\Service
  */
@@ -33,13 +35,13 @@ class CommitTax extends AbstractService
         parent::__construct($adapter);
         $this->getTaxService = $adapter->getService('GetTax');
     }
-    
+
     /**
      *
-     * @param \Shopware\Models\Order\Order $order
-     * @return boolean
+     * @param Order $order
+     * @throws \RuntimeException
      */
-    public function commitOrder(\Shopware\Models\Order\Order $order)
+    public function commitOrder(Order $order)
     {
         $adapter = $this->getAdapter();
         try {
@@ -75,15 +77,14 @@ class CommitTax extends AbstractService
     
     /**
      *
-     * @param \Shopware\Models\Order\Order $order
+     * @param Order $order
      * @param \stdClass $taxResult
-     * @return boolean
      */
-    protected function updateOrderAttributes(\Shopware\Models\Order\Order $order, $taxResult)
+    protected function updateOrderAttributes(Order $order, $taxResult)
     {
         $attr = $order->getAttribute();
         $attr->setMoptAvalaraDocCode($taxResult->code);
-        $attr->setMoptAvalaraTransactionType(\Avalara\DocumentType::C_SALESINVOICE);
+        $attr->setMoptAvalaraTransactionType(DocumentType::C_SALESINVOICE);
         
         Shopware()->Models()->persist($order);
         Shopware()->Models()->flush();
@@ -91,16 +92,16 @@ class CommitTax extends AbstractService
     
     /**
      *
-     * @param \Shopware\Models\Order\Detail $detail
+     * @param Detail $detail
      * @param \stdClass $taxResult
      * @return float
      * @throws \Exception
      */
-    protected function getTaxRateForOrderDetail(\Shopware\Models\Order\Detail $detail, $taxResult)
+    protected function getTaxRateForOrderDetail(Detail $detail, $taxResult)
     {
         $taxRate = $this->getTaxService->getTaxRateForOrderBasketId($taxResult, $detail->getId());
         if (!$taxRate) {
-            throw new \Exception('Avalara: no tax information found for line ' . $detail->getId());
+            throw new \UnexpectedValueException('Avalara: no tax information found for line ' . $detail->getId());
         }
         
         return $taxRate;

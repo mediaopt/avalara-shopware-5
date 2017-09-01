@@ -1,19 +1,16 @@
 <?php
 
-/**
- * For the full copyright and license information, refer to the accompanying LICENSE file.
- *
- * @copyright derksen mediaopt GmbH
- */
-
 namespace Shopware\Plugins\MoptAvalara\Adapter;
 
-use Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface;
 use Shopware_Plugins_Backend_MoptAvalara_Bootstrap;
 use Shopware\Plugins\MoptAvalara\Logger\Formatter;
 use Shopware\Plugins\MoptAvalara\Logger\LogSubscriber;
 use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
+use Shopware\Plugins\MoptAvalara\Adapter\Factory\AbstractFactory;
+use Shopware\Plugins\MoptAvalara\Service\AbstractService;
 use Avalara\AvaTaxClient;
+use Monolog\Logger;
+use Monolog\Handler\RotatingFileHandler;
 
 /**
  * This is the adaptor for avalara's API
@@ -23,33 +20,57 @@ use Avalara\AvaTaxClient;
  */
 class AvalaraSDKAdapter implements AdapterInterface
 {
+    /**
+     * @var int Scale to be used in all bcmath calls
+     */
     const BCMATH_SCALE = 8;
     
+    /**
+     * @var string
+     */
     const SERVICE_NAME = 'AvalaraSdkAdapter';
     
+    /**
+     * @var string
+     */
     const PRODUCTION_ENV = 'production';
     
+    /**
+     * @var string
+     */
     const SANDBOX_ENV = 'sandbox';
     
+    /**
+     * @var string
+     */
     const MACHINE_NAME = 'localhost';
     
+    /**
+     * @var string
+     */
     const SEVICES_NAMESPACE = '\Shopware\Plugins\MoptAvalara\Service\\';
     
+    /**
+     * @var string
+     */
     const FACTORY_NAMESPACE = '\Shopware\Plugins\MoptAvalara\Adapter\Factory\\';
     
+    /**
+     * @var string
+     */
     const LANDED_COST_LOG_FORMAT = '>>>>>>>> %s %s %s <<<<<<<< %s %s %s';
 
     /**
      *
      * @var \Avalara\AvaTaxClient
      */
-    protected $avaTaxClient = null;
+    protected $avaTaxClient;
     
     /**
      *
      * @var \Monolog\Logger
      */
-    protected $logger = null;
+    protected $logger;
     
     /**
      *
@@ -157,9 +178,9 @@ class AvalaraSDKAdapter implements AdapterInterface
         }
 
         //setup monolog
-        $this->logger = new \Monolog\Logger('mopt_avalara');
+        $this->logger = new Logger('mopt_avalara');
         $logFileName = Form::LOG_FILE_NAME . Form::LOG_FILE_EXT;
-        $streamHandler = new \Monolog\Handler\RotatingFileHandler(
+        $streamHandler = new RotatingFileHandler(
             $this->getLogDir() . $logFileName,
             $this->getMaxFiles(),
             $this->getLogLevel()
@@ -168,15 +189,14 @@ class AvalaraSDKAdapter implements AdapterInterface
 
         return $this->logger;
     }
-    
+
     /**
-     *
      * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
      */
     public function getBootstrap()
     {
         if (!$bootstrap = Shopware()->Plugins()->Backend()->get(Shopware_Plugins_Backend_MoptAvalara_Bootstrap::PLUGIN_NAME)) {
-            throw new \Exception(Shopware_Plugins_Backend_MoptAvalara_Bootstrap::PLUGIN_NAME . ' is not enabled or installed.');
+            throw new \RuntimeException(Shopware_Plugins_Backend_MoptAvalara_Bootstrap::PLUGIN_NAME . ' is not enabled or installed.');
         }
         
         return $bootstrap;
@@ -185,7 +205,7 @@ class AvalaraSDKAdapter implements AdapterInterface
     /**
      * checks first, if module is available / installed
      * @param string $key
-     * @return type
+     * @return mixed
      */
     public function getPluginConfig($key)
     {
@@ -197,7 +217,6 @@ class AvalaraSDKAdapter implements AdapterInterface
     }
     
     /**
-     * 
      * @param int $id
      * @return \Shopware\Models\Order\Order
      */
@@ -208,7 +227,6 @@ class AvalaraSDKAdapter implements AdapterInterface
     }
 
     /**
-     * 
      * @param int $orderNumber
      * @return \Shopware\Models\Order\Order
      */
@@ -257,7 +275,7 @@ class AvalaraSDKAdapter implements AdapterInterface
             return $rotationDays;
         }
 
-        return Shopware_Plugins_Backend_MoptAvalara_Bootstrap::DEFAULT_ROTATING_DAYS;
+        return Form::LOGGER_DEFAULT_ROTATING_DAYS;
     }
 
     /**
@@ -275,26 +293,13 @@ class AvalaraSDKAdapter implements AdapterInterface
         //set levels
         switch ($logLevel) {
             case 'INFO':
-                return \Monolog\Logger::INFO;
+                return Logger::INFO;
             case 'ERROR':
-                return \Monolog\Logger::ERROR;
+                return Logger::ERROR;
             case 'DEBUG':
             default:
-                return \Monolog\Logger::DEBUG;
+                return Logger::DEBUG;
         }
-    }
-
-    /**
-     *
-     * @param string $messageFormat
-     * @return type
-     */
-    private function createGuzzleLoggingMiddleware($messageFormat)
-    {
-        return \GuzzleHttp\Ring\Client\Middleware::log(
-            $this->getLogger(),
-            new \GuzzleHttp\MessageFormatter($messageFormat)
-        );
     }
 
     /**
@@ -305,9 +310,9 @@ class AvalaraSDKAdapter implements AdapterInterface
     {
         $logLevel = $this->getLogLevel();
         switch ($logLevel) {
-            case \Monolog\Logger::INFO:
+            case Logger::INFO:
                 return Formatter::CLF;
-            case \Monolog\Logger::ERROR:
+            case Logger::ERROR:
                 return Formatter::CLF;
             case 'DEBUG':
             default:
@@ -316,7 +321,6 @@ class AvalaraSDKAdapter implements AdapterInterface
     }
     
     /**
-     * 
      * @param string $docCode
      * @return \stdClass
      */

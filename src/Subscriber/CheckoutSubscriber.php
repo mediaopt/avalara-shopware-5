@@ -9,13 +9,13 @@
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
 use Avalara\DocumentType;
+use Shopware\Models\Order\Order;
 use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
 use Shopware\Plugins\MoptAvalara\LandedCost\LandedCostRequestParams;
 
 /**
- * 
  * @author derksen mediaopt GmbH
  * @package Shopware\Plugins\MoptAvalara\Subscriber
  */
@@ -24,7 +24,7 @@ class CheckoutSubscriber extends AbstractSubscriber
     /**
      * return array with all subsribed events
      *
-     * @return array
+     * @return string[]
      */
     public static function getSubscribedEvents()
     {
@@ -75,12 +75,12 @@ class CheckoutSubscriber extends AbstractSubscriber
         
         //Recall controller so basket tax and landedCost could be applied
         $args->getSubject()->forward('confirm');
-        return;
     }
 
     /**
-     * check if current basket matches with previous avalara call (e.g. multi tab)
-     * @param \Enlight_Event_EventArgs $args
+     * Check if current basket matches with previous avalara call (e.g. multi tab)
+     *
+     * @param \Enlight_Hook_HookArgs $args
      */
     public function onBeforeSOrderSaveOrder(\Enlight_Hook_HookArgs $args)
     {
@@ -91,18 +91,17 @@ class CheckoutSubscriber extends AbstractSubscriber
             return $args->getReturn();
         }
         $this->getSession()->MoptAvalaraGetTaxCommitRequest = $getTaxCommitRequest;
-        //set all basket items' taxId to 0 for custom taxrates in backend etc.
-        foreach ($args->getSubject()->sBasketData["content"] as &$basketRow) {
-            $basketRow["taxId"] = 0;
-            $basketRow["taxID"] = 0;
-        }
-        
+
+        $args->getSubject()->sBasketData['content'] = $this->resetBasketTaxId($args->getSubject()->sBasketData['content']);
+
         return $args->getReturn();
     }
 
     /**
      * validate commit call with previous getTax call
+     *
      * @return \Avalara\CreateTransactionModel | bool
+     * @throws \RuntimeException
      */
     protected function validateCommitCall()
     {
@@ -123,7 +122,7 @@ class CheckoutSubscriber extends AbstractSubscriber
         //prevent parent execution on request mismatch
         if ($session->MoptAvalaraGetTaxRequestHash != $service->getHashFromRequest($model)) {
             $adapter->getLogger()->error('Mismatching requests, do not proceed.');
-            throw new \Exception('MoptAvalara: mismatching requests, do not proceed.');
+            throw new \RuntimeException('MoptAvalara: mismatching requests, do not proceed.');
         }
 
         $adapter->getLogger()->debug('Matching requests, proceed...', [$model]);
@@ -132,9 +131,10 @@ class CheckoutSubscriber extends AbstractSubscriber
     }
 
     /**
-     * commit transaction
-     * @param \Enlight_Event_EventArgs $args
-     * @return type
+     * Commit transaction
+     *
+     * @param \Enlight_Hook_HookArgs $args
+     * @throws \RuntimeException
      */
     public function onAfterSOrderSaveOrder(\Enlight_Hook_HookArgs $args)
     {
@@ -159,19 +159,21 @@ class CheckoutSubscriber extends AbstractSubscriber
         if (!$order = $adapter->getOrderByNumber($orderNumber)) {
             $msg = 'There is no order with number: ' . $orderNumber;
             $this->getAdapter()->getLogger()->critical($msg);
-            throw new \Exception($msg);
+            throw new \RuntimeException($msg);
         }
         $this->setOrderAttributes($order, $taxRequest, $taxResult);
-        
-        unset($session->MoptAvalaraGetTaxRequestHash);
-        unset($session->MoptAvalaraGetTaxCommitRequest);
-        unset($session->MoptAvalaraGetTaxResult);
+
+        unset(
+            $session->MoptAvalaraGetTaxRequestHash,
+            $session->MoptAvalaraGetTaxCommitRequest,
+            $session->MoptAvalaraGetTaxResult
+        );
     }
 
     /**
      *
      * @param \Enlight_Hook_HookArgs $args
-     * @return void
+     * @return string[]|void
      */
     public function onAfterAdminGetPremiumDispatch(\Enlight_Hook_HookArgs $args)
     {
@@ -197,7 +199,6 @@ class CheckoutSubscriber extends AbstractSubscriber
     /**
      * set taxrate for discounts
      * @param \Enlight_Hook_HookArgs $args
-     * @return type
      */
     public function onBeforeSBasketSGetBasket(\Enlight_Hook_HookArgs $args)
     {
@@ -223,7 +224,6 @@ class CheckoutSubscriber extends AbstractSubscriber
     /**
      *
      * @param \Enlight_Hook_HookArgs $args
-     * @return void
      */
     public function onBeforeBasketSAddVoucher(\Enlight_Hook_HookArgs $args)
     {
@@ -263,12 +263,11 @@ class CheckoutSubscriber extends AbstractSubscriber
     }
     
     /**
-     * 
-     * @param \Shopware\Models\Order\Order $order
+     * @param Order $order
      * @param \stdClass $taxRequest
      * @param \stdClass $taxResult
      */
-    private function setOrderAttributes(\Shopware\Models\Order\Order $order, $taxRequest, $taxResult)
+    private function setOrderAttributes(Order $order, $taxRequest, $taxResult)
     {
         /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
         $service = $this->getAdapter()->getService('GetTax');
@@ -292,5 +291,22 @@ class CheckoutSubscriber extends AbstractSubscriber
         
         Shopware()->Models()->persist($order);
         Shopware()->Models()->flush();
+    }
+
+    /**
+     * @param array $basketContent
+     * @return array
+     */
+    private function resetBasketTaxId($basketContent = [])
+    {
+        array_walk(
+            $basketContent,
+            function (&$basketRow) {
+                $basketRow['taxId'] = 0;
+                $basketRow['taxID'] = 0;
+            }
+        );
+
+        return $basketContent;
     }
 }

@@ -9,6 +9,8 @@
 namespace Shopware\Plugins\MoptAvalara\Bootstrap;
 
 use Shopware\Models\Config\Element as FormElement;
+use Shopware\Models\Shop\Shop;
+use Shopware\Components\Routing\Context as RoutingContext;
 
 /**
  * This class will represent the plugin config options
@@ -19,48 +21,108 @@ use Shopware\Models\Config\Element as FormElement;
 class Form
 {
     /**
-     * Field names
+     * @var int Number of rotated log files / days to be logged
      */
     const LOGGER_DEFAULT_ROTATING_DAYS = 7;
     
+    /**
+     * @var string Default logfile name
+     */
     const LOG_FILE_NAME = 'mopt_avalara';
 
+    /**
+     * @var string Default logfile extension
+     */
     const LOG_FILE_EXT = '.log';
     
+    /**
+     * @var string Field name for the plugin config
+     */
     const IS_LIVE_MODE_FIELD = 'mopt_avalara__is_live_mode';
     
+    /**
+     * @var string Field name for the plugin config
+     */
     const ACCOUNT_NUMBER_FIELD = 'mopt_avalara__account_number';
     
+    /**
+     * @var string Field name for the plugin config
+     */
     const LICENSE_KEY_FIELD = 'mopt_avalara__license_key';
     
+    /**
+     * @var string Field name for the plugin config
+     */
     const COMPANY_CODE_FIELD = 'mopt_avalara__company_code';
     
+    /**
+     * @var string Field name for the plugin config
+     */
     const TAX_ENABLED_FIELD = 'mopt_avalara__tax_enabled';
     
+    /**
+     * @var string Field name for the plugin config
+     */
     const DOC_COMMIT_ENABLED_FIELD = 'mopt_avalara__doc_commit_enabled';
 
+    /**
+     * @var string Field name for the plugin config
+     */
     const LANDEDCOST_ENABLED_FIELD = 'mopt_avalara__landedcost_enabled';
     
+    /**
+     * @var string Field name for the plugin config
+     */
     const INCOTERMS_FIELD = 'mopt_avalara__incoterms';
     
+    /**
+     * @var string Field name for the plugin config
+     */
     const ADDRESS_VALIDATION_COUNTRIES_FIELD = 'mopt_avalara_addressvalidation_countries';
     
+    /**
+     * @var string Field name for the plugin config
+     */
     const LOG_LEVEL_FIELD = 'mopt_avalara_loglevel';
     
+    /**
+     * @var string Field name for the plugin config
+     */
     const LOG_ROTATION_DAYS_FIELD = 'mopt_avalara_log_rotation_days';
     
+    /**
+     * @var string Field name for the plugin config
+     */
     const ORIGIN_ADDRESS_LINE_1_FIELD = 'mopt_avalara__origin_address__line1';
     
+    /**
+     * @var string Field name for the plugin config
+     */
     const ORIGIN_ADDRESS_LINE_2_FIELD = 'mopt_avalara__origin_address__line2';
     
+    /**
+     * @var string Field name for the plugin config
+     */
     const ORIGIN_ADDRESS_LINE_3_FIELD = 'mopt_avalara__origin_address__line3';
     
+    /**
+     * @var string Field name for the plugin config
+     */
     const ORIGIN_POSTAL_CODE_FIELD = 'mopt_avalara__origin_address__postal_code';
     
+    /**
+     * @var string Field name for the plugin config
+     */
     const ORIGIN_CITY_FIELD = 'mopt_avalara__origin_address__city';
     
+    /**
+     * @var string Field name for the plugin config
+     */
     const ORIGIN_REGION_FIELD = 'mopt_avalara__origin_address__region';
     
+    /**
+     * @var string Field name for the plugin config
+     */
     const ORIGIN_COUNTRY_FIELD = 'mopt_avalara__origin_address__country';
     
     
@@ -420,7 +482,7 @@ class Form
 
         /* @var $element \Shopware\Models\Config\Element */
         foreach ($form->getElements() as $element) {
-            $element->setPosition(array_search($element->getName(), $elements));
+            $element->setPosition(array_search($element->getName(), $elements, false));
         }
     }
     
@@ -432,12 +494,12 @@ class Form
     {
         $container = Shopware()->Container();
         /** @var \Shopware\Models\Shop\Repository $repository */
-        $repository = $container->get('models')->getRepository(\Shopware\Models\Shop\Shop::class);
+        $repository = $container->get('models')->getRepository(Shop::class);
         /** @var $shop \Shopware\Models\Shop\Shop */
         $shop = $repository->getActiveDefault();
         /** @var $config \Shopware_Components_Config */
         $config = $container->get('config');
         
-        return \Shopware\Components\Routing\Context::createFromShop($shop, $config);
+        return RoutingContext::createFromShop($shop, $config);
     }
 }

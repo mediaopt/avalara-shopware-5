@@ -11,7 +11,6 @@ namespace Shopware\Plugins\MoptAvalara\Service;
 use Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface;
 
 /**
- * 
  * @author derksen mediaopt GmbH
  * @package Shopware\Plugins\MoptAvalara\Service
  */

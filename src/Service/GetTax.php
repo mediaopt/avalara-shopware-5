@@ -15,13 +15,19 @@ use Shopware\Plugins\MoptAvalara\Adapter\Factory\InsuranceFactory;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
 
 /**
- * 
  * @author derksen mediaopt GmbH
  * @package Shopware\Plugins\MoptAvalara\Service
  */
 class GetTax extends AbstractService
 {
+    /**
+     * @var string Item ID in Avalara response
+     */
     const IMPORT_FEES_LINE = 'ImportFees';
+    
+    /**
+     * @var string Item ID in Avalara response
+     */
     const IMPORT_DUTIES_LINE = 'ImportDuties';
     
     /**
@@ -80,7 +86,7 @@ class GetTax extends AbstractService
         }
         $landedCostLineNumbers = [self::IMPORT_DUTIES_LINE, self::IMPORT_FEES_LINE];
         foreach ($taxResult->lines as $line) {
-            if (in_array($line->lineNumber, $landedCostLineNumbers)) {
+            if (in_array($line->lineNumber, $landedCostLineNumbers, false)) {
                 $totalLandedCost = bcadd(
                     $totalLandedCost, 
                     bcadd(
@@ -129,10 +135,9 @@ class GetTax extends AbstractService
     
     /**
      * check if getTax call has to be made
-     * @param \Avalara\CreateTransactionModel $model
-     * @param 
+     * @param CreateTransactionModel $model
+     * @param \Enlight_Components_Session_Namespace $session
      * @return boolean
-     * @todo: check country (?)
      */
     public function isGetTaxCallAvailable(CreateTransactionModel $model, \Enlight_Components_Session_Namespace $session)
     {
@@ -152,7 +157,6 @@ class GetTax extends AbstractService
     }
     
     /**
-     * 
      * @return bool
      */
     public function isGetTaxEnabled()
@@ -164,7 +168,6 @@ class GetTax extends AbstractService
     }
     
     /**
-     * 
      * @return bool
      */
     public function isLandedCostEnabled()
@@ -185,11 +188,13 @@ class GetTax extends AbstractService
     public function getHashFromRequest(CreateTransactionModel $model)
     {
         $data = $this->objectToArray($model);
-        $data['discount'] = number_format($data['discount'], 0);
-        unset($data['type']);
-        unset($data['date']);
-        unset($data['commit']);
-        
+        $data['discount'] = number_format($data['discount']);
+        unset(
+            $data['type'],
+            $data['date'],
+            $data['commit']
+        );
+
         //Normalize floats
         foreach ($data['lines'] as $key => $line) {
             $data['lines'][$key]['amount'] = number_format($line['amount'], 2);
@@ -197,16 +202,17 @@ class GetTax extends AbstractService
 
         return md5(json_encode($data));
     }
-    
+
     /**
      *
      * @param \stdClass | string $data
      * @return \stdClass
+     * @throws \InvalidArgumentException
      */
     public function generateTaxResultFromResponse($data)
     {
         if (is_string($data) || !is_object($data)) {
-            throw new \Exception($data);
+            throw new \InvalidArgumentException($data);
         }
         $result = new \stdClass();
         $result->totalTaxable = $data->totalTaxable;

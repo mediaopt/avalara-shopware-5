@@ -58,21 +58,18 @@ interface AdapterInterface
     public function getBootstrap();
     
     /**
-     * 
      * @param int $id
      * @return \Shopware\Models\Order\Order
      */
     public function getOrderById($id);
     
     /**
-     * 
      * @param int $orderNumber
      * @return \Shopware\Models\Order\Order
      */
     public function getOrderByNumber($orderNumber);
     
     /**
-     * 
      * @param string $docCode
      * @return \stdClass
      */

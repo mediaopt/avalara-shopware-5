@@ -13,7 +13,7 @@ class OrderSubscriber extends AbstractSubscriber
     /**
      * return array with all subsribed events
      *
-     * @return array
+     * @return string[]
      */
     public static function getSubscribedEvents()
     {
@@ -23,7 +23,7 @@ class OrderSubscriber extends AbstractSubscriber
     }
 
     /**
-     * Updates totals with Avalara subcharge
+     * Updates totals with Avalara surcharge
      * @param \Enlight_Event_EventArgs $args
      */
     public function onFilterOrders(\Enlight_Event_EventArgs $args)
