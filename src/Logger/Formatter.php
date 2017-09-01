@@ -51,7 +51,7 @@ class Formatter
      * Apache Common Log Format.
      * @var string
      */
-    const CLF = "{hostname} {req_header_User-Agent} - [{ts}] \"{method} {resource} {protocol}/{version}\" {code} {res_header_Content-Length}";
+    const CLF = '{hostname} {req_header_User-Agent} - [{ts}] "{method} {resource} {protocol}/{version}" {code} {res_header_Content-Length}';
     
     /**
      * Apache Common Log Format.
@@ -86,23 +86,32 @@ class Formatter
 
     /**
      * public template setter
-     * @param type $template
+     * @param string $template
      */
     public function setTemplate($template)
     {
         $this->template = $template;
     }
 
+    /**
+     * @return string
+     */
     public function getStandardTemplate()
     {
         return $this->standardTemplate;
     }
 
+    /**
+     * @param string $standardTemplate
+     */
     public function setStandardTemplate($standardTemplate)
     {
         $this->standardTemplate = $standardTemplate;
     }
 
+    /**
+     * Will reset a log template
+     */
     public function resetTemplate()
     {
         $this->setTemplate($this->getStandardTemplate());

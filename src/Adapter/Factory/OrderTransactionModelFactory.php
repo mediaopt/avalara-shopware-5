@@ -13,7 +13,6 @@ use Avalara\AddressesModel;
 use Avalara\LineItemModel;
 use Avalara\DocumentType;
 use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
-use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
 
 /**
  *
@@ -71,14 +70,14 @@ class OrderTransactionModelFactory extends AbstractTransactionModelFactory
     }
     
     /**
-     *
+     * @param array $positions
      * @return LineItemModel[]
      */
-    protected function getLineModels()
+    protected function getLineModels($positions = [])
     {
-        $positions = Shopware()->Modules()->Basket()->sGetBasket();
+        $basketPositions = Shopware()->Modules()->Basket()->sGetBasket();
 
-        return parent::getLineModels($positions['content']);
+        return parent::getLineModels($basketPositions['content']);
     }
     
     /**
@@ -96,7 +95,7 @@ class OrderTransactionModelFactory extends AbstractTransactionModelFactory
             }
             
             if (LineFactory::isNotVoucher($position)) {
-                $discount -= floatval($position['netprice']);
+                $discount -= (float)$position['netprice'];
             }
         }
 

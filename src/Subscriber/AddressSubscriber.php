@@ -12,6 +12,7 @@ use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 use Avalara\AddressLocationInfo;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\AddressFactory;
 use Shopware_Plugins_Backend_MoptAvalara_Bootstrap as AvalaraBootstrap;
+use GuzzleHttp\Exception\TransferException;
 
 /**
  * @author derksen mediaopt GmbH
@@ -30,11 +31,12 @@ class AddressSubscriber extends AbstractSubscriber
             'Enlight_Controller_Action_Frontend_Checkout_Confirm' => 'onBeforeCheckoutConfirm',
             'Enlight_Controller_Action_PostDispatch_Frontend_Address' => 'onPostDispatchFrontendAddress',
         ];
-    }
+    }/** @noinspection PhpInconsistentReturnPointsInspection */
 
     /**
      * perform address check
-     * @param \Shopware\Plugins\MoptAvalara\Subscriber\Enlight_Event_EventArgs $args
+     * @param \Enlight_Event_EventArgs $args
+     * @return bool|void
      */
     public function onBeforeCheckoutConfirm(\Enlight_Event_EventArgs $args)
     {
@@ -62,10 +64,10 @@ class AddressSubscriber extends AbstractSubscriber
                     'sTarget' => 'checkout',
                     'id' => $activeShippingAddressId
                 ]);
-                
+
                 return true;
             }
-        } catch (\GuzzleHttp\Exception\TransferException $e) {
+        } catch (TransferException $e) {
             //address check failed - nothing to do
             $adapter->getLogger()->info('address check failed: ' . $e->getMessage());
         }
@@ -87,7 +89,7 @@ class AddressSubscriber extends AbstractSubscriber
             return true;
         }
         
-        if ($session->MoptAvalaraCheckedAddress != $this->getAddressHash($address)) {
+        if ($session->MoptAvalaraCheckedAddress !== $this->getAddressHash($address)) {
             return true;
         }
 
@@ -110,12 +112,12 @@ class AddressSubscriber extends AbstractSubscriber
             case Form::DELIVERY_COUNTRY_NO_VALIDATION:
                 return false;
             case Form::DELIVERY_COUNTRY_USA:
-                if ($country == AddressFactory::COUNTRY_CODE__US) {
+                if ($country === AddressFactory::COUNTRY_CODE__US) {
                     return true;
                 }
                 break;
             case Form::DELIVERY_COUNTRY_CANADA:
-                if ($country == AddressFactory::COUNTRY_CODE__CA) {
+                if ($country === AddressFactory::COUNTRY_CODE__CA) {
                     return true;
                 }
                 break;
@@ -125,7 +127,7 @@ class AddressSubscriber extends AbstractSubscriber
                     AddressFactory::COUNTRY_CODE__US
                 ];
                 
-                if (in_array($country, $usaAndCanada)) {
+                if (in_array($country, $usaAndCanada, false)) {
                     return true;
                 }
                 break;
@@ -133,10 +135,12 @@ class AddressSubscriber extends AbstractSubscriber
         
         return false;
     }
-    
+
     /**
      * get hash of given address
+     *
      * @param \Avalara\AddressLocationInfo $address
+     * @return string
      */
     protected function getAddressHash(AddressLocationInfo $address)
     {
@@ -144,7 +148,9 @@ class AddressSubscriber extends AbstractSubscriber
     }
 
     /**
-     * show normalized shipping address
+     * Show normalized shipping address
+     *
+     * @param \Enlight_Event_EventArgs $args
      */
     public function onPostDispatchFrontendAddress(\Enlight_Event_EventArgs $args)
     {
@@ -184,9 +190,9 @@ class AddressSubscriber extends AbstractSubscriber
     }
 
     /**
-     * add error message
+     * Add error message
      *
-     * @param \Shopware\Plugins\MoptAvalara\Subscriber\Enlight_View_Default $view
+     * @param \Enlight_View_Default $view
      */
     protected function addErrorMessage(\Enlight_View_Default $view)
     {

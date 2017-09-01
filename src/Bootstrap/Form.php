@@ -9,6 +9,8 @@
 namespace Shopware\Plugins\MoptAvalara\Bootstrap;
 
 use Shopware\Models\Config\Element as FormElement;
+use Shopware\Models\Shop\Shop;
+use Shopware\Components\Routing\Context as RoutingContext;
 
 /**
  * This class will represent the plugin config options
@@ -480,7 +482,7 @@ class Form
 
         /* @var $element \Shopware\Models\Config\Element */
         foreach ($form->getElements() as $element) {
-            $element->setPosition(array_search($element->getName(), $elements));
+            $element->setPosition(array_search($element->getName(), $elements, false));
         }
     }
     
@@ -492,12 +494,12 @@ class Form
     {
         $container = Shopware()->Container();
         /** @var \Shopware\Models\Shop\Repository $repository */
-        $repository = $container->get('models')->getRepository(\Shopware\Models\Shop\Shop::class);
+        $repository = $container->get('models')->getRepository(Shop::class);
         /** @var $shop \Shopware\Models\Shop\Shop */
         $shop = $repository->getActiveDefault();
         /** @var $config \Shopware_Components_Config */
         $config = $container->get('config');
         
-        return \Shopware\Components\Routing\Context::createFromShop($shop, $config);
+        return RoutingContext::createFromShop($shop, $config);
     }
 }

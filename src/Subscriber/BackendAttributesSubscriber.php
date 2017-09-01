@@ -32,7 +32,7 @@ class BackendAttributesSubscriber extends AbstractSubscriber
     /**
      * extend backend category editing
      *
-     * @param Enlight_Event_EventArgs $args
+     * @param |Enlight_Event_EventArgs $args
      */
     public function onPostDispatchBackendCategory(\Enlight_Event_EventArgs $args)
     {
@@ -47,7 +47,7 @@ class BackendAttributesSubscriber extends AbstractSubscriber
     /**
      *  extend backend article editing
      *
-     * @param Enlight_Event_EventArgs $args
+     * @param \Enlight_Event_EventArgs $args
      */
     public function onPostDispatchBackendArticle(\Enlight_Event_EventArgs $args)
     {

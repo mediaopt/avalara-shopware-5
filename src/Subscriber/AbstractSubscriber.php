@@ -43,12 +43,7 @@ abstract class AbstractSubscriber implements SubscriberInterface
     {
         $this->bootstrap = $bootstrap;
     }
-    
-    /**
-     * @return array
-     */
-    abstract public static function getSubscribedEvents();
-    
+
     /**
      *
      * @return \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface

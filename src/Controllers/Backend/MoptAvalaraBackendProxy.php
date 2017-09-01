@@ -25,10 +25,10 @@ class Shopware_Controllers_Backend_MoptAvalaraBackendProxy extends Shopware_Cont
             $pingResponse = $client->ping();
 
             if (!($pingResponse instanceof \stdClass)) {
-                throw new \Exception('Connection test failed: unknown error.');
+                throw new \RuntimeException('Connection test failed: unknown error.');
             }
             if (empty($pingResponse->authenticated)) {
-                throw new \Exception('Connection test failed: please check your credentials.');
+                throw new \RuntimeException('Connection test failed: please check your credentials.');
             }
 
             $this->testAvaTax();
@@ -44,16 +44,18 @@ class Shopware_Controllers_Backend_MoptAvalaraBackendProxy extends Shopware_Cont
         
         exit;
     }
-    
+
     /**
      * Make a test request to AvaTax API with or without landed cost
+     *
+     * @throws \Exception
      */
     private function testAvaTax()
     {
         $adapter = $this->getAdapter();
         /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
         $service = $adapter->getService('GetTax');
-        $fileName = ($service->isLandedCostEnabled())
+        $fileName = $service->isLandedCostEnabled()
             ? 'testTaxAndLandedCostRequest.json'
             : 'testTaxRequest.json'
         ;
@@ -63,11 +65,11 @@ class Shopware_Controllers_Backend_MoptAvalaraBackendProxy extends Shopware_Cont
         if (is_string($response)) {
             $lastResponse = $adapter->getLogSubscriber()->getLastResponseWithError();
             if (!$errorData = json_decode($lastResponse->getBody(), true)) {
-                throw new Exception('Unknown error with AvalaraTax API');
+                throw new RuntimeException('Unknown error with AvalaraTax API');
             }
             
-            if (isset($errorData['error']) && isset($errorData['error']['message'])) {
-                throw new Exception($errorData['error']['message']);
+            if (isset($errorData['error']['message'])) {
+                throw new RuntimeException($errorData['error']['message']);
             }
         }
     }
@@ -83,7 +85,7 @@ class Shopware_Controllers_Backend_MoptAvalaraBackendProxy extends Shopware_Cont
         $this->getAdapter()->getBootstrap();
         $filePath = $this->getAdapter()->getBootstrap()->Path() . 'Data/' . $fileName;
         if (!file_exists($filePath)) {
-            throw new \Exception('Wrong data file: ' . $filePath);
+            throw new \RuntimeException('Wrong data file: ' . $filePath);
         }
         $json = str_replace('%companyCode%', $this->getCompanyCode(), file_get_contents($filePath));
         

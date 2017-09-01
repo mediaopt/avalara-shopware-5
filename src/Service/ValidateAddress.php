@@ -45,7 +45,7 @@ class ValidateAddress extends AbstractService
     public function getAddressChanges(AddressLocationInfo $checkedAddress, $response)
     {
         $changes = [];
-        if (empty($response) || !is_object($response) || empty($response->validatedAddresses)) {
+        if (null === $response || !is_object($response) || empty($response->validatedAddresses)) {
             return $changes;
         }
 
@@ -54,7 +54,7 @@ class ValidateAddress extends AbstractService
 
         foreach ($checkedAddress as $key => $value) {
             //Skip the region key
-            if (in_array($key, self::$ignoreAddressParts)) {
+            if (in_array($key, self::$ignoreAddressParts, false)) {
                 continue;
             }
             if (isset($suggestedAddress->$key) && $suggestedAddress->$key != $value) {

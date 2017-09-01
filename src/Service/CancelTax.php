@@ -11,6 +11,7 @@ namespace Shopware\Plugins\MoptAvalara\Service;
 use Avalara\VoidTransactionModel;
 use Avalara\VoidReasonCode;
 use Avalara\DocumentType;
+use Shopware\Models\Order\Order;
 use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 
 /**
@@ -21,10 +22,10 @@ class CancelTax extends AbstractService
 {
     /**
      *
-     * @param \Shopware\Models\Order\Order $order
-     * @return \stdClass
+     * @param Order $order
+     * @throws \RuntimeException
      */
-    public function cancel(\Shopware\Models\Order\Order $order)
+    public function cancel(Order $order)
     {
         $adapter = $this->getAdapter();
         try {
@@ -53,7 +54,7 @@ class CancelTax extends AbstractService
 
             $order
                 ->getAttribute()
-                ->setMoptAvalaraTransactionType(\Avalara\VoidReasonCode::C_DOCVOIDED)
+                ->setMoptAvalaraTransactionType(VoidReasonCode::C_DOCVOIDED)
             ;
             Shopware()->Models()->persist($order);
             Shopware()->Models()->flush();

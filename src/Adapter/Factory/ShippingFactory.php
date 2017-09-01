@@ -127,6 +127,6 @@ class ShippingFactory extends AbstractFactory
             return false;
         }
         
-        return $attr->getMoptAvalaraExpressShipping();
+        return (bool)$attr->getMoptAvalaraExpressShipping();
     }
 }

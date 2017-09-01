@@ -45,7 +45,6 @@ abstract class AbstractZendMailFormatter
 
     /**
      * @param Mail $mailModel
-     * @param array $context
      * @return string
      */
     abstract protected function getMailTemplate(Mail $mailModel);

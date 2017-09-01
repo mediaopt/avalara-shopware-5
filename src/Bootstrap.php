@@ -187,15 +187,16 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
         
         $this->addMailFormatterSubscriber($subscribers);
 
-        foreach ($subscribers as $subscriber) {
-            $this->Application()->Events()->addSubscriber($subscriber);
-        }
+        array_map(
+            function($subscriber){
+                $this->Application()->Events()->addSubscriber($subscriber);
+            }, $subscribers
+        );
     }
     
     /**
      * 
      * @param \Enlight\Event\SubscriberInterface[] $subscribers
-     * @return \Enlight\Event\SubscriberInterface[]
      */
     private function addMailFormatterSubscriber(&$subscribers = []) {
         $templateMailService = $this->get('TemplateMail');

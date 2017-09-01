@@ -10,6 +10,7 @@ namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
 use Avalara\AddressLocationInfo;
 use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
+use Shopware\Models\Order\Order;
 
 /**
  *
@@ -53,10 +54,10 @@ class AddressFactory extends AbstractFactory
     /**
      * build Address-model based on delivery address
      *
-     * @param \Shopware\Models\Order\Order $order
+     * @param Order $order
      * @return \Avalara\AddressLocationInfo
      */
-    public function buildDeliveryAddressFromOrder(\Shopware\Models\Order\Order $order)
+    public function buildDeliveryAddressFromOrder(Order $order)
     {
         $address = new AddressLocationInfo();
         $address->city = $order->getShipping()->getCity();
@@ -98,7 +99,9 @@ class AddressFactory extends AbstractFactory
     
     /**
      * Change country name to ISO code
-     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
+     *
+     * @param AddressLocationInfo $address
+     * @return AddressFactory
      */
     private function fixCountryCode(AddressLocationInfo $address)
     {
@@ -117,7 +120,9 @@ class AddressFactory extends AbstractFactory
     
     /**
      * Change region name to ISO code
-     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
+     *
+     * @param AddressLocationInfo $address
+     * @return AddressFactory
      */
     private function fixRegionCode(AddressLocationInfo $address)
     {
@@ -142,25 +147,26 @@ class AddressFactory extends AbstractFactory
     private function getRegionById($id)
     {
         //get region
-        $sql = "SELECT shortcode FROM "
-            . "s_core_countries_states a "
-            . "INNER JOIN s_order_shippingaddress b "
-            . "ON a.id = b.stateID "
-            . "WHERE b.id = " . $id
+        $sql = 'SELECT shortcode FROM '
+            . 's_core_countries_states a '
+            . 'INNER JOIN s_order_shippingaddress b '
+            . 'ON a.id = b.stateID '
+            . 'WHERE b.id = ' . $id
         ;
 
         return Shopware()->Db()->fetchOne($sql);
     }
-    
+
     /**
      *
      * @param int $id
      * @return \Shopware\Models\Country\Country
+     * @throws \InvalidArgumentException
      */
     public function getDeliveryCountry($id)
     {
         if (!$id) {
-            throw new \Exception('Missing id for getDeliveryCountry');
+            throw new \InvalidArgumentException('Missing id for getDeliveryCountry');
         }
         return Shopware()
             ->Models()

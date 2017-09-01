@@ -32,7 +32,6 @@ class BodyHtmlZendMailFormatter extends AbstractZendMailFormatter
 
     /**
      * @param Mail $mailModel
-     * @param array $context
      * @return string
      */
     protected function getMailTemplate(Mail $mailModel) {

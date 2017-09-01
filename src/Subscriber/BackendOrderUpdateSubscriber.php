@@ -8,6 +8,9 @@
 
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
+use Avalara\DocumentType;
+use Avalara\VoidReasonCode;
+
 /**
  * @author derksen mediaopt GmbH
  * @package Shopware\Plugins\MoptAvalara\Subscriber
@@ -38,7 +41,7 @@ class BackendOrderUpdateSubscriber extends AbstractSubscriber
         $observedActions = ['save', 'savePosition'];
         $action = $request->getActionName();
         
-        if (!in_array($action, $observedActions)) {
+        if (!in_array($action, $observedActions, false)) {
             return;
         }
         
@@ -78,11 +81,11 @@ class BackendOrderUpdateSubscriber extends AbstractSubscriber
 
         $transaction = $adapter->getTransactionByDocCode($attr->getMoptAvalaraDocCode());
         if ($transaction === null) {
-            $status = \Avalara\DocumentType::C_SALESORDER;
+            $status = DocumentType::C_SALESORDER;
         } elseif ($transaction->status === 'Cancelled') {
-            $status = \Avalara\VoidReasonCode::C_DOCVOIDED;
+            $status = VoidReasonCode::C_DOCVOIDED;
         } elseif ($transaction->status === 'Committed') {
-            $status = \Avalara\DocumentType::C_SALESINVOICE;
+            $status = DocumentType::C_SALESINVOICE;
         }
 
         $order
@@ -120,7 +123,7 @@ class BackendOrderUpdateSubscriber extends AbstractSubscriber
      * 
      * @param \Enlight_Event_EventArgs $args
      * @param int $orderId
-     * @return null
+     * @return void
      */
     private function updateOrderChanged(\Enlight_Event_EventArgs $args, $orderId)
     {

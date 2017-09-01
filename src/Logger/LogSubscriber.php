@@ -13,6 +13,7 @@ use GuzzleHttp\Event\SubscriberInterface;
 use GuzzleHttp\Event\CompleteEvent;
 use GuzzleHttp\Event\ErrorEvent;
 use GuzzleHttp\Event\BeforeEvent;
+use GuzzleHttp\Subscriber\Log\SimpleLogger;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
@@ -62,7 +63,7 @@ class LogSubscriber implements SubscriberInterface
      */
     public function __construct($logger = null, $formatter = null)
     {
-        $this->logger = $logger instanceof LoggerInterface ? $logger : new \GuzzleHttp\Subscriber\Log\SimpleLogger($logger);
+        $this->logger = $logger instanceof LoggerInterface ? $logger : new SimpleLogger($logger);
 
         $this->formatter = $formatter instanceof Formatter ? $formatter : new Formatter($formatter);
     }
@@ -87,7 +88,7 @@ class LogSubscriber implements SubscriberInterface
     public function onComplete(CompleteEvent $event)
     {
         $this->logger->log(
-            substr($event->getResponse()->getStatusCode(), 0, 1) == '2' ? LogLevel::INFO : LogLevel::WARNING,
+            $this->getLogLevel($event),
             $this->formatter->format(
                 $event->getRequest(),
                 $event->getResponse(),
@@ -157,5 +158,17 @@ class LogSubscriber implements SubscriberInterface
     protected function getProcessingTime()
     {
         return number_format(microtime(true) - $this->timestampBefore, 2);
+    }
+
+    /**
+     * @param CompleteEvent $event
+     * @return string
+     */
+    private function getLogLevel(CompleteEvent $event)
+    {
+        return 0 === strpos($event->getResponse()->getStatusCode(), '2')
+            ? LogLevel::INFO
+            : LogLevel::WARNING
+        ;
     }
 }

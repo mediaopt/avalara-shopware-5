@@ -84,31 +84,30 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             ]);
         }
     }
-    
+
     /**
      * @param int $id
      * @return \Shopware\Models\Order\Order
+     * @throws \RuntimeException
      */
     protected function getAvalaraOrder($id)
     {
         $adapter = $this->getAdapter();
         if (!$order = $adapter->getOrderById($id)) {
             $adapter->getLogger()->error('No order with id: ' . $id);
-            throw new \Exception('Avalara: invalid order.');
+            throw new \RuntimeException('Avalara: invalid order.');
         }
         
         if (null === $order->getAttribute() || !$transactionType = $order->getAttribute()->getMoptAvalaraTransactionType()) {
             $adapter->getLogger()->error('Avalara: order with id: ' . $id . ' is not registered with Avalara.');
-            throw new \Exception('Avalara: order is not registered with Avalara.');
+            throw new \RuntimeException('Avalara: order is not registered with Avalara.');
         }
         
         return $order;
     }
 
     /**
-     *
      * @param \Shopware\Models\Order\Order $order
-     * @return boolean
      */
     protected function resetUpdateFlag(\Shopware\Models\Order\Order $order)
     {
@@ -121,7 +120,6 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
     }
 
     /**
-     *
      * @return \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface
      */
     protected function getAdapter()

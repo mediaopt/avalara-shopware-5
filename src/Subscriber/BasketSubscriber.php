@@ -90,7 +90,7 @@ class BasketSubscriber extends AbstractSubscriber
         
         if (is_string($value)) {
             $float = str_replace(',', '.', $value);
-            return str_replace('.', ',', (bcadd($float, $cost, AvalaraSDKAdapter::BCMATH_SCALE)));
+            return str_replace('.', ',', bcadd($float, $cost, AvalaraSDKAdapter::BCMATH_SCALE));
         }
         
         return (float)bcadd($value, $cost, AvalaraSDKAdapter::BCMATH_SCALE);
