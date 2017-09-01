@@ -139,7 +139,6 @@ class CheckoutSubscriber extends AbstractSubscriber
      *
      * @param \Enlight_Hook_HookArgs $args
      * @throws \RuntimeException
-     * @return void
      */
     public function onAfterSOrderSaveOrder(\Enlight_Hook_HookArgs $args)
     {
@@ -204,7 +203,6 @@ class CheckoutSubscriber extends AbstractSubscriber
     /**
      * set taxrate for discounts
      * @param \Enlight_Hook_HookArgs $args
-     * @return void
      */
     public function onBeforeSBasketSGetBasket(\Enlight_Hook_HookArgs $args)
     {
@@ -230,7 +228,6 @@ class CheckoutSubscriber extends AbstractSubscriber
     /**
      *
      * @param \Enlight_Hook_HookArgs $args
-     * @return void
      */
     public function onBeforeBasketSAddVoucher(\Enlight_Hook_HookArgs $args)
     {

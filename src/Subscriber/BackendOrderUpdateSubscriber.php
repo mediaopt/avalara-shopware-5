@@ -33,7 +33,6 @@ class BackendOrderUpdateSubscriber extends AbstractSubscriber
     /**
      * 
      * @param \Enlight_Event_EventArgs $args
-     * @return void
      */
     public function onPostDispatchBackendOrder(\Enlight_Event_EventArgs $args)
     {
@@ -52,7 +51,6 @@ class BackendOrderUpdateSubscriber extends AbstractSubscriber
     /**
      * 
      * @param \Enlight_Event_EventArgs $args
-     * @return void
      */
     public function onPreDispatchBackendOrder(\Enlight_Event_EventArgs $args)
     {
@@ -100,7 +98,6 @@ class BackendOrderUpdateSubscriber extends AbstractSubscriber
     /**
      * 
      * @param \Enlight_Event_EventArgs $args
-     * @return void
      */
     protected function onPostDispatchSavePosition(\Enlight_Event_EventArgs $args)
     {
@@ -111,7 +108,6 @@ class BackendOrderUpdateSubscriber extends AbstractSubscriber
     /**
      * 
      * @param \Enlight_Event_EventArgs $args
-     * @return void
      */
     protected function onPostDispatchSave(\Enlight_Event_EventArgs $args)
     {
@@ -123,7 +119,6 @@ class BackendOrderUpdateSubscriber extends AbstractSubscriber
      * 
      * @param \Enlight_Event_EventArgs $args
      * @param int $orderId
-     * @return void
      */
     private function updateOrderChanged(\Enlight_Event_EventArgs $args, $orderId)
     {
