@@ -91,13 +91,9 @@ class CheckoutSubscriber extends AbstractSubscriber
             return $args->getReturn();
         }
         $this->getSession()->MoptAvalaraGetTaxCommitRequest = $getTaxCommitRequest;
-        //set all basket items' taxId to 0 for custom taxrates in backend etc.
 
-        array_map(function ($basketRow) {
-            $basketRow['taxId'] = 0;
-            $basketRow['taxID'] = 0;
-        }, $args->getSubject()->sBasketData['content']);
-        
+        $args->getSubject()->sBasketData['content'] = $this->resetBasketTaxId($args->getSubject()->sBasketData['content']);
+
         return $args->getReturn();
     }
 
@@ -296,5 +292,22 @@ class CheckoutSubscriber extends AbstractSubscriber
         
         Shopware()->Models()->persist($order);
         Shopware()->Models()->flush();
+    }
+
+    /**
+     * @param array $basketContent
+     * @return array
+     */
+    private function resetBasketTaxId($basketContent = [])
+    {
+        array_walk(
+            $basketContent,
+            function (&$basketRow) {
+                $basketRow['taxId'] = 0;
+                $basketRow['taxID'] = 0;
+            }
+        );
+
+        return $basketContent;
     }
 }
