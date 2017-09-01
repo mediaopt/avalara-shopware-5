@@ -337,7 +337,7 @@ class Database
         $this->crudService->update(
             $table,
             $name,
-            'string',
+            $type,
             [
                 'label' => $label,
                 'supportText' => $descr,
