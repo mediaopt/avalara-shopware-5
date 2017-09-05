@@ -396,27 +396,13 @@ class Form
             'baseCls' => 'x-panel-header-default-top x-panel-header-default x-window-header-text-default',
         ]);
 
-        $context = $this->getContext();
-
-        $remoteUrlConnectionTest = Shopware()->Front()->Router()->assemble(
-            ["module" => "backend", "controller" => "MoptAvalaraBackendProxy", "action" => "getConnectionTest"],
-            $context
-        );
-
-        $downloadUrlCall = Shopware()->Front()->Router()->assemble(
-            ["module" => "backend", "controller" => "MoptAvalaraLog", "action" => "downloadLogfile"],
-            $context
-        );
-
         $form->setElement('button', 'mopt_avalara__license_check', [
             'label' => 'Connection-Test',
             'maxWidth' => '150',
             'handler' => 'function (){
-                var token = Ext.CSRFService.getToken();
-                var urlConnectionTest = "' . $remoteUrlConnectionTest . '?__csrf_token=" + token;
                 Ext.Ajax.request({
                    scope:this,
-                   url: urlConnectionTest,
+                   url: "MoptAvalaraBackendProxy/getConnectionTest?__csrf_token=" + Ext.CSRFService.getToken(),
                    success: function(result,request) {
                    var jsonResponse = Ext.JSON.decode(result.responseText);
                    var successPrefixHtml = "<div class=\"sprite-tick-small\"  style=\"width: 25px; height: 25px; float: left;\">&nbsp;</div><div style=\"float: left;\">";
@@ -484,22 +470,5 @@ class Form
         foreach ($form->getElements() as $element) {
             $element->setPosition(array_search($element->getName(), $elements, false));
         }
-    }
-    
-    /**
-     *
-     * @return \Shopware\Components\Routing\Context
-     */
-    private function getContext()
-    {
-        $container = Shopware()->Container();
-        /** @var \Shopware\Models\Shop\Repository $repository */
-        $repository = $container->get('models')->getRepository(Shop::class);
-        /** @var $shop \Shopware\Models\Shop\Shop */
-        $shop = $repository->getActiveDefault();
-        /** @var $config \Shopware_Components_Config */
-        $config = $container->get('config');
-        
-        return RoutingContext::createFromShop($shop, $config);
     }
 }
