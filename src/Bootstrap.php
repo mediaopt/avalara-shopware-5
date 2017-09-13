@@ -71,19 +71,15 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
     }
 
     /**
-     * perform all neccessary install tasks and return true if successful
+     * Perform all necessary install tasks
      *
      * @return array
      * @throws \Exception
      */
     public function install()
     {
-        // Check if bcmath extention is avalible
-        if (!extension_loaded('bcmath')) {
-            throw new \RuntimeException('This plugin requires the bcmath PHP extension.');
-        }
-        
         $this
+            ->isBcMathInstalled()
             ->registerControllers()
             ->registerEvents()
             ->createForm()
@@ -94,29 +90,76 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
     }
 
     /**
+     * Perform all necessary update tasks
+     *
+     * @return array
+     * @throws \Exception
+     */
+    public function update()
+    {
+        $this
+            ->isBcMathInstalled()
+            ->registerControllers()
+            ->registerEvents()
+            ->createForm()
+            ->updateDatabase()
+        ;
+
+        return ['success' => true, 'invalidateCache' => ['frontend', 'backend', 'proxy']];
+    }
+
+    /**
+     * Perform all necessary uninstall tasks
+     *
+     * @return boolean
+     * @throws \Exception
+     */
+    public function uninstall()
+    {
+        $this
+            ->clearDatabase()
+            ->disable()
+        ;
+
+        return true;
+    }
+
+    /**
      * Extend attributes with avalara properties
      * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
      * @throws \Exception
      */
     private function updateDatabase()
     {
-        $crudService = $this->get('shopware_attribute.crud_service');
-        $modelManager = Shopware()->Models();
-        $bootstrapDatabase = new Database($crudService, $modelManager);
+        $bootstrapDatabase = $this->getDatabaseUpdater();
         $bootstrapDatabase->install();
-        
+
         return $this;
     }
-    
+
+
     /**
-     * perform all neccessary uninstall tasks and return true if successful
-     *
-     * @return boolean
+     * Method will remove avalara properties
+     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
+     * @throws \Exception
      */
-    public function uninstall()
+    private function clearDatabase()
     {
-        $this->disable();
-        return true;
+        $bootstrapDatabase = $this->getDatabaseUpdater();
+        $bootstrapDatabase->uninstall();
+
+        return $this;
+    }
+
+    /**
+     * @return Database
+     */
+    private function getDatabaseUpdater()
+    {
+        $crudService = $this->get('shopware_attribute.crud_service');
+        $em = Shopware()->Models();
+
+        return new Database($crudService, $em);
     }
 
     /**
@@ -222,6 +265,18 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
         $pluginConfigForm = new Form($this);
         $pluginConfigForm->create();
         
+        return $this;
+    }
+
+    /**
+     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
+     */
+    private function isBcMathInstalled()
+    {
+        if (!extension_loaded('bcmath')) {
+            throw new \RuntimeException('This plugin requires the bcmath PHP extension.');
+        }
+
         return $this;
     }
 }

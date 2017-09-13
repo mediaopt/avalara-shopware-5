@@ -139,46 +139,77 @@ class Database
      */
     public function install()
     {
+        $this->updateDatabase(true);
+        return $this;
+    }
+
+    /**
+     * Hide Avalara attributes
+     * @return \Shopware\Plugins\MoptAvalara\Bootstrap\Database
+     * @throws \Exception
+     */
+    public function uninstall()
+    {
+        $this->updateDatabase(false);
+        return $this;
+    }
+
+    /**
+     * @param bool $displayInBackground
+     * @return \Shopware\Plugins\MoptAvalara\Bootstrap\Database
+     */
+    private function updateDatabase($displayInBackground = true)
+    {
         $this->addField(
             self::CATEGORIES_ATTR_TABLE,
             self::TAXCODE_FIELD,
             'string',
             'Avalara Tax Code',
-            'This is the Avalara Tax code of the category sent to Avalara.'
+            'This is the Avalara Tax code of the category sent to Avalara.',
+            null,
+            $displayInBackground
         );
-        
+
         $this->addField(
             self::CATEGORIES_ATTR_TABLE,
             self::HSCODE_FIELD,
             'string',
             'Avalara Harmonized Classification Code (hsCode)',
-            'This is the Avalara Harmonized Classification Code (hsCode) of the article sent to Avalara.'
+            'This is the Avalara Harmonized Classification Code (hsCode) of the article sent to Avalara.',
+            null,
+            $displayInBackground
         );
-        
+
         $this->addField(
             self::ARTICLES_ATTR_TABLE,
             self::TAXCODE_FIELD,
             'string',
             'Avalara Tax Code',
-            'This is the Avalara Tax code of the article sent to Avalara.'
+            'This is the Avalara Tax code of the article sent to Avalara.',
+            null,
+            $displayInBackground
         );
-        
+
         $this->addField(
             self::ARTICLES_ATTR_TABLE,
             self::HSCODE_FIELD,
             'string',
             'Avalara Harmonized Classification Code (hsCode)',
-            'This is the Avalara Harmonized Classification Code (hsCode) of the article sent to Avalara.'
+            'This is the Avalara Harmonized Classification Code (hsCode) of the article sent to Avalara.',
+            null,
+            $displayInBackground
         );
-        
+
         $this->addField(
             self::USER_ATTR_TABLE,
             self::EXEMPTION_CODE_FIELD,
             'string',
             'Avalara Exemption Code',
-            'Here is the exemption code for a use that can be tax-free for you.'
+            'Here is the exemption code for a use that can be tax-free for you.',
+            null,
+            $displayInBackground
         );
-        
+
         $this->addField(
             self::ORDER_ATTR_TABLE,
             self::DOC_CODE_FIELD,
@@ -186,7 +217,7 @@ class Database
             null, null, null,
             false
         );
-        
+
         $this->addField(
             self::ORDER_ATTR_TABLE,
             self::TRANSACTION_TYPE_FIELD,
@@ -194,86 +225,93 @@ class Database
             null, null, null,
             false
         );
-        
+
         $this->addField(
             self::ORDER_ATTR_TABLE,
             self::ORDER_CHANGED_FIELD,
             'boolean',
-            null, null, null, 
+            null, null, null,
             false
         );
-        
+
         $this->addField(
             self::ORDER_ATTR_TABLE,
             self::LANDEDCOST_FIELD,
             'float',
-            null, null, null, 
+            null, null, null,
             false
         );
-        
+
         $this->addField(
             self::ORDER_ATTR_TABLE,
             self::INSURANCE_FIELD,
             'float',
-            null, null, null, 
+            null, null, null,
             false
         );
-        
+
         $this->addField(
             self::ORDER_ATTR_TABLE,
             self::INCOTERMS_FIELD,
             'string',
-            null, null, null, 
+            null, null, null,
             false
         );
-        
+
         $this->addField(
             self::ORDER_ATTR_TABLE,
             self::INSURED_FIELD,
             'boolean',
-            null, null, null, 
+            null, null, null,
             false
         );
-        
+
         $this->addField(
             self::ORDER_ATTR_TABLE,
             self::EXPRESS_SHIPPING_FIELD,
             'boolean',
-            null, null, null, 
+            null, null, null,
             false
         );
-        
+
         $this->addField(
             self::VOUCHER_ATTR_TABLE,
             self::TAXCODE_FIELD,
             'string',
             'Avalara Tax Code',
-            'This is where the Avalara Tax code for vouchers is given, which is sent to Avalara.'
+            'This is where the Avalara Tax code for vouchers is given, which is sent to Avalara.',
+            null,
+            $displayInBackground
         );
-        
+
         $this->addField(
             self::DISPATCH_ATTR_TABLE,
             self::TAXCODE_FIELD,
             'string',
             'Avalara Tax Code',
             'This is the Avalara Tax code for the shipment sent to Avalara. Leave empty to use default.',
-            ShippingFactory::TAXCODE
+            ShippingFactory::TAXCODE,
+            $displayInBackground
         );
-        
+
         $this->addField(
             self::DISPATCH_ATTR_TABLE,
             self::INSURED_FIELD,
             'boolean',
             'Insurance 100%',
-            'You can set if a delivery is completely insured.'
+            'You can set if a delivery is completely insured.',
+            null,
+            $displayInBackground
         );
-        
+
         $this->addField(
             self::DISPATCH_ATTR_TABLE,
             self::EXPRESS_SHIPPING_FIELD,
             'boolean',
             'Express delivery',
-            'You can set if this is an express delivery.'
+            'You can set if this is an express delivery.',
+            null,
+            $displayInBackground
         );
 
         $this->crudService->update(
@@ -285,7 +323,7 @@ class Database
                 'supportText' => 'Terms of sale. Used to determine buyer obligations for a landed cost.',
                 'helpText' => '',
                 'translatable' => false,
-                'displayInBackend' => true,
+                'displayInBackend' => $displayInBackground,
                 'position' => 10,
                 'custom' => true,
                 'defaultValue' => Form::INCOTERMS_DEFAULT,
@@ -318,7 +356,7 @@ class Database
             self::VOUCHER_ATTR_TABLE,
             self::COUNTRIES_ATTR_TABLE,
         ]);
-        
+
         return $this;
     }
 

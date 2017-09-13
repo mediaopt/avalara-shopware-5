@@ -10,7 +10,6 @@ namespace Shopware\Plugins\MoptAvalara\Bootstrap;
 
 use Shopware\Models\Config\Element as FormElement;
 use Shopware\Models\Shop\Shop;
-use Shopware\Components\Routing\Context as RoutingContext;
 
 /**
  * This class will represent the plugin config options
