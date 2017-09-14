@@ -3,6 +3,8 @@
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
 use Shopware\Plugins\MoptAvalara\Bootstrap\Database;
+use Avalara\DocumentType;
+use Shopware\Plugins\MoptAvalara\LandedCost\LandedCostRequestParams;
 
 /**
  * Description of OrderSubscriber
@@ -19,6 +21,8 @@ class OrderSubscriber extends AbstractSubscriber
     {
         return [
             'Shopware_Modules_Admin_GetOpenOrderData_FilterResult' => 'onFilterOrders',
+            'sOrder::sSaveOrder::before' => 'onBeforeSOrderSaveOrder',
+            'sOrder::sSaveOrder::after' => 'onAfterSOrderSaveOrder',
         ];
     }
 
@@ -40,6 +44,148 @@ class OrderSubscriber extends AbstractSubscriber
         }
 
         return $orders;
+    }
+
+    /**
+     * Commit transaction
+     *
+     * @param \Enlight_Hook_HookArgs $args
+     * @throws \RuntimeException
+     */
+    public function onAfterSOrderSaveOrder(\Enlight_Hook_HookArgs $args)
+    {
+        $adapter = $this->getAdapter();
+        $adapter->getLogger()->debug('onAfterSOrderSaveOrder call');
+        $session = $this->getSession();
+        if (!$orderNumber = $args->getReturn()) {
+            $adapter->getLogger()->debug('orderNumber did not exist');
+            return;
+        }
+
+        if (!$taxRequest = $session->MoptAvalaraGetTaxCommitRequest) {
+            $adapter->getLogger()->debug('MoptAvalaraGetTaxCommitRequest is empty');
+            return;
+        }
+
+        if (!$taxResult = $session->MoptAvalaraGetTaxResult) {
+            $adapter->getLogger()->debug('MoptAvalaraGetTaxResult is empty');
+            return;
+        }
+
+        if (!$order = $adapter->getOrderByNumber($orderNumber)) {
+            $msg = 'There is no order with number: ' . $orderNumber;
+            $this->getAdapter()->getLogger()->critical($msg);
+            throw new \RuntimeException($msg);
+        }
+        $this->setOrderAttributes($order, $taxRequest, $taxResult);
+
+        unset(
+            $session->MoptAvalaraGetTaxRequestHash,
+            $session->MoptAvalaraGetTaxCommitRequest,
+            $session->MoptAvalaraGetTaxResult
+        );
+    }
+
+    /**
+     * Check if current basket matches with previous avalara call (e.g. multi tab)
+     *
+     * @param \Enlight_Hook_HookArgs $args
+     */
+    public function onBeforeSOrderSaveOrder(\Enlight_Hook_HookArgs $args)
+    {
+        $adapter = $this->getAdapter();
+        $getTaxCommitRequest = $this->validateCommitCall();
+        if (!$getTaxCommitRequest) {
+            $adapter->getLogger()->error('Not in avalara context');
+            return $args->getReturn();
+        }
+        $this->getSession()->MoptAvalaraGetTaxCommitRequest = $getTaxCommitRequest;
+
+        $args->getSubject()->sBasketData['content'] = $this->resetBasketTaxId($args->getSubject()->sBasketData['content']);
+
+        return $args->getReturn();
+    }
+
+
+    /**
+     * @param Order $order
+     * @param \stdClass $taxRequest
+     * @param \stdClass $taxResult
+     */
+    private function setOrderAttributes(Order $order, $taxRequest, $taxResult)
+    {
+        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
+        $service = $this->getAdapter()->getService('GetTax');
+        if (!$service->isGetTaxEnabled()) {
+            return;
+        }
+
+        $incoterms = isset($taxRequest->parameters->{LandedCostRequestParams::LANDED_COST_INCOTERMS})
+            ? $taxRequest->parameters->{LandedCostRequestParams::LANDED_COST_INCOTERMS}
+            : null
+        ;
+
+        $session = $this->getSession();
+        $landedCost = $service->getLandedCost($session->MoptAvalaraGetTaxResult);
+        $insurance = $service->getInsuranceCost($taxResult);
+
+        $order->getAttribute()->setMoptAvalaraTransactionType(DocumentType::C_SALESORDER);
+        $order->getAttribute()->setMoptAvalaraIncoterms($incoterms);
+        $order->getAttribute()->setMoptAvalaraLandedcost($landedCost);
+        $order->getAttribute()->setMoptAvalaraInsurance($insurance);
+
+        Shopware()->Models()->persist($order);
+        Shopware()->Models()->flush();
+    }
+
+    /**
+     * @param array $basketContent
+     * @return array
+     */
+    private function resetBasketTaxId($basketContent = [])
+    {
+        array_walk(
+            $basketContent,
+            function (&$basketRow) {
+                $basketRow['taxId'] = 0;
+                $basketRow['taxID'] = 0;
+            }
+        );
+
+        return $basketContent;
+    }
+
+    /**
+     * validate commit call with previous getTax call
+     *
+     * @return \Avalara\CreateTransactionModel | bool
+     * @throws \RuntimeException
+     */
+    protected function validateCommitCall()
+    {
+        $session = $this->getSession();
+        $adapter = $this->getAdapter();
+        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
+        $service = $this->getAdapter()->getService('GetTax');
+
+        //proceed if no sales order call was made
+        if (!$session->MoptAvalaraGetTaxRequestHash) {
+            $adapter->getLogger()->debug('No sales order call was made.');
+            return null;
+        }
+
+        /* @var $model \Avalara\CreateTransactionModel */
+        $model = $adapter->getFactory('OrderTransactionModelFactory')->build();
+        $adapter->getLogger()->debug('validateCommitCall...');
+        //prevent parent execution on request mismatch
+        if ($session->MoptAvalaraGetTaxRequestHash != $service->getHashFromRequest($model)) {
+            $adapter->getLogger()->error('Mismatching requests, do not proceed.');
+            throw new \RuntimeException('MoptAvalara: mismatching requests, do not proceed.');
+        }
+
+        $adapter->getLogger()->debug('Matching requests, proceed...', [$model]);
+
+        return $model;
     }
 
     /**

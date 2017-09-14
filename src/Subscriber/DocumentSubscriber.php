@@ -9,7 +9,6 @@
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
 use Shopware\Plugins\MoptAvalara\Bootstrap\Database;
-use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
 use Shopware_Plugins_Backend_MoptAvalara_Bootstrap as AvalaraBootstrap;
 
 /**
@@ -19,6 +18,11 @@ use Shopware_Plugins_Backend_MoptAvalara_Bootstrap as AvalaraBootstrap;
  */
 class DocumentSubscriber extends AbstractSubscriber
 {
+    /**
+     * @const int
+     */
+    const PAGE_BREAK = 10;
+
     /**
      * return array with all subsribed events
      *
@@ -54,7 +58,7 @@ class DocumentSubscriber extends AbstractSubscriber
         
         $landedCost = $this->getLandedCostFromOrderData($orderData);
         $insurance = $this->getInsuranceFromOrderData($orderData);
-        $shippingCostSurcharge = bcadd($landedCost, $insurance, AvalaraSDKAdapter::BCMATH_SCALE);
+        $shippingCostSurcharge = $this->bcMath->bcadd($landedCost, $insurance);
         
         $this
             ->fixTax($orderSmartyObj)
@@ -62,7 +66,7 @@ class DocumentSubscriber extends AbstractSubscriber
             ->addPosition($orderSmartyObj, $insurance, 'insurance')
         ;
 
-        $positions = array_chunk($orderSmartyObj->value['_positions'], $document->_document['pagebreak'], true);
+        $positions = array_chunk($orderSmartyObj->value['_positions'], self::PAGE_BREAK, true);
         $document->_view->assign('Pages', $positions);
         
         $orderSmartyObj->value['_amount'] = $this->addCostToValue($orderSmartyObj->value['_amount'], $shippingCostSurcharge);
@@ -76,7 +80,7 @@ class DocumentSubscriber extends AbstractSubscriber
      */
     private function addCostToValue($value, $cost)
     {
-        return bcadd($value, $cost, AvalaraSDKAdapter::BCMATH_SCALE);
+        return $this->bcMath->bcadd($value, $cost);
     }
     
     /**

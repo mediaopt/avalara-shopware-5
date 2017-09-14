@@ -3,7 +3,6 @@
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
 use Shopware\Plugins\MoptAvalara\Mail\AbstractZendMailFormatter;
-use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
 
 /**
  * Description of CheckoutSubscriber
@@ -74,7 +73,7 @@ class SendOrderMailSubscriber extends AbstractSubscriber
         
         $landedCost = $service->getLandedCost($taxResult);
         $insurance = $service->getInsuranceCost($taxResult);
-        $shippingCostSurcharge = bcadd($landedCost, $insurance, AvalaraSDKAdapter::BCMATH_SCALE);
+        $shippingCostSurcharge = $this->bcMath->bcadd($landedCost, $insurance);
 
         $context['moptAvalaraShippingCostSurcharge'] = 0;
         $context['moptAvalaraLandedCost'] = 0;

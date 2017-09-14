@@ -79,7 +79,6 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
     public function install()
     {
         $this
-            ->isBcMathInstalled()
             ->registerControllers()
             ->registerEvents()
             ->createForm()
@@ -98,7 +97,6 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
     public function update()
     {
         $this
-            ->isBcMathInstalled()
             ->registerControllers()
             ->registerEvents()
             ->createForm()
@@ -265,18 +263,6 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
         $pluginConfigForm = new Form($this);
         $pluginConfigForm->create();
         
-        return $this;
-    }
-
-    /**
-     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
-     */
-    private function isBcMathInstalled()
-    {
-        if (!extension_loaded('bcmath')) {
-            throw new \RuntimeException('This plugin requires the bcmath PHP extension.');
-        }
-
         return $this;
     }
 }

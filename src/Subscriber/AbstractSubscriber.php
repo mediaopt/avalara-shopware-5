@@ -10,6 +10,7 @@ namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
 use Enlight\Event\SubscriberInterface;
 use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
+use Shopware\Plugins\MoptAvalara\Util\BcMath;
 
 /**
  * @author derksen mediaopt GmbH
@@ -34,6 +35,11 @@ abstract class AbstractSubscriber implements SubscriberInterface
      * @param \Shopware\Components\Form\Container
      */
     private $container;
+
+    /**
+     * @var BcMath
+     */
+    protected $bcMath;
     
     /**
      *
@@ -42,6 +48,7 @@ abstract class AbstractSubscriber implements SubscriberInterface
     public function __construct(\Shopware_Plugins_Backend_MoptAvalara_Bootstrap $bootstrap)
     {
         $this->bootstrap = $bootstrap;
+        $this->bcMath = new BcMath();
     }
 
     /**

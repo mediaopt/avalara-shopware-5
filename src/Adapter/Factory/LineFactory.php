@@ -10,7 +10,6 @@ namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
 use Shopware\Models\Article\Article;
 use Avalara\LineItemModel;
-use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
 use Shopware\Plugins\MoptAvalara\LandedCost\LandedCostRequestParams;
 
 /**
@@ -73,7 +72,7 @@ class LineFactory extends AbstractFactory
     {
         $price = (float)str_replace(',', '.', $lineData['netprice']);
         
-        return bcmul($price, (float)$lineData['quantity'], AvalaraSDKAdapter::BCMATH_SCALE);
+        return $this->bcMath->bcmul($price, (float)$lineData['quantity']);
     }
 
     /**
