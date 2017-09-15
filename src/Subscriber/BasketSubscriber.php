@@ -50,7 +50,7 @@ class BasketSubscriber extends AbstractSubscriber
         }
         //abfangen voucher mode==2 strict=1 => eigene TaxRate zuweisen aus Avalara Response
         $taxResult = $session->MoptAvalaraGetTaxResult;
-        if (!((float)$taxResult->totalTaxable)) {
+        if ($taxResult->totalTaxable < 0.0) {
             return;
         }
 
