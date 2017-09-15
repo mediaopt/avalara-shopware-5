@@ -23,7 +23,7 @@ class OrderSubscriber extends AbstractSubscriber
         return [
             'Shopware_Modules_Admin_GetOpenOrderData_FilterResult' => 'onFilterOrders',
             'sOrder::sSaveOrder::before' => 'onBeforeSOrderSaveOrder',
-            'sOrder::sSaveOrder::after' => 'onAfterSOrderSaveOrder',
+            'sOrder::sSaveOrder::after' => 'onAfterSaveOrder',
         ];
     }
 
@@ -57,10 +57,10 @@ class OrderSubscriber extends AbstractSubscriber
      * @param \Enlight_Hook_HookArgs $args
      * @throws \RuntimeException
      */
-    public function onAfterSOrderSaveOrder(\Enlight_Hook_HookArgs $args)
+    public function onAfterSaveOrder(\Enlight_Hook_HookArgs $args)
     {
         $adapter = $this->getAdapter();
-        $adapter->getLogger()->debug('onAfterSOrderSaveOrder call');
+        $adapter->getLogger()->debug('onAfterSaveOrder call');
         $session = $this->getSession();
         if (!$orderNumber = $args->getReturn()) {
             $adapter->getLogger()->debug('orderNumber did not exist');
