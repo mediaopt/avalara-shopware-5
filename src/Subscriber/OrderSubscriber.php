@@ -45,7 +45,6 @@ class OrderSubscriber extends AbstractSubscriber
                 ->bcMath
                 ->bcadd($orders[$i]['moptAvalaraLandedCost'], $orders[$i]['moptAvalaraInsurance'])
             ;
-
             $orders[$i]['invoice_shipping'] = $this->getShippingWithoutSurcharge($orders[$i]['invoice_shipping'], $surcharge);
         }
 
