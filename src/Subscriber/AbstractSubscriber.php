@@ -97,9 +97,9 @@ abstract class AbstractSubscriber implements SubscriberInterface
 
     /**
      * Method returns array of shipping surcharges in this order:
-     * ['shippingCostSurcharge'] => float ($landedCost + $insurance)
-     * ['landedCost'] => float
-     * ['insurance'] => float
+     * 'shippingCostSurcharge' => float ($landedCost + $insurance)
+     * 'landedCost' => float
+     * 'insurance' => float
      *
      * @return float[]
      */
