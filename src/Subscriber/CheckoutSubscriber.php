@@ -80,7 +80,7 @@ class CheckoutSubscriber extends AbstractSubscriber
     {
         $shippingCost = $this->saveOriginalShippingCost($args);
 
-        return $this->modifyShippingCost($shippingCost);
+        return $this->addSurchargesToShippingCost($shippingCost);
     }
 
     /**
@@ -168,7 +168,7 @@ class CheckoutSubscriber extends AbstractSubscriber
      * @param mixed[] $shippingCost
      * @return mixed[]
      */
-    private function modifyShippingCost($shippingCost)
+    private function addSurchargesToShippingCost($shippingCost)
     {
         $surcharges = $this->getShippingSurcharges();
         $shippingCostSurcharge = $surcharges['shippingCostSurcharge'];
