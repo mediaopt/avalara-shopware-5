@@ -38,10 +38,15 @@ class OrderSubscriber extends AbstractSubscriber
 
         foreach ($orders as $i => $orderData) {
             $id = $orderData['id'];
-
             $orderAttr = $avalaraAttributes[$id];
             $orders[$i]['moptAvalaraLandedCost'] = (float)$orderAttr[Database::LANDEDCOST_FIELD];
             $orders[$i]['moptAvalaraInsurance'] = (float)$orderAttr[Database::INSURANCE_FIELD];
+            $surcharge = $this
+                ->bcMath
+                ->bcadd($orders[$i]['moptAvalaraLandedCost'], $orders[$i]['moptAvalaraInsurance'])
+            ;
+
+            $orders[$i]['invoice_shipping'] = $this->getShippingWithoutSurcharge($orders[$i]['invoice_shipping'], $surcharge);
         }
 
         return $orders;
