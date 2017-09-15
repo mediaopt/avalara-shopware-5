@@ -94,4 +94,58 @@ abstract class AbstractSubscriber implements SubscriberInterface
     {
         return $this->getContainer()->get('session');
     }
+
+    /**
+     * Method returns array of shipping surcharges in this order:
+     * ['shippingCostSurcharge'] => float ($landedCost + $insurance)
+     * ['landedCost'] => float
+     * ['insurance'] => float
+     *
+     * @return float[]
+     */
+    protected function getShippingSurcharge()
+    {
+        $session = $this->getSession();
+        $adapter = $this->getAdapter();
+
+        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
+        $service = $adapter->getService('GetTax');
+        $taxResult = $session->MoptAvalaraGetTaxResult
+            ?: $session->MoptAvalaraOnFinishGetTaxResult
+        ;
+
+        if (!$taxResult) {
+            return [
+                'shippingCostSurcharge' => 0.0,
+                'landedCost'            => 0.0,
+                'insurance'             => 0.0
+            ];
+        }
+
+        $landedCost = $service->getLandedCost($taxResult);
+        $insurance = $service->getInsuranceCost($taxResult);
+        $shippingCostSurcharge = $this->bcMath->bcadd($landedCost, $insurance);
+
+        return [
+            'shippingCostSurcharge' => $shippingCostSurcharge,
+            'landedCost'            => $landedCost,
+            'insurance'             => $insurance
+        ];
+    }
+
+    /**
+     * @param mixed $shippingCost
+     * @param float $surcharge
+     * @return float
+     */
+    protected function getShippingWithoutSurcharge($shippingCost, $surcharge)
+    {
+        $shippingFloat = $this
+            ->bcMath
+            ->convertToFloat($shippingCost);
+
+        return $this
+            ->bcMath
+            ->bcsub($shippingFloat, $surcharge);
+    }
 }

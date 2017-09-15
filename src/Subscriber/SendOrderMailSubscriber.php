@@ -60,36 +60,48 @@ class SendOrderMailSubscriber extends AbstractSubscriber
     }
 
     /**
-     *
      * @param array $context
      * @return array
      */
     private function updateContext($context)
     {
-        $adapter = $this->getAdapter();
-        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
-        $service = $adapter->getService('GetTax');
-        $taxResult = $this->getSession()->MoptAvalaraGetTaxResult;
-        
-        $landedCost = $service->getLandedCost($taxResult);
-        $insurance = $service->getInsuranceCost($taxResult);
-        $shippingCostSurcharge = $this->bcMath->bcadd($landedCost, $insurance);
-
-        $context['moptAvalaraShippingCostSurcharge'] = 0;
-        $context['moptAvalaraLandedCost'] = 0;
-        $context['moptAvalaraInsuranceCost'] = 0;
-        
-        if ((float)$shippingCostSurcharge <= 0) {
-            return $context;
-        }
-
         /* @var $shop \Shopware\Models\Shop\DetachedShop */
         $shop = $this->getContainer()->get('Shop');
         $context['sShopURL'] = 'http://' . $shop->getHost() . $shop->getBasePath();
-        $context['moptAvalaraShippingCostSurcharge'] = $shippingCostSurcharge;
-        $context['moptAvalaraLandedCost'] = $landedCost;
-        $context['moptAvalaraInsuranceCost'] = $insurance;
+        $surcharges = $this->getShippingSurcharge();
+
+        $context['moptAvalaraShippingCostSurcharge'] = $surcharges['shippingCostSurcharge'];
+        $context['moptAvalaraLandedCost'] = $surcharges['landedCost'];
+        $context['moptAvalaraInsuranceCost'] = $surcharges['insurance'];
+        
+        if ((float)$surcharges['shippingCostSurcharge'] <= 0) {
+            return $context;
+        }
+
+        $context['sShippingCosts'] = $this->updateShippingCostInContext($context, $surcharges['shippingCostSurcharge']);
 
         return $context;
+    }
+
+    /**
+     * This method will extract avalara landed cost from shipping cost string.
+     * $context['sShippingCosts'] should have a value like 12,9 EUR
+     *
+     * @param mixed[] $context
+     * @param float $surcharge
+     * @return string
+     */
+    private function updateShippingCostInContext($context, $surcharge)
+    {
+        $shippingCost = trim(
+            explode(
+                $context['sCurrency'],
+                $context['sShippingCosts']
+            )[0]
+        );
+        $shippingWithoutSurcharge = $this->getShippingWithoutSurcharge($shippingCost, $surcharge);
+
+        return number_format($shippingWithoutSurcharge,2, ',', '')
+            . ' ' . $context['sCurrency'];
     }
 }

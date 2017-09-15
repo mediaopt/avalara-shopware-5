@@ -2,6 +2,7 @@
 
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
+use Shopware\Models\Order\Order;
 use Shopware\Plugins\MoptAvalara\Bootstrap\Database;
 use Avalara\DocumentType;
 use Shopware\Plugins\MoptAvalara\LandedCost\LandedCostRequestParams;
@@ -78,6 +79,8 @@ class OrderSubscriber extends AbstractSubscriber
             throw new \RuntimeException($msg);
         }
         $this->setOrderAttributes($order, $taxRequest, $taxResult);
+
+        $session->MoptAvalaraOnFinishGetTaxResult = $session->MoptAvalaraGetTaxResult;
 
         unset(
             $session->MoptAvalaraGetTaxRequestHash,

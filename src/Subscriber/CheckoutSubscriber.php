@@ -38,13 +38,8 @@ class CheckoutSubscriber extends AbstractSubscriber
     public function onBeforeCheckoutConfirm(\Enlight_Event_EventArgs $args)
     {
         $action = $args->getRequest()->getActionName();
-        // Trigger this subscriber only on 'confirm' action
-        if ('confirm' !== $action) {
-            return;
-        }
-
-        $this->changeShippingCostInView($args);
-        $this->requestAvalaraTax($args);
+        $this->changeShippingCostInView($args, $action);
+        $this->requestAvalaraTax($args, $action);
     }
 
     /**
@@ -92,9 +87,14 @@ class CheckoutSubscriber extends AbstractSubscriber
      * Method will decrease a shipping cost in view
      *
      * @param \Enlight_Event_EventArgs $args
+     * @param string $action
      */
-    private function changeShippingCostInView(\Enlight_Event_EventArgs $args)
+    private function changeShippingCostInView(\Enlight_Event_EventArgs $args, $action)
     {
+        if (!in_array($action, ['confirm', 'finish', 'shippingPayment'], true)) {
+            return;
+        }
+
         /** @var $request \Enlight_Controller_Request_RequestHttp */
         $view = $args->getSubject()->View();
         $surcharges = $this->getShippingSurcharge();
@@ -111,62 +111,15 @@ class CheckoutSubscriber extends AbstractSubscriber
     }
 
     /**
-     * @param mixed $shippingCost
-     * @param float $surcharge
-     * @return float
+     * @param \Enlight_Event_EventArgs $args
+     * @param string $action
      */
-    private function getShippingWithoutSurcharge($shippingCost, $surcharge)
+    private function requestAvalaraTax(\Enlight_Event_EventArgs $args, $action)
     {
-        $shippingFloat = $this
-            ->bcMath
-            ->convertToFloat($shippingCost)
-        ;
-
-        return $this
-            ->bcMath
-            ->bcsub($shippingFloat, $surcharge)
-        ;
-    }
-
-    /**
-     * Method returns array of shipping surcharges in this order:
-     * ['shippingCostSurcharge'] => float ($landedCost + $insurance)
-     * ['landedCost'] => float
-     * ['insurance'] => float
-     *
-     * @return float[]
-     */
-    private function getShippingSurcharge()
-    {
-        $session = $this->getSession();
-        $adapter = $this->getAdapter();
-
-        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
-        $service = $adapter->getService('GetTax');
-        if (!$taxResult = $session->MoptAvalaraGetTaxResult) {
-            return [
-                'shippingCostSurcharge' => 0.0,
-                'landedCost' => 0.0,
-                'insurance' => 0.0
-            ];
+        if (!in_array($action, ['confirm', 'shippingPayment'], true)) {
+            return;
         }
 
-        $landedCost = $service->getLandedCost($taxResult);
-        $insurance = $service->getInsuranceCost($taxResult);
-        $shippingCostSurcharge = $this->bcMath->bcadd($landedCost, $insurance);
-
-        return [
-            'shippingCostSurcharge' => $shippingCostSurcharge,
-            'landedCost' => $landedCost,
-            'insurance' => $insurance
-        ];
-    }
-
-    /**
-     * @param \Enlight_Event_EventArgs $args
-     */
-    private function requestAvalaraTax(\Enlight_Event_EventArgs $args)
-    {
         $session = $this->getSession();
         $adapter = $this->getAdapter();
         /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
@@ -193,7 +146,7 @@ class CheckoutSubscriber extends AbstractSubscriber
         }
 
         //Recall controller so basket tax and landedCost could be applied
-        $args->getSubject()->forward('confirm');
+        $args->getSubject()->forward($action);
     }
 
     /**
