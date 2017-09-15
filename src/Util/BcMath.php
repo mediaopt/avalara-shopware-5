@@ -33,7 +33,6 @@ class BcMath
      */
     public function bcadd($left, $right)
     {
-        // Check if bcmath extention is avalible
         if (!extension_loaded(self::BCMATH_EXTENTION)) {
             return (float)round($left + $right, self::BCMATH_SCALE);
         }
@@ -48,7 +47,6 @@ class BcMath
      */
     public function bcsub($left, $right)
     {
-        // Check if bcmath extention is avalible
         if (!extension_loaded(self::BCMATH_EXTENTION)) {
             return (float)round($left - $right, self::BCMATH_SCALE);
         }
@@ -64,7 +62,6 @@ class BcMath
      */
     public function bcmul($left, $right)
     {
-        // Check if bcmath extention is avalible
         if (!extension_loaded(self::BCMATH_EXTENTION)) {
             return (float)round($left * $right, self::BCMATH_SCALE);
         }
@@ -81,7 +78,6 @@ class BcMath
      */
     public function bcdiv($left, $right, $scale = self::BCMATH_SCALE)
     {
-        // Check if bcmath extention is avalible
         if (!extension_loaded(self::BCMATH_EXTENTION)) {
             return round($left / $right, $scale);
         }
