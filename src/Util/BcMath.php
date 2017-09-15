@@ -12,11 +12,6 @@ use Shopware\Components\Model\ModelManager;
 class BcMath
 {
     /**
-     * @var string bcmath extension name
-     */
-    const BCMATH_EXTENTION = 'bcmath';
-
-    /**
      * @var int Scale to be used in all bcmath calls
      */
     const BCMATH_SCALE = 8;
@@ -33,7 +28,7 @@ class BcMath
      */
     public function bcadd($left, $right)
     {
-        if (!extension_loaded(self::BCMATH_EXTENTION)) {
+        if (!extension_loaded('bcmath')) {
             return (float)round($left + $right, self::BCMATH_SCALE);
         }
 
@@ -47,7 +42,7 @@ class BcMath
      */
     public function bcsub($left, $right)
     {
-        if (!extension_loaded(self::BCMATH_EXTENTION)) {
+        if (!extension_loaded('bcmath')) {
             return (float)round($left - $right, self::BCMATH_SCALE);
         }
 
@@ -55,14 +50,13 @@ class BcMath
     }
 
     /**
-     *
      * @param mixed $left
      * @param mixed $right
      * @return float
      */
     public function bcmul($left, $right)
     {
-        if (!extension_loaded(self::BCMATH_EXTENTION)) {
+        if (!extension_loaded('bcmath')) {
             return (float)round($left * $right, self::BCMATH_SCALE);
         }
 
@@ -70,7 +64,6 @@ class BcMath
     }
 
     /**
-     *
      * @param mixed $left
      * @param mixed $right
      * @param int $scale
@@ -78,7 +71,7 @@ class BcMath
      */
     public function bcdiv($left, $right, $scale = self::BCMATH_SCALE)
     {
-        if (!extension_loaded(self::BCMATH_EXTENTION)) {
+        if (!extension_loaded('bcmath')) {
             return round($left / $right, $scale);
         }
 
@@ -104,10 +97,9 @@ class BcMath
      */
     public function convertToFloat($value)
     {
-        if (is_string($value)) {
-            return (float)str_replace(',', '.', $value);
-        }
-
-        return $value;
+        return is_string($value)
+            ? (float)str_replace(',', '.', $value)
+            : $value
+        ;
     }
 }
