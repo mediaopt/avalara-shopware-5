@@ -77,7 +77,7 @@ class BasketSubscriber extends AbstractSubscriber
         $voucherCode = strtolower(stripslashes($args->get('voucherCode')));
 
         // Load the voucher details
-        $voucherDetails = (array)Shopware()->Db()->fetchRow(
+        $voucherDetails = Shopware()->Db()->fetchRow(
             'SELECT *
               FROM s_emarketing_vouchers
               WHERE modus != 1
@@ -87,7 +87,7 @@ class BasketSubscriber extends AbstractSubscriber
                 OR valid_to IS NULL
               )',
             [$voucherCode]
-        );
+        ) ?: [];
 
         if (empty($voucherDetails['strict'])) {
             return;
