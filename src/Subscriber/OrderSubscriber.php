@@ -22,7 +22,7 @@ class OrderSubscriber extends AbstractSubscriber
     {
         return [
             'Shopware_Modules_Admin_GetOpenOrderData_FilterResult' => 'onFilterOrders',
-            'sOrder::sSaveOrder::before' => 'onBeforeSOrderSaveOrder',
+            'sOrder::sSaveOrder::before' => 'onBeforeSaveOrder',
             'sOrder::sSaveOrder::after' => 'onAfterSaveOrder',
         ];
     }
@@ -84,12 +84,15 @@ class OrderSubscriber extends AbstractSubscriber
      * @param \Enlight_Hook_HookArgs $args
      * @throws \RuntimeException
      */
-    public function onBeforeSOrderSaveOrder(\Enlight_Hook_HookArgs $args)
+    public function onBeforeSaveOrder(\Enlight_Hook_HookArgs $args)
     {
-        $adapter = $this->getAdapter();
         $getTaxCommitRequest = $this->validateCommitCall();
         if (!$getTaxCommitRequest) {
-            $adapter->getLogger()->error('Not in avalara context');
+            $this
+                ->getAdapter()
+                ->getLogger()
+                ->error('Not in avalara context')
+            ;
             return $args->getReturn();
         }
         $this->getSession()->MoptAvalaraGetTaxCommitRequest = $getTaxCommitRequest;
