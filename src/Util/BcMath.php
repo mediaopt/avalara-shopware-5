@@ -80,15 +80,15 @@ class BcMath
 
     /**
      * @param mixed $brutto
-     * @param float $tax
+     * @param mixed $tax
      * @return float
      */
     public function calculateNetto($brutto, $tax)
     {
-        $left = $this->bcmul($brutto, 100);
-        $right = $this->bcadd($tax, 100);
+        $dividend = $this->bcmul($brutto, 100);
+        $divisor = $this->bcadd($tax, 100);
 
-        return (float)$this->bcdiv($left, $right, self::NETTO_SCALE);
+        return (float)$this->bcdiv($dividend, $divisor, self::NETTO_SCALE);
     }
 
     /**
