@@ -31,8 +31,8 @@ class BasketSubscriber extends AbstractSubscriber
         return [
             'Shopware_Modules_Basket_getPriceForUpdateArticle_FilterPrice' => 'onGetPriceForUpdateArticle',
             'sArticles::getTaxRateByConditions::after' => 'afterGetTaxRateByConditions',
-            'sBasket::sGetBasket::before' => 'onBeforeSBasketSGetBasket',
-            'sBasket::sAddVoucher::before' => 'onBeforeBasketSAddVoucher',
+            'sBasket::sGetBasket::before' => 'onBeforeGetBasket',
+            'sBasket::sAddVoucher::before' => 'onBeforeAddVoucher',
         ];
     }
 
@@ -40,7 +40,7 @@ class BasketSubscriber extends AbstractSubscriber
      * set taxrate for discounts
      * @param \Enlight_Hook_HookArgs $args
      */
-    public function onBeforeSBasketSGetBasket(\Enlight_Hook_HookArgs $args)
+    public function onBeforeGetBasket(\Enlight_Hook_HookArgs $args)
     {
         /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
         $service = $this->getAdapter()->getService('GetTax');
@@ -65,7 +65,7 @@ class BasketSubscriber extends AbstractSubscriber
      *
      * @param \Enlight_Hook_HookArgs $args
      */
-    public function onBeforeBasketSAddVoucher(\Enlight_Hook_HookArgs $args)
+    public function onBeforeAddVoucher(\Enlight_Hook_HookArgs $args)
     {
         $session = $this->getSession();
         /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
