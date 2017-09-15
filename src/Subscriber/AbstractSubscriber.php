@@ -103,16 +103,14 @@ abstract class AbstractSubscriber implements SubscriberInterface
      *
      * @return float[]
      */
-    protected function getShippingSurcharge()
+    protected function getShippingSurcharges()
     {
         $session = $this->getSession();
         $adapter = $this->getAdapter();
 
         /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
         $service = $adapter->getService('GetTax');
-        $taxResult = $session->MoptAvalaraGetTaxResult
-            ?: $session->MoptAvalaraOnFinishGetTaxResult
-        ;
+        $taxResult = $session->MoptAvalaraGetTaxResult ?: $session->MoptAvalaraOnFinishGetTaxResult;
 
         if (!$taxResult) {
             return [

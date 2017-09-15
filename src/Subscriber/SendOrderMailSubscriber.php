@@ -68,7 +68,7 @@ class SendOrderMailSubscriber extends AbstractSubscriber
         /* @var $shop \Shopware\Models\Shop\DetachedShop */
         $shop = $this->getContainer()->get('Shop');
         $context['sShopURL'] = 'http://' . $shop->getHost() . $shop->getBasePath();
-        $surcharges = $this->getShippingSurcharge();
+        $surcharges = $this->getShippingSurcharges();
 
         $context['moptAvalaraShippingCostSurcharge'] = $surcharges['shippingCostSurcharge'];
         $context['moptAvalaraLandedCost'] = $surcharges['landedCost'];

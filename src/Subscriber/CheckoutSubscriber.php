@@ -97,7 +97,7 @@ class CheckoutSubscriber extends AbstractSubscriber
 
         /** @var $request \Enlight_Controller_Request_RequestHttp */
         $view = $args->getSubject()->View();
-        $surcharges = $this->getShippingSurcharge();
+        $surcharges = $this->getShippingSurcharges();
         $view->assign('moptAvalaraLandedCost', $surcharges['landedCost']);
         $view->assign('moptAvalaraInsuranceCost', $surcharges['insurance']);
 
@@ -170,7 +170,7 @@ class CheckoutSubscriber extends AbstractSubscriber
      */
     private function modifyShippingCost($shippingCost)
     {
-        $surcharges = $this->getShippingSurcharge();
+        $surcharges = $this->getShippingSurcharges();
         $shippingCostSurcharge = $surcharges['shippingCostSurcharge'];
         if ($shippingCostSurcharge <= 0.0) {
             return $shippingCost;
