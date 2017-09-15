@@ -83,7 +83,7 @@ class BcMath
     {
         // Check if bcmath extention is avalible
         if (!extension_loaded(self::BCMATH_EXTENTION)) {
-            return round($left / $right,$scale);
+            return round($left / $right, $scale);
         }
 
         return (float)\bcdiv($left, $right, $scale);

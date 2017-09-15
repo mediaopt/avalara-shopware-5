@@ -72,7 +72,7 @@ class LineFactory extends AbstractFactory
     {
         $price = (float)str_replace(',', '.', $lineData['netprice']);
         
-        return $this->bcMath->bcmul($price, (float)$lineData['quantity']);
+        return $this->bcMath->bcmul($price, $lineData['quantity']);
     }
 
     /**

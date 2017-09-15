@@ -54,7 +54,7 @@ class BasketSubscriber extends AbstractSubscriber
             return;
         }
 
-        $taxRate = $this->bcMath->bcdiv((float)$taxResult->totalTax, (float)$taxResult->totalTaxable);
+        $taxRate = $this->bcMath->bcdiv($taxResult->totalTax, $taxResult->totalTaxable);
 
         $config = Shopware()->Config();
         $config['sDISCOUNTTAX'] = $this->bcMath->bcmul($taxRate, 100);

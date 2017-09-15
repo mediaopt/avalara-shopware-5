@@ -84,7 +84,7 @@ class GetTax extends AbstractService
         if (!$taxLine || !((float)$taxLine->taxableAmount)) {
             return null;
         }
-        $taxRate = $this->bcMath->bcdiv((float)$taxLine->tax, (float)$taxLine->taxableAmount);
+        $taxRate = $this->bcMath->bcdiv($taxLine->tax, $taxLine->taxableAmount);
         
         return $this->bcMath->bcmul($taxRate, 100);
     }
