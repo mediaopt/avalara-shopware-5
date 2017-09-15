@@ -9,6 +9,7 @@
 namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
 use Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface;
+use Shopware\Plugins\MoptAvalara\Util\BcMath;
 
 /**
  *
@@ -36,6 +37,11 @@ abstract class AbstractFactory
      * @var array
      */
     protected $pluginConfig;
+
+    /**
+     * @var BcMath
+     */
+    protected $bcMath;
     
     /**
      *
@@ -44,6 +50,7 @@ abstract class AbstractFactory
     public function __construct(AdapterInterface $adapter)
     {
         $this->adapter = $adapter;
+        $this->bcMath = new BcMath();
     }
     
     /**

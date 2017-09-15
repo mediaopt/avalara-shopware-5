@@ -83,7 +83,7 @@ abstract class AbstractZendMailFormatter
         ;
         
         if (!$mailModel) {
-            throw new \Enlight_Exception("Mail-Template with name '{$modelName}' could not be found.");
+            throw new \Enlight_Exception('Mail-Template with name "{$modelName}" could not be found.');
         }
         
         $isoCode = $this->getShop()->get('isocode');
@@ -172,8 +172,8 @@ abstract class AbstractZendMailFormatter
         }
 
         $potentialSurcharges = [];
-        $potentialSurcharges[] = $this->getLandedCostSurcharge($context);
         $potentialSurcharges[] = $this->getIncuranceSurcharge($context);
+        $potentialSurcharges[] = $this->getLandedCostSurcharge($context);
         $surcharges = array_filter($potentialSurcharges);
         
         $shippingInfo = sprintf(

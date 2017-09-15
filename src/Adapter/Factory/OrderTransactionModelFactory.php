@@ -128,9 +128,8 @@ class OrderTransactionModelFactory extends AbstractTransactionModelFactory
             return null;
         }
 
-        return (isset($orderVars['sBasket']) && isset($orderVars['sBasket']['sShippingcostsNet']))
-            ? $orderVars['sBasket']['sShippingcostsNet']
-            : null
+        return Shopware()->Session()->moptAvalaraShippingcostsNetOrigin
+            ?: $orderVars['sBasket']['sShippingcostsNet']
         ;
     }
     
@@ -142,9 +141,10 @@ class OrderTransactionModelFactory extends AbstractTransactionModelFactory
     {
         return Shopware()->Session()->sOrderVariables;
     }
-    
+
     /**
      * @return string | null
+     * @throws \InvalidArgumentException
      */
     protected function getIncoterm()
     {

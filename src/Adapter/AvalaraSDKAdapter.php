@@ -21,11 +21,6 @@ use Monolog\Handler\RotatingFileHandler;
 class AvalaraSDKAdapter implements AdapterInterface
 {
     /**
-     * @var int Scale to be used in all bcmath calls
-     */
-    const BCMATH_SCALE = 8;
-    
-    /**
      * @var string
      */
     const SERVICE_NAME = 'AvalaraSdkAdapter';
@@ -192,6 +187,7 @@ class AvalaraSDKAdapter implements AdapterInterface
 
     /**
      * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
+     * @throws \RuntimeException
      */
     public function getBootstrap()
     {

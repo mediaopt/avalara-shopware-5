@@ -12,7 +12,6 @@ use Avalara\CreateTransactionModel;
 use Avalara\AddressesModel;
 use Avalara\DocumentType;
 use Shopware\Models\Order\Order;
-use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
 use Shopware\Models\Order\Detail;
 
 /**
@@ -170,10 +169,10 @@ class InvoiceTransactionModelFactory extends AbstractTransactionModelFactory
      */
     protected function getNetPrice(Detail $detail)
     {
-        $taxRate = bcdiv($detail->getTaxRate(), 100, AvalaraSDKAdapter::BCMATH_SCALE);
-        $taxRatePlusOne = bcadd($taxRate, 1.0, AvalaraSDKAdapter::BCMATH_SCALE);
+        $taxRate = $this->bcMath->bcdiv($detail->getTaxRate(), 100);
+        $taxRatePlusOne = $this->bcMath->bcadd($taxRate, 1.0);
         
-        return (float)bcdiv($detail->getPrice(), $taxRatePlusOne, AvalaraSDKAdapter::BCMATH_SCALE);
+        return $this->bcMath->bcdiv($detail->getPrice(), $taxRatePlusOne);
     }
 
     /**

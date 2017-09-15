@@ -31,7 +31,7 @@ class AddressSubscriber extends AbstractSubscriber
             'Enlight_Controller_Action_Frontend_Checkout_Confirm' => 'onBeforeCheckoutConfirm',
             'Enlight_Controller_Action_PostDispatch_Frontend_Address' => 'onPostDispatchFrontendAddress',
         ];
-    }/** @noinspection PhpInconsistentReturnPointsInspection */
+    }
 
     /**
      * perform address check

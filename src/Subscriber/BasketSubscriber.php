@@ -8,7 +8,7 @@
 
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
-use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
+use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
 
 /**
  * @author derksen mediaopt GmbH
@@ -29,70 +29,77 @@ class BasketSubscriber extends AbstractSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            'Shopware_Modules_Basket_GetBasket_FilterResult' => 'onFilterBasket',
             'Shopware_Modules_Basket_getPriceForUpdateArticle_FilterPrice' => 'onGetPriceForUpdateArticle',
             'sArticles::getTaxRateByConditions::after' => 'afterGetTaxRateByConditions',
+            'sBasket::sGetBasket::before' => 'onBeforeGetBasket',
+            'sBasket::sAddVoucher::before' => 'onBeforeAddVoucher',
         ];
     }
 
     /**
-     * Updates totals with LandedCost surcharge
-     * @param \Enlight_Event_EventArgs $args
+     * set taxrate for discounts
+     * @param \Enlight_Hook_HookArgs $args
      */
-    public function onFilterBasket(\Enlight_Event_EventArgs $args)
+    public function onBeforeGetBasket(\Enlight_Hook_HookArgs $args)
+    {
+        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
+        $service = $this->getAdapter()->getService('GetTax');
+        $session = $this->getSession();
+        if (empty($session->MoptAvalaraGetTaxResult) || !$service->isGetTaxEnabled()) {
+            return;
+        }
+        //abfangen voucher mode==2 strict=1 => eigene TaxRate zuweisen aus Avalara Response
+        $taxResult = $session->MoptAvalaraGetTaxResult;
+        if ($taxResult->totalTaxable < 0.0) {
+            return;
+        }
+
+        $taxRate = $this->bcMath->bcdiv($taxResult->totalTax, $taxResult->totalTaxable);
+
+        $config = Shopware()->Config();
+        $config['sDISCOUNTTAX'] = $this->bcMath->bcmul($taxRate, 100);
+        $config['sTAXAUTOMODE'] = false;
+    }
+
+    /**
+     *
+     * @param \Enlight_Hook_HookArgs $args
+     */
+    public function onBeforeAddVoucher(\Enlight_Hook_HookArgs $args)
     {
         $session = $this->getSession();
-        $newBasket = $args->getReturn();
-        $adapter = $this->getAdapter();
         /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
-        $service = $adapter->getService('GetTax');
-        $taxResult = $session->MoptAvalaraGetTaxResult;
-        if(!$taxResult || !$service->isLandedCostEnabled()) {
-            return $newBasket;
+        $service = $this->getAdapter()->getService('GetTax');
+        if (empty($session->MoptAvalaraGetTaxResult) || !$service->isGetTaxEnabled()) {
+            return;
         }
 
-        $landedCost = $service->getLandedCost($taxResult);
-        $insurance = $service->getInsuranceCost($taxResult);
-        $shippingCostSurcharge = bcadd($landedCost, $insurance, AvalaraSDKAdapter::BCMATH_SCALE);
+        $voucherCode = strtolower(stripslashes($args->get('voucherCode')));
 
-        $newBasket['moptAvalaraShippingCostSurcharge'] = $shippingCostSurcharge;
-        $newBasket['moptAvalaraLandedCost'] = $landedCost;
-        $newBasket['moptAvalaraInsuranceCost'] = $insurance;
-        $newBasket['moptAvalaraAmountWithoutLandedCost'] = $newBasket['Amount'];
+        // Load the voucher details
+        $voucherDetails = Shopware()->Db()->fetchRow(
+            'SELECT *
+              FROM s_emarketing_vouchers
+              WHERE modus != 1
+              AND LOWER(vouchercode) = ?
+              AND (
+                now() BETWEEN valid_from AND valid_to
+                OR valid_to IS NULL
+              )',
+            [$voucherCode]
+        ) ?: [];
 
-        $toAppend = [
-            'Amount',
-            'AmountNet',
-            'AmountNumeric',
-            'AmountNetNumeric',
-            'AmountWithTax',
-            'AmountWithTaxNumeric'
-        ];
+        if (empty($voucherDetails['strict'])) {
+            return;
+        }
 
-        foreach ($toAppend as $prop) {
-            $newBasket[$prop] = $this->addCostToValue($newBasket[$prop], $shippingCostSurcharge);
+        //get tax rate for voucher
+        $taxRate = $service->getTaxRateForOrderBasketId($session->MoptAvalaraGetTaxResult, LineFactory::ARTICLEID_VOUCHER);
+        if (!$taxRate) {
+            return;
         }
-        
-        return $newBasket;
-    }
-    
-    /**
-     * @param mixed $value
-     * @param float $cost
-     * @return mixed
-     */
-    private function addCostToValue($value, $cost)
-    {
-        if (!$value) {
-            return $value;
-        }
-        
-        if (is_string($value)) {
-            $float = str_replace(',', '.', $value);
-            return str_replace('.', ',', bcadd($float, $cost, AvalaraSDKAdapter::BCMATH_SCALE));
-        }
-        
-        return (float)bcadd($value, $cost, AvalaraSDKAdapter::BCMATH_SCALE);
+        $config = Shopware()->Config();
+        $config['sVOUCHERTAX'] = $taxRate;
     }
     
     /**

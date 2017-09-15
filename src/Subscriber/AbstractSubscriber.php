@@ -10,6 +10,7 @@ namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
 use Enlight\Event\SubscriberInterface;
 use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
+use Shopware\Plugins\MoptAvalara\Util\BcMath;
 
 /**
  * @author derksen mediaopt GmbH
@@ -34,6 +35,11 @@ abstract class AbstractSubscriber implements SubscriberInterface
      * @param \Shopware\Components\Form\Container
      */
     private $container;
+
+    /**
+     * @var BcMath
+     */
+    protected $bcMath;
     
     /**
      *
@@ -42,6 +48,7 @@ abstract class AbstractSubscriber implements SubscriberInterface
     public function __construct(\Shopware_Plugins_Backend_MoptAvalara_Bootstrap $bootstrap)
     {
         $this->bootstrap = $bootstrap;
+        $this->bcMath = new BcMath();
     }
 
     /**
@@ -86,5 +93,57 @@ abstract class AbstractSubscriber implements SubscriberInterface
     protected function getSession()
     {
         return $this->getContainer()->get('session');
+    }
+
+    /**
+     * Method returns array of shipping surcharges in this order:
+     * 'shippingCostSurcharge' => float ($landedCost + $insurance)
+     * 'landedCost' => float
+     * 'insurance' => float
+     *
+     * @return float[]
+     */
+    protected function getShippingSurcharges()
+    {
+        $session = $this->getSession();
+        $adapter = $this->getAdapter();
+
+        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
+        $service = $adapter->getService('GetTax');
+        $taxResult = $session->MoptAvalaraGetTaxResult ?: $session->MoptAvalaraOnFinishGetTaxResult;
+
+        if (!$taxResult) {
+            return [
+                'shippingCostSurcharge' => 0.0,
+                'landedCost'            => 0.0,
+                'insurance'             => 0.0
+            ];
+        }
+
+        $landedCost = $service->getLandedCost($taxResult);
+        $insurance = $service->getInsuranceCost($taxResult);
+        $shippingCostSurcharge = $this->bcMath->bcadd($landedCost, $insurance);
+
+        return [
+            'shippingCostSurcharge' => $shippingCostSurcharge,
+            'landedCost'            => $landedCost,
+            'insurance'             => $insurance
+        ];
+    }
+
+    /**
+     * @param mixed $shippingCost
+     * @param float $surcharge
+     * @return float
+     */
+    protected function getShippingWithoutSurcharge($shippingCost, $surcharge)
+    {
+        $shippingFloat = $this
+            ->bcMath
+            ->convertToFloat($shippingCost);
+
+        return $this
+            ->bcMath
+            ->bcsub($shippingFloat, $surcharge);
     }
 }
