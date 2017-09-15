@@ -43,65 +43,106 @@ class DocumentSubscriber extends AbstractSubscriber
     public function onBeforeRenderDocument(\Enlight_Hook_HookArgs $args)
     {
         $document = $args->getSubject();
-        $this->addShippingCostSurchargeToView($document);
-        
-        $this->updateDocument($document);
+        $this
+            ->subtractLandedCostFromShippingCost($document)
+            ->addLandedCostSurcharge($document)
+            ->updatePages($document)
+        ;
     }
-    
+
     /**
      * @param \Shopware_Components_Document $document
+     * @return DocumentSubscriber
      */
-    private function addShippingCostSurchargeToView(\Shopware_Components_Document $document)
+    private function subtractLandedCostFromShippingCost(\Shopware_Components_Document $document)
+    {
+        $orderSmartyObj = $document->_view->getVariable('Order');
+        $orderData = $orderSmartyObj->value['_order'];
+
+        $landedCost = $this->getLandedCostFromOrderData($orderData);
+        $insurance = $this->getInsuranceFromOrderData($orderData);
+        $surcharge = $this->bcMath->bcadd($landedCost, $insurance);
+
+        foreach ($orderSmartyObj->value['_positions'] as $i => $position) {
+            if (isset($position['id'])) {
+                continue;
+            }
+
+            $orderSmartyObj->value['_positions'][$i] = $this
+                ->subtractCost(
+                    $position,
+                    $surcharge
+                )
+            ;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param \Shopware_Components_Document $document
+     * @return DocumentSubscriber
+     */
+    private function addLandedCostSurcharge(\Shopware_Components_Document $document)
     {
         $orderSmartyObj = $document->_view->getVariable('Order');
         $orderData = $orderSmartyObj->value['_order'];
         
         $landedCost = $this->getLandedCostFromOrderData($orderData);
         $insurance = $this->getInsuranceFromOrderData($orderData);
-        $shippingCostSurcharge = $this->bcMath->bcadd($landedCost, $insurance);
         
         $this
             ->fixTax($orderSmartyObj)
-            ->addPosition($orderSmartyObj, $landedCost, 'landedCost')
             ->addPosition($orderSmartyObj, $insurance, 'insurance')
+            ->addPosition($orderSmartyObj, $landedCost, 'landedCost')
         ;
 
         $positions = array_chunk($orderSmartyObj->value['_positions'], self::PAGE_BREAK, true);
         $document->_view->assign('Pages', $positions);
-        
-        $orderSmartyObj->value['_amount'] = $this->addCostToValue($orderSmartyObj->value['_amount'], $shippingCostSurcharge);
-        $orderSmartyObj->value['_amountNetto'] = $this->addCostToValue($orderSmartyObj->value['_amountNetto'], $shippingCostSurcharge);
+
+        return $this;
     }
-    
+
     /**
-     * @param mixed $value
-     * @param float $cost
-     * @return mixed
-     */
-    private function addCostToValue($value, $cost)
-    {
-        return $this->bcMath->bcadd($value, $cost);
-    }
-    
-    /**
-     * Method will update a document amount value
      * @param \Shopware_Components_Document $document
+     * @return DocumentSubscriber
      */
-    private function updateDocument(\Shopware_Components_Document $document)
+    private function updatePages(\Shopware_Components_Document $document)
     {
         $orderSmartyObj = $document->_view->getVariable('Order');
-        $update = '
-            UPDATE `s_order_documents` SET `amount` = ?
-            WHERE orderID = ? LIMIT 1
-            '
+        $positions = array_chunk(
+            $orderSmartyObj->value['_positions'],
+            self::PAGE_BREAK, true)
         ;
-        
-        Shopware()->Db()->query($update, [
-            $orderSmartyObj->value['_amount'],
-            $orderSmartyObj->value['_order']['id'],
-        ]);
+
+        $document->_view->assign('Pages', $positions);
+
+        return $this;
     }
-    
+
+    /**
+     * @param array $position
+     * @param float $surcharge
+     * @return array
+     */
+    private function subtractCost($position, $surcharge)
+    {
+        $brutto = (float)$position['price'];
+        $bruttoUpdated = $this
+            ->bcMath
+            ->bcsub($brutto, $surcharge)
+        ;
+
+        $nettoUpdated = $this
+            ->bcMath
+            ->calculateNetto($bruttoUpdated, $position['tax'])
+        ;
+        $position['price'] = $position['amount'] = $bruttoUpdated;
+        $position['netto'] = $position['amount_netto'] = $nettoUpdated;
+
+        return $position;
+    }
+
     /**
      * @param array $orderData Order params and values
      * @return float
@@ -127,7 +168,7 @@ class DocumentSubscriber extends AbstractSubscriber
             : 0.0
         ;
     }
-    
+
     /**
      * Method will leave only 2 dec in tax
      * @param \Smarty_Variable $orderSmartyObj
@@ -140,7 +181,7 @@ class DocumentSubscriber extends AbstractSubscriber
         }
         return $this;
     }
-    
+
     /**
      * @param \Smarty_Variable $orderSmartyObj
      * @param float $value
