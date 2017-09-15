@@ -112,7 +112,8 @@ class DocumentSubscriber extends AbstractSubscriber
         $orderSmartyObj = $document->_view->getVariable('Order');
         $positions = array_chunk(
             $orderSmartyObj->value['_positions'],
-            self::PAGE_BREAK, true)
+            self::PAGE_BREAK,
+            true)
         ;
 
         $document->_view->assign('Pages', $positions);
