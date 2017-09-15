@@ -145,7 +145,7 @@ class CheckoutSubscriber extends AbstractSubscriber
             $adapter->getLogger()->error('GetTax call failed: ' . $e->getMessage());
         }
 
-        //Recall controller so basket tax and landedCost could be applied
+        //Trigger the same action again so the basket tax and landed cost could be applied in this request.
         $args->getSubject()->forward($action);
     }
 
