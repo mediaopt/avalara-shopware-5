@@ -98,6 +98,7 @@ class OrderSubscriber extends AbstractSubscriber
      * Check if current basket matches with previous avalara call (e.g. multi tab)
      *
      * @param \Enlight_Hook_HookArgs $args
+     * @throws \RuntimeException
      */
     public function onBeforeSOrderSaveOrder(\Enlight_Hook_HookArgs $args)
     {

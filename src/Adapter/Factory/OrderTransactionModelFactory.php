@@ -141,9 +141,10 @@ class OrderTransactionModelFactory extends AbstractTransactionModelFactory
     {
         return Shopware()->Session()->sOrderVariables;
     }
-    
+
     /**
      * @return string | null
+     * @throws \InvalidArgumentException
      */
     protected function getIncoterm()
     {

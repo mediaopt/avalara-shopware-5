@@ -187,6 +187,7 @@ class AvalaraSDKAdapter implements AdapterInterface
 
     /**
      * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
+     * @throws \RuntimeException
      */
     public function getBootstrap()
     {
