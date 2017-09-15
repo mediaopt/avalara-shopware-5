@@ -76,16 +76,17 @@ class BcMath
      *
      * @param mixed $left
      * @param mixed $right
+     * @param int $scale
      * @return float
      */
-    public function bcdiv($left, $right)
+    public function bcdiv($left, $right, $scale = self::BCMATH_SCALE)
     {
         // Check if bcmath extention is avalible
         if (!extension_loaded(self::BCMATH_EXTENTION)) {
-            return round($left / $right,self::BCMATH_SCALE);
+            return round($left / $right,$scale);
         }
 
-        return (float)\bcdiv($left, $right, self::BCMATH_SCALE);
+        return (float)\bcdiv($left, $right, $scale);
     }
 
     /**
