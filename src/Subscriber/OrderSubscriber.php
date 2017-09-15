@@ -60,31 +60,16 @@ class OrderSubscriber extends AbstractSubscriber
     public function onAfterSaveOrder(\Enlight_Hook_HookArgs $args)
     {
         $adapter = $this->getAdapter();
-        $adapter->getLogger()->debug('onAfterSaveOrder call');
         $session = $this->getSession();
-        if (!$orderNumber = $args->getReturn()) {
-            $adapter->getLogger()->debug('orderNumber did not exist');
-            return;
+        $order = $this->validateOnSaveOrder($args);
+        $taxRequest = $session->MoptAvalaraGetTaxCommitRequest;
+        $taxResult = $session->MoptAvalaraGetTaxResult;
+        if (!$taxRequest || !$taxResult) {
+            $adapter->getLogger()->debug('No Avalara info for order ' . $args->getReturn());
         }
-
-        if (!$taxRequest = $session->MoptAvalaraGetTaxCommitRequest) {
-            $adapter->getLogger()->debug('MoptAvalaraGetTaxCommitRequest is empty');
-            return;
-        }
-
-        if (!$taxResult = $session->MoptAvalaraGetTaxResult) {
-            $adapter->getLogger()->debug('MoptAvalaraGetTaxResult is empty');
-            return;
-        }
-
-        if (!$order = $adapter->getOrderByNumber($orderNumber)) {
-            $msg = 'There is no order with number: ' . $orderNumber;
-            $this->getAdapter()->getLogger()->critical($msg);
-            throw new \RuntimeException($msg);
-        }
-        $this->setOrderAttributes($order, $taxRequest, $taxResult);
 
         $session->MoptAvalaraOnFinishGetTaxResult = $session->MoptAvalaraGetTaxResult;
+        $this->setOrderAttributes($order, $taxRequest, $taxResult);
 
         unset(
             $session->MoptAvalaraGetTaxRequestHash,
@@ -227,5 +212,29 @@ class OrderSubscriber extends AbstractSubscriber
         }
 
         return $avalaraAttributes;
+    }
+
+    /**
+     * @param \Enlight_Hook_HookArgs $args
+     * @return Order
+     */
+    protected function validateOnSaveOrder(\Enlight_Hook_HookArgs $args)
+    {
+        $adapter = $this->getAdapter();
+        $adapter->getLogger()->debug('onAfterSaveOrder call');
+
+        if (!$orderNumber = $args->getReturn()) {
+            $msg = 'orderNumber did not exist';
+            $adapter->getLogger()->critical($msg);
+            throw new \RuntimeException($msg);
+        }
+
+        if (!$order = $adapter->getOrderByNumber($orderNumber)) {
+            $msg = 'There is no order with number: ' . $orderNumber;
+            $this->getAdapter()->getLogger()->critical($msg);
+            throw new \RuntimeException($msg);
+        }
+
+        return $order;
     }
 }
