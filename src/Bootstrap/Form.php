@@ -244,16 +244,19 @@ class Form
         $form->setElement('text', self::ACCOUNT_NUMBER_FIELD, [
             'label' => 'Account number',
             'required' => true,
+            'scope' => FormElement::SCOPE_SHOP
         ]);
 
         $form->setElement('text', self::LICENSE_KEY_FIELD, [
             'label' => 'License key',
             'required' => true,
+            'scope' => FormElement::SCOPE_SHOP
         ]);
         
         $form->setElement('text', self::COMPANY_CODE_FIELD, [
             'label' => 'Company code',
             'required' => true,
+            'scope' => FormElement::SCOPE_SHOP
         ]);
 
         $form->setElement('base', 'mopt_avalara__fieldset__configuration', [
@@ -292,6 +295,7 @@ class Form
             'label' => 'Default incoterms for Landed cost',
             'description' => 'Terms of sale. Used to determine buyer obligations for a landed cost.',
             'value' => self::INCOTERMS_DAP,
+            'scope' => FormElement::SCOPE_SHOP,
             'store' => [
                 [self::INCOTERMS_DAP, self::INCOTERMS_DAP_LABEL],
                 [self::INCOTERMS_DDP, self::INCOTERMS_DDP_LABEL],
@@ -320,6 +324,7 @@ class Form
                 ['ERROR', 'ERROR'],
                 ['INFO', 'INFO'],
             ],
+            'scope' => FormElement::SCOPE_SHOP
         ]);
 
         $form->setElement('number', self::LOG_ROTATION_DAYS_FIELD, [
@@ -329,6 +334,7 @@ class Form
             'minValue' => 0,
             'maxValue' => 365,
             'required' => true,
+            'scope' => FormElement::SCOPE_SHOP
         ]);
 
         $form->setElement('base', 'mopt_avalara__fieldset__origin_address', [
@@ -343,42 +349,50 @@ class Form
                 'padding' => '5px',
             ],
             'baseCls' => 'x-panel-header-default-top x-panel-header-default x-window-header-text-default',
+            'scope' => FormElement::SCOPE_SHOP
         ]);
 
         $form->setElement('text', self::ORIGIN_ADDRESS_LINE_1_FIELD, [
             'label' => 'Line1',
             'required' => true,
+            'scope' => FormElement::SCOPE_SHOP
         ]);
 
         $form->setElement('text', self::ORIGIN_ADDRESS_LINE_2_FIELD, [
             'label' => 'Line2',
             'required' => false,
+            'scope' => FormElement::SCOPE_SHOP
         ]);
 
         $form->setElement('text', self::ORIGIN_ADDRESS_LINE_3_FIELD, [
             'label' => 'Line3',
             'required' => false,
+            'scope' => FormElement::SCOPE_SHOP
         ]);
 
         $form->setElement('text', self::ORIGIN_POSTAL_CODE_FIELD, [
             'label' => 'Postal code (zipcode)',
             'required' => true,
+            'scope' => FormElement::SCOPE_SHOP
         ]);
 
         $form->setElement('select', self::ORIGIN_COUNTRY_FIELD, [
             'label' => 'Country (ISO 3166 country code)',
             'required' => true,
             'store' => $this->getCountriesISO(),
+            'scope' => FormElement::SCOPE_SHOP
         ]);
 
         $form->setElement('text', self::ORIGIN_REGION_FIELD, [
             'label' => 'Region (ISO 3166 region code)',
             'required' => true,
+            'scope' => FormElement::SCOPE_SHOP
         ]);
         
         $form->setElement('text', self::ORIGIN_CITY_FIELD, [
             'label' => 'City',
             'required' => true,
+            'scope' => FormElement::SCOPE_SHOP
         ]);
 
         $form->setElement('base', 'mopt_avalara__fieldset__test', [
