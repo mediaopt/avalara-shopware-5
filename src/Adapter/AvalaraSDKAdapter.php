@@ -237,11 +237,10 @@ class AvalaraSDKAdapter implements AdapterInterface
      */
     private function getSDKEnv()
     {
-        if ($this->getPluginConfig(Form::IS_LIVE_MODE_FIELD)) {
-            return self::PRODUCTION_ENV;
-        }
-        
-        return self::SANDBOX_ENV;
+        return $this->getPluginConfig(Form::IS_LIVE_MODE_FIELD)
+            ? self::PRODUCTION_ENV
+            : self::SANDBOX_ENV
+        ;
     }
     
     /**
