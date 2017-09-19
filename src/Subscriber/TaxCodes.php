@@ -16,11 +16,11 @@ class TaxCodes extends AbstractSubscriber
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             'Enlight_Controller_Action_PostDispatch_Backend_Category' => 'onPostDispatchBackendCategory',
             'Enlight_Controller_Action_PostDispatch_Backend_Article' => 'onPostDispatchBackendArticle',
             'Enlight_Controller_Action_PostDispatch_Backend_Shipping' => 'onPostDispatchBackendShipping',
-        );
+        ];
     }
 
     /**

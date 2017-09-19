@@ -18,20 +18,20 @@ if (version_compare(\Shopware::VERSION, '4.3.0', '>=')) {
 
 //init plugin (for autoloading)
 Shopware()->Plugins()->Backend()->MoptAvalara();
-
-$sdkMain = Shopware()->Container()->get('MediaoptAvalaraSdkMain');
+$service = \Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter::SERVICE_NAME;
+$adapter = Shopware()->Container()->get($service);
 try {
     $address1 = array();
     $address1['AddressCode'] = '01';
     $address1['City'] = 'Washingtooon';
-    $address1['Country'] = \Mediaopt\Avalara\Sdk\Model\Address::COUNTRY_CODE__US;
+    $address1['Country'] = \Shopware\Plugins\MoptAvalara\Adapter\Factory\AddressFactory::COUNTRY_CODE__US;
     $address1['Line1'] = 'White House';
     $address1['Line2'] = '1600 Pennsylvania Ave NW';
     $address1['PostalCode'] = 20500;
     $address1['Region'] = 'DC';
     $address2['AddressCode'] = '02';
     $address2['City'] = 'Washington';
-    $address2['Country'] = \Mediaopt\Avalara\Sdk\Model\Address::COUNTRY_CODE__US;
+    $address2['Country'] = \Shopware\Plugins\MoptAvalara\Adapter\Factory\AddressFactory::COUNTRY_CODE__US;
     $address2['Line1'] = 'White House';
     $address2['Line2'] = '1600 Pennsylvania Ave NW';
     $address2['PostalCode'] = 20500;
@@ -73,7 +73,7 @@ try {
     $orderData['DocCode'] = 'DOC33333';
     $avalaraData['DocType'] = 'SalesInvoice';
     $avalaraData['Commit'] = 'true';
-    $response = $sdkMain->getService('getTax')->getTax($userData,$addressData,$lineData,$orderData,$avalaraData);
+    $response = $adapter->getService('getTax')->getTax($userData,$addressData,$lineData,$orderData,$avalaraData);
     if(empty($response['ResultCode']) || $response['ResultCode'] != 'Success') {
         echo 'Validation failed !';
         exit;

@@ -15,16 +15,16 @@ class AdjustTax extends AbstractSubscriber
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             'Enlight_Controller_Action_PostDispatch_Backend_Order' => 'onPostDispatchBackendOrder',
             'Enlight_Controller_Action_PostDispatch_Backend_Order_SavePosition' => 'onBackendOrderSavePosition',
-        );
+        ];
     }
     
     public function onPostDispatchBackendOrder(\Enlight_Event_EventArgs $args)
     {
         $request = $args->getSubject()->Request();
-        $observedActions = array('save', 'savePosition');
+        $observedActions = ['save', 'savePosition'];
         $action = $request->getActionName();
         
         if (!in_array($action, $observedActions)) {

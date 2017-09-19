@@ -4,8 +4,75 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "cdcc8dc8ced5619b67f90e7b895ab843",
+    "content-hash": "32a9203ec4000a38a72a0ef16f6a7f3f",
     "packages": [
+        {
+            "name": "avalara/avataxclient",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bubnov-mikhail/AvaTax-REST-V2-PHP-SDK.git",
+                "reference": "36af04f7940e30a32c06a8fca07f76f97eb3830d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bubnov-mikhail/AvaTax-REST-V2-PHP-SDK/zipball/36af04f7940e30a32c06a8fca07f76f97eb3830d",
+                "reference": "36af04f7940e30a32c06a8fca07f76f97eb3830d",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "5.*",
+                "php": ">=5.5.9"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "5.7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Avalara\\": "src/"
+                }
+            },
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Avalara Developer Relations",
+                    "homepage": "https://developer.avalara.com"
+                },
+                {
+                    "name": "Community Developer Forum",
+                    "homepage": "https://community.avalara.com"
+                },
+                {
+                    "name": "Ted Spence",
+                    "email": "ted.spence@avalara.com"
+                },
+                {
+                    "name": "Bob Maidens",
+                    "email": "bob.maidens@avalara.com"
+                }
+            ],
+            "description": "Client library for Avalara's AvaTax suite of business tax calculation and processing services. Uses the REST v2 API.",
+            "homepage": "http://developer.avalara.com/",
+            "keywords": [
+                "AvaTax",
+                "Avalara",
+                "ecommerce",
+                "sales compliance",
+                "tax",
+                "tax calculation",
+                "taxes"
+            ],
+            "support": {
+                "docs": "https://developer.avalara.com",
+                "forum": "https://community.avalara.com",
+                "source": "https://github.com/avadev/AvaTax-REST-V2-PHP-SDK",
+                "issues": "https://github.com/avadev/AvaTax-REST-V2-PHP-SDK/issues"
+            },
+            "time": "2017-05-04 10:56:40"
+        },
         {
             "name": "guzzlehttp/guzzle",
             "version": "5.3.1",
@@ -213,25 +280,6 @@
             "time": "2014-10-12T19:18:40+00:00"
         },
         {
-            "name": "mediaopt/avalara-sdk",
-            "version": "1.0.1",
-            "source": {
-                "type": "git",
-                "url": "git@bitbucket.org:mediaopt/avalara-sdk.git",
-                "reference": "ab4f34c9232ad073e8948366089b72c3098f58d4"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Mediaopt\\Avalara\\": "src/"
-                }
-            },
-            "license": [
-                "proprietary"
-            ],
-            "time": "2017-04-27T11:11:53+00:00"
-        },
-        {
             "name": "monolog/monolog",
             "version": "1.12.0",
             "source": {
@@ -398,9 +446,18 @@
         }
     ],
     "packages-dev": [],
-    "aliases": [],
+    "aliases": [
+        {
+            "alias": "2.17",
+            "alias_normalized": "2.17.0.0",
+            "version": "9999999-dev",
+            "package": "avalara/avataxclient"
+        }
+    ],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "avalara/avataxclient": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],

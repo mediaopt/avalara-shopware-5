@@ -1,5 +1,5 @@
 <?php
-
+error_reporting( E_ALL );
 /**
  * this class configures:
  * installment, uninstallment, updates, hooks, events, payment methods
@@ -10,12 +10,6 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
 {
     const PLUGIN_NAME = 'MoptAvalara';
 
-    const LOGGER_DEFAULT_ROTATING_DAYS = 7;
-
-    const LOG_FILE_NAME = 'mo_avalara';
-
-    const LOG_FILE_EXT = '.log';
-
     /**
      * get plugin capabilities
      *
@@ -23,11 +17,11 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
      */
     public function getCapabilities()
     {
-        return array(
+        return [
             'install' => true,
             'update' => true,
             'enable' => true,
-        );
+        ];
     }
 
     /**
@@ -63,11 +57,12 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
      */
     public function install()
     {
+        $this->registerControllers();
         $this->registerEvents();
         $this->addAttributes();
         $this->createForm();
 
-        return array('success' => true, 'invalidateCache' => array('backend', 'proxy'));
+        return ['success' => true, 'invalidateCache' => ['backend', 'proxy']];
     }
 
     /**
@@ -81,6 +76,9 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
         if (version_compare($oldVersion, '1.0.2', '<=')) {
             $this->update_1_1_0();
         }
+        if (version_compare($oldVersion, '2.0.0', '<=')) {
+            $this->update_2_0_0();
+        }
         return true;
     }
 
@@ -90,6 +88,15 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
     protected function update_1_1_0()
     {
         $this->addAttributes();
+    }
+
+    /**
+     * @TODO Add new fields to categories and articles
+     *  New fields
+     */
+    protected function update_2_0_0()
+    {
+        
     }
 
     /**
@@ -104,27 +111,47 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
     }
 
     /**
-     * include plugin bootstrap
+     * Create SDK
      */
     public function afterInit()
     {
         $this->Application()->Loader()->registerNamespace('Shopware\\Plugins\\MoptAvalara', $this->Path());
-
+        require_once $this->Path() . 'vendor/autoload.php';
+        // @TODO remove this require after avalara will fix autoloading
+        require_once $this->Path() . 'vendor/avalara/avataxclient/src/AvaTaxClient.php';
+        $serviceName = \Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter::SERVICE_NAME;
+        Shopware()->Container()->set($serviceName, $this->createAvalaraSdkAdapter());
+        
         //add snippets
         $this->get('Snippets')->addConfigDir($this->Path() . 'Snippets/');
-
-        require_once __DIR__ . '/vendor/mediaopt/avalara-sdk/src/Adapter/Shopware4/bootstrap.php';
     }
-
+    
+    /**
+     * 
+     * @return \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface
+     */
+    private function createAvalaraSdkAdapter()
+    {
+        return new \Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter($this->getName(), $this->getVersion());
+    }
+    
+    /**
+     * register controllers
+     * @throws \Exception
+     */
+    protected function registerControllers()
+    {
+        $this->registerController('Backend', 'MoptAvalaraBackendProxy');
+        $this->registerController('Backend', 'MoptAvalara');
+        $this->registerController('Backend', 'MoptAvalaraLog');
+    }
+    
     /**
      * register for several events to extend shop functions
      * @throws \Exception
      */
     protected function registerEvents()
     {
-        $this->registerController('Backend', 'MoptAvalaraBackendProxy');
-        $this->registerController('Backend', 'MoptAvalara');
-        $this->registerController('Backend', 'MoptAvalaraLog');
         $this->subscribeEvent('Enlight_Controller_Front_DispatchLoopStartup', 'onDispatchLoopStartup');
     }
 
@@ -135,9 +162,8 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
      */
     public function onDispatchLoopStartup(Enlight_Event_EventArgs $args)
     {
-        $container = Shopware()->Container();
-        $subscribers = array();
-        $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\AddressCheck($this, $container);
+        $subscribers = [];
+        $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\AddressCheck($this);
         $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\Templating($this);
         $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\GetTax($this);
         $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\AdjustTax($this);
@@ -215,6 +241,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
      */
     public function createForm()
     {
-        include_once __DIR__ . '/Bootstrap/createForm.php';
+        $formCreator = new \Shopware\Plugins\MoptAvalara\Form\FormCreator($this);
+        $formCreator->createForms();
     }
 }

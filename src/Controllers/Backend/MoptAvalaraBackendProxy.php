@@ -10,20 +10,40 @@ class Shopware_Controllers_Backend_MoptAvalaraBackendProxy extends Shopware_Cont
      */
     public function getConnectionTestAction()
     {
-        $sdkMain = Shopware()->Container()->get('MediaoptAvalaraSdkMain');
+        $client = $this->getAvalaraSDKClient();
         try {
-            $response = $sdkMain->getService('testConnection')->test();
-            if (empty($response['ResultCode']) || $response['ResultCode'] != 'Success') {
-                $result['error'] = 'Unknown error';
-            } else {
-                $result['info'] = 'Connection test successful.';
+            /* @var $pingResponse \Avalara\PingResultModel */
+            $pingResponse = $client->ping();
+
+            if (!($pingResponse instanceof \stdClass)) {
+                throw new \Exception('Connection test failed: unknown error.');
             }
+            if (empty($pingResponse->authenticated)) {
+                throw new \Exception('Connection test failed: please check your credentials.');
+            }
+            
+            $result['info'] = 'Connection test successful.';
         } catch (Exception $e) {
-            $result['error'] = 'Connection test failed: please check your credentials.';
+            $result['error'] = $e->getMessage();
         }
+        
         $response = $this->Response();
         $response->setBody(json_encode($result));
         $response->sendResponse();
+        
         exit;
+    }
+    
+    /**
+     * 
+     * @return \Avalara\AvaTaxClient
+     */
+    private function getAvalaraSDKClient()
+    {
+        $serviceName = \Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter::SERVICE_NAME;
+        /* @var $adapter \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface */
+        $adapter = Shopware()->Container()->get($serviceName);
+        
+        return $adapter->getClient();
     }
 }

@@ -17,19 +17,19 @@ class Shopware_Controllers_Backend_MoptAvalaraLog extends Shopware_Controllers_B
   public function downloadLogfileAction()
   {
       try {
-          $fileNamePart = Shopware_Plugins_Backend_MoptAvalara_Bootstrap::LOG_FILE_NAME;
-          $logFileName = $fileNamePart . '-' . date('Y-m-d') . Shopware_Plugins_Backend_MoptAvalara_Bootstrap::LOG_FILE_EXT;
+          $fileNamePart = \Shopware\Plugins\MoptAvalara\Form\FormCreator::LOG_FILE_NAME;
+          $logFileName = $fileNamePart . '-' . date('Y-m-d') . \Shopware\Plugins\MoptAvalara\Form\FormCreator::LOG_FILE_EXT;
 
           $logDirectory = $this->getLogDir();
 
           $file = $logDirectory . $logFileName;
 
           if (!file_exists($file)) {
-              $this->View()->assign(array(
+              $this->View()->assign([
                   'success' => false,
                   'data' => $logFileName,
                   'message' => 'File not exist'
-              ));
+              ]);
           }
 
           $response = $this->Response();
@@ -45,11 +45,11 @@ class Shopware_Controllers_Backend_MoptAvalaraLog extends Shopware_Controllers_B
       }
       catch (Exception $e) {
           echo("Exception");
-          $this->View()->assign(array(
+          $this->View()->assign([
              'success' => false,
              'data' => $this->Request()->getParams(),
              'message' => $e->getMessage()
-          ));
+          ]);
           return;
       }
 

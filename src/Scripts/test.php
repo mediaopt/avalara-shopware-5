@@ -19,17 +19,18 @@ if (version_compare(\Shopware::VERSION, '4.3.0', '>=')) {
 //init plugin (for autoloading)
 Shopware()->Plugins()->Backend()->MoptAvalara();
 
-$sdkMain = Shopware()->Container()->get('MediaoptAvalaraSdkMain');
+$serviceName = \Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter::SERVICE_NAME;
+$adapter = Shopware()->Container()->get($serviceName);
 try {
     $addressData = array();
     $addressData['City'] = 'Washingtooon';
-    $addressData['Country'] = \Mediaopt\Avalara\Sdk\Model\Address::COUNTRY_CODE__US;
+    $addressData['Country'] = \Shopware\Plugins\MoptAvalara\Adapter\Factory\AddressFactory::COUNTRY_CODE__US;
     $addressData['Line1'] = 'White House';
     $addressData['Line2'] = '1600 Pennsylvania Ave NW';
     $addressData['PostalCode'] = 20500;
     $addressData['Region'] = 'DC';
 
-    $response = $sdkMain->getService('validateAddress')->validate($addressData);
+    $response = $adapter->getService('validateAddress')->validate($addressData);
     if(empty($response['ResultCode']) || $response['ResultCode'] != 'Success') {
         echo 'Validation failed !';
         exit;
@@ -37,7 +38,7 @@ try {
     
     //compare address fields
     foreach ($addressData as $key => $value) {
-        $sdkMain->getLogger()->info("".$key." : ".$value);
+        $adapter->getLogger()->info("".$key." : ".$value);
         echo 'compare ' . $key . ': ' . $value . ' == ' . $response['Address'][$key]  . ' => ' . 
                 ($value == $response['Address'][$key] ? 'true' : 'false') . '<br />';
     }
