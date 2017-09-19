@@ -84,6 +84,11 @@ class AvalaraSDKAdapter implements AdapterInterface
      * @var LogSubscriber
      */
     private $logSubscriber;
+
+    /**
+     * @var AbstractService[]
+     */
+    private $services = [];
     
     /**
      *
@@ -110,15 +115,19 @@ class AvalaraSDKAdapter implements AdapterInterface
     }
     
     /**
-     * get service by type
+     * Get service by type
      *
      * @param string $type
      * @return AbstractService
      */
     public function getService($type)
     {
-        $name = self::SEVICES_NAMESPACE . ucfirst($type);
-        return new $name($this);
+        if (!isset($this->services[$type])) {
+            $name = self::SEVICES_NAMESPACE . ucfirst($type);
+            $this->services[$type] = new $name($this);
+        }
+
+        return $this->services[$type];
     }
     
     /**
