@@ -234,6 +234,36 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
             'displayInBackend' => false,
             'custom' => true,
         ]);
+
+        $tables = [
+            's_categories_attributes',
+            's_articles_attributes',
+            's_user_attributes',
+            's_order_attributes',
+            's_premium_dispatch_attributes',
+            's_emarketing_vouchers_attributes',
+        ];
+
+        $this->refreshAttributeModels($tables);
+    }
+
+    /**
+     *
+     * @param array $tables
+     */
+    private function refreshAttributeModels($tables = [])
+    {
+        if (empty($tables)) {
+            return;
+        }
+
+        $modelManager = $this->get('models');
+        $modelManager
+            ->getConfiguration()
+            ->getMetadataCacheImpl()
+            ->deleteAll()
+        ;
+        $modelManager->generateAttributeModels($tables);
     }
 
     /**
