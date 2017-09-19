@@ -151,22 +151,25 @@ class FormCreator {
 
         $form->setElement('boolean', self::IS_LIVE_MODE_FIELD, [
             'label' => 'Live Modus',
-            'scope' => FormElement::SCOPE_SHOP
+            'scope' => FormElement::SCOPE_SHOP,
         ]);
 
         $form->setElement('text', self::ACCOUNT_NUMBER_FIELD, [
             'label' => 'Account number',
             'required' => true,
+            'scope' => FormElement::SCOPE_SHOP,
         ]);
 
         $form->setElement('text', self::LICENSE_KEY_FIELD, [
             'label' => 'License key',
             'required' => true,
+            'scope' => FormElement::SCOPE_SHOP,
         ]);
         
         $form->setElement('text', self::COMPANY_CODE_FIELD, [
             'label' => 'Company code',
             'required' => true,
+            'scope' => FormElement::SCOPE_SHOP,
         ]);
 
         $form->setElement('base', 'mopt_avalara__fieldset__configuration', [
@@ -186,13 +189,13 @@ class FormCreator {
         $form->setElement('boolean', self::TAX_ENABLED_FIELD, [
             'label' => 'Enable Avalara SalesTax calculation',
             'description' => 'Choose, if you want to use the Avalara SalesTax Calculation.',
-            'scope' => FormElement::SCOPE_SHOP
+            'scope' => FormElement::SCOPE_SHOP,
         ]);
 
         $form->setElement('boolean', self::DOC_COMMIT_ENABLED_FIELD, [
             'label' => 'Enable document committing',
             'description' => 'Disable document committing will result that all calls will be done with DocType=SalesOrder and suppress any non-getTax calls(i.e.canceltax,postTax)',
-            'scope' => FormElement::SCOPE_SHOP
+            'scope' => FormElement::SCOPE_SHOP,
         ]);
 
         $form->setElement('select', self::ADDRESS_VALIDATION_COUNTRIES_FIELD, [
@@ -205,6 +208,7 @@ class FormCreator {
                 [self::DELIVERY_COUNTRY_CANADA, 'Canada only'],
                 [self::DELIVERY_COUNTRY_USA_AND_CANADA, 'USA & Canada']
             ],
+            'scope' => FormElement::SCOPE_SHOP,
         ]);
 
         $form->setElement('select', self::LOG_LEVEL_FIELD, [
@@ -216,6 +220,7 @@ class FormCreator {
                 ['ERROR', 'ERROR'],
                 ['INFO', 'INFO'],
             ],
+            'scope' => FormElement::SCOPE_SHOP,
         ]);
 
         $form->setElement('number', self::LOG_ROTATION_DAYS_FIELD, [
@@ -225,6 +230,7 @@ class FormCreator {
             'minValue' => 0,
             'maxValue' => 365,
             'required' => true,
+            'scope' => FormElement::SCOPE_SHOP,
         ]);
 
         $form->setElement('base', 'mopt_avalara__fieldset__origin_address', [
@@ -244,37 +250,44 @@ class FormCreator {
         $form->setElement('text', self::ORIGIN_ADDRESS_LINE_1_FIELD, [
             'label' => 'Line1',
             'required' => true,
+            'scope' => FormElement::SCOPE_SHOP,
         ]);
 
         $form->setElement('text', self::ORIGIN_ADDRESS_LINE_2_FIELD, [
             'label' => 'Line2',
             'required' => false,
+            'scope' => FormElement::SCOPE_SHOP,
         ]);
 
         $form->setElement('text', self::ORIGIN_ADDRESS_LINE_3_FIELD, [
             'label' => 'Line3',
             'required' => false,
+            'scope' => FormElement::SCOPE_SHOP,
         ]);
 
         $form->setElement('text', self::ORIGIN_POSTAL_CODE_FIELD, [
             'label' => 'Postal code (zipcode)',
             'required' => true,
+            'scope' => FormElement::SCOPE_SHOP,
         ]);
 
         $form->setElement('select', self::ORIGIN_COUNTRY_FIELD, [
             'label' => 'Country (ISO 3166 country code)',
             'required' => true,
             'store' => $this->getCountriesISO(),
+            'scope' => FormElement::SCOPE_SHOP,
         ]);
 
         $form->setElement('text', self::ORIGIN_REGION_FIELD, [
             'label' => 'Region (ISO 3166 region code)',
             'required' => true,
+            'scope' => FormElement::SCOPE_SHOP,
         ]);
         
         $form->setElement('text', self::ORIGIN_CITY_FIELD, [
             'label' => 'City',
             'required' => true,
+            'scope' => FormElement::SCOPE_SHOP,
         ]);
 
         $form->setElement('base', 'mopt_avalara__fieldset__test', [
