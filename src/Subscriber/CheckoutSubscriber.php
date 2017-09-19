@@ -141,12 +141,11 @@ class CheckoutSubscriber extends AbstractSubscriber
 
             $session->MoptAvalaraGetTaxResult = $service->generateTaxResultFromResponse($response);
             $session->MoptAvalaraGetTaxRequestHash = $service->getHashFromRequest($model);
+            //Trigger the same action again so the basket tax and landed cost could be applied in this request.
+            $args->getSubject()->forward($action);
         } catch (\Exception $e) {
             $adapter->getLogger()->error('GetTax call failed: ' . $e->getMessage());
         }
-
-        //Trigger the same action again so the basket tax and landed cost could be applied in this request.
-        $args->getSubject()->forward($action);
     }
 
     /**
