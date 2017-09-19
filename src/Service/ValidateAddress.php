@@ -48,7 +48,7 @@ class ValidateAddress extends AbstractService
 
         foreach ($checkedAddress as $key => $value) {
             //Skip the region key
-            if (in_array($key, self::$ignoreAddressParts)) {
+            if (in_array($key, self::$ignoreAddressParts, true)) {
                 continue;
             }
             if (isset($suggestedAddress->$key) && $suggestedAddress->$key != $value) {

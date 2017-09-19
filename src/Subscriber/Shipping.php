@@ -28,7 +28,7 @@ class Shipping extends AbstractSubscriber
         $observedActions = ['updateDispatch', 'createDispatch'];
         $action = $request->getActionName();
         
-        if (!in_array($action, $observedActions)) {
+        if (!in_array($action, $observedActions, true)) {
             return;
         }
         

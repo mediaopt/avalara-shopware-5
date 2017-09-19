@@ -3,7 +3,6 @@
 namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
 use Avalara\LineItemModel;
-use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
 
 /**
  * Factory to create \Avalara\LineItemModel
@@ -120,7 +119,8 @@ class LineFactory extends AbstractFactory
             self::MODUS_VOUCHER, 
             self::MODUS_BASKET_DISCOUNT, 
             self::MODUS_DISCOUNT,
-        ]);
+        ],
+        true);
     }
     
     /**

@@ -27,7 +27,7 @@ class AdjustTax extends AbstractSubscriber
         $observedActions = ['save', 'savePosition'];
         $action = $request->getActionName();
         
-        if (!in_array($action, $observedActions)) {
+        if (!in_array($action, $observedActions, true)) {
             return;
         }
         
