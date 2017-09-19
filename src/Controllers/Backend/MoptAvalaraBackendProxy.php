@@ -59,7 +59,7 @@ class Shopware_Controllers_Backend_MoptAvalaraBackendProxy extends Shopware_Cont
             ? 'testTaxAndLandedCostRequest.json'
             : 'testTaxRequest.json'
         ;
-        $model = $this->loadMockData($fileName);
+        $model = $this->getMockModel($fileName);
         $response = $adapter->getAvaTaxClient()->createTransaction(null, $model);
 
         if (is_string($response)) {
@@ -80,7 +80,7 @@ class Shopware_Controllers_Backend_MoptAvalaraBackendProxy extends Shopware_Cont
      * @return \stdClass
      * @throws \Exception
      */
-    private function loadMockData($fileName)
+    private function getMockModel($fileName)
     {
         $this->getAdapter()->getBootstrap();
         $filePath = $this->getAdapter()->getBootstrap()->Path() . 'Data/' . $fileName;
