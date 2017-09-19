@@ -115,7 +115,7 @@ class LineFactory extends AbstractFactory
      */
     public static function isDiscount($modus)
     {
-        return in_array($modus, [
+        return in_array((int)$modus, [
             self::MODUS_VOUCHER, 
             self::MODUS_BASKET_DISCOUNT, 
             self::MODUS_DISCOUNT,
@@ -148,7 +148,7 @@ class LineFactory extends AbstractFactory
         if (null === $attr) {
             return null;
         }
-        
+
         return $attr->getMoptAvalaraTaxcode();
     }
 }
