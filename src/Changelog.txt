@@ -1,0 +1,9 @@
+
+== develop ==
+
+== 2.0.5 ==
+* It is now possible to setup all plugin configuration per subshop.
+* Bugfix: Avoiding loop redirect in case of error calling Avalara API.
+
+== 2.0.4 ==
+* It is now possible to setup live mode per subshop.
