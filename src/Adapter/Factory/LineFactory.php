@@ -161,6 +161,12 @@ class LineFactory extends AbstractFactory
      */
     private function getHsCode(Article $article)
     {
+        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
+        $service = $this->getAdapter()->getService('GetTax');
+        if (!$service->isLandedCostEnabled()) {
+            return null;
+        }
+
         //directly assigned to article ?
         if ($hsCode = $this->getHsCodeFromAttr($article->getAttribute())) {
             return $hsCode;
