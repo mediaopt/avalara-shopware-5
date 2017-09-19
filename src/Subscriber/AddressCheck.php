@@ -121,7 +121,7 @@ class AddressCheck extends AbstractSubscriber
                     AddressFactory::COUNTRY_CODE__US
                 ];
                 
-                if(in_array($country, $usaAndCanada)) {
+                if(in_array($country, $usaAndCanada, true)) {
                     return true;
                 }
                 break;

@@ -36,11 +36,11 @@ class TransactionModelFactoryFromOrder extends AbstractFactory
         $model->commit = true;
         $model->customerCode = $customer->getId();
         $model->date = date('Y-m-d', time());
-        $model->discount = $this->discount;
         $model->type = \Avalara\DocumentType::C_SALESINVOICE;
         $model->currencyCode = $order->getCurrency();
         $model->addresses = $this->getAddressesModel($order);
         $model->lines = $this->getLineModels($order);
+        $model->discount = $this->discount;
         $model->companyCode = $this
             ->getAdapter()
             ->getPluginConfig(FormCreator::COMPANY_CODE_FIELD)

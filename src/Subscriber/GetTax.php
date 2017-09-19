@@ -50,7 +50,6 @@ class GetTax extends AbstractSubscriber
 
         if (!$this->isGetTaxCall($model) || empty($args->getSubject()->View()->sUserLoggedIn)) {
             $adapter->getLogger()->info('GetTax call for current basket already done / not enabled.');
-            
             return;
         }
 
@@ -64,7 +63,7 @@ class GetTax extends AbstractSubscriber
             $session->MoptAvalaraGetTaxResult = $response;
             $session->MoptAvalaraGetTaxRequestHash = $this->getHashFromRequest($model);
             //Trigger the same action again so the basket tax and landed cost could be applied in this request.
-            $args->getSubject()->forward('checkout', 'index');
+            $args->getSubject()->forward('confirm');
         } catch (\GuzzleHttp\Exception\TransferException $e) {
             $adapter->getLogger()->error('GetTax call failed: ' . $e->getMessage());
 
@@ -88,7 +87,7 @@ class GetTax extends AbstractSubscriber
 
         /* @var $session Enlight_Components_Session_Namespace */
         $session = Shopware()->Session();
-        
+
         if (!$session->MoptAvalaraGetTaxRequestHash) {
             return true;
         }
@@ -157,8 +156,8 @@ class GetTax extends AbstractSubscriber
      */
     public function onBeforeSOrderSaveOrder(\Enlight_Hook_HookArgs $args)
     {
+        $adapter = $this->getAdapter();
         if (!$getTaxCommitRequest = $this->validateCommitCall()) {
-            //@todo error-message
             throw new \Exception('MoptAvalara: invalid call.');
         } elseif (!($getTaxCommitRequest instanceof CreateTransactionModel)) {
             $adapter->getLogger()->error('Not in avalara context');
@@ -208,7 +207,6 @@ class GetTax extends AbstractSubscriber
     /**
      * commit transaction
      * @param \Enlight_Event_EventArgs $args
-     * @return type
      */
     public function onAfterSOrderSaveOrder(\Enlight_Hook_HookArgs $args)
     {

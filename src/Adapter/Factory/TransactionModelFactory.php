@@ -34,11 +34,11 @@ class TransactionModelFactory extends AbstractFactory
         $model->commit = $isCommit;
         $model->customerCode = $user['additional']['user']['id'];
         $model->date = date('Y-m-d', time());
-        $model->discount = $this->discount;
         $model->type = $docType;
         $model->currencyCode = Shopware()->Shop()->getCurrency()->getCurrency();
         $model->addresses = $this->getAddressesModel();
         $model->lines = $this->getLineModels();
+        $model->discount = $this->discount;
         $model->companyCode = $this
             ->getAdapter()
             ->getPluginConfig(FormCreator::COMPANY_CODE_FIELD)
@@ -83,9 +83,9 @@ class TransactionModelFactory extends AbstractFactory
                 $lines[] = $lineFactory->build($position);
                 continue;
             }
-            
+
             if (LineFactory::isDiscountGlobal($position)) {
-                $this->discount -= floatval($position['netprice']);
+                $this->discount -= (float)$position['netprice'];
                 continue;
             }
             
