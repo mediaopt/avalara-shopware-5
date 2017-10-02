@@ -1,6 +1,9 @@
 
 == develop ==
 
+== 2.1.0 ==
+* Avalara LandedCost has been implemented
+
 == 2.0.5 ==
 * It is now possible to setup all plugin configuration per subshop.
 * Bugfix: Avoiding loop redirect in case of error calling Avalara API.
