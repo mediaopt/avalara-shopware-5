@@ -1,12 +1,18 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Service;
 
 use Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface;
 
 /**
- * Description of AbstractService
- *
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Service
  */
 abstract class AbstractService
 {
@@ -17,7 +23,7 @@ abstract class AbstractService
     protected $adapter;
     
     /**
-     * 
+     *
      * @param AdapterInterface $adapter
      */
     public function __construct(AdapterInterface $adapter)
@@ -27,7 +33,7 @@ abstract class AbstractService
     
     /**
      * get adapter
-     * 
+     *
      * @return \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface
      */
     public function getAdapter()

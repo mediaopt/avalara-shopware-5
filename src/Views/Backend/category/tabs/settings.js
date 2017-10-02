@@ -6,7 +6,8 @@ Ext.define('Shopware.apps.moptAvalara.Category.view.category.tabs.settings', {
     /**
      * @Override
      */
-    getItems: function () {
+    getItems: function () 
+    {
         var me = this;
         var result = me.callParent(arguments);
         result.push(me.getCategoryMapping());
@@ -22,8 +23,14 @@ Ext.define('Shopware.apps.moptAvalara.Category.view.category.tabs.settings', {
             items: [{
                     xtype: 'textfield',
                     fieldLabel: 'Taxcode',
-                    name: 'attribute[moptAvalaraTaxcode]',
-                }]
+                    name: 'attribute[moptAvalaraTaxcode]'
+                },
+                {
+                    xtype: 'textfield',
+                    fieldLabel: 'Harmonized Classification Code (hsCode)',
+                    name: 'attribute[moptAvalaraHscode]'
+                }
+            ]
         });
     }
 });

@@ -1,18 +1,24 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Service;
 
 use Avalara\AddressLocationInfo;
 
 /**
- * Description of ValidateAddress
- *
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Service
  */
 class ValidateAddress extends AbstractService
 {
     /**
      * Ignore any difference in this address parts
-     * @var array 
+     * @var array
      */
     private static $ignoreAddressParts = [
         'region',
@@ -21,17 +27,17 @@ class ValidateAddress extends AbstractService
     ];
     
     /**
-     * 
+     *
      * @param \Avalara\AddressLocationInfo $address
      * @return \stdClass
      */
     public function validate(AddressLocationInfo $address)
     {
-        return $this->getAdapter()->getClient()->resolveAddressPost($address);
+        return $this->getAdapter()->getAvaTaxClient()->resolveAddressPost($address);
     }
 
     /**
-     * 
+     *
      * @param \Avalara\AddressLocationInfo $checkedAddress
      * @param \stdClass $response
      * @return array
@@ -39,7 +45,7 @@ class ValidateAddress extends AbstractService
     public function getAddressChanges(AddressLocationInfo $checkedAddress, $response)
     {
         $changes = [];
-        if (empty($response) || !is_object($response) || empty($response->validatedAddresses)) {
+        if (null === $response || !is_object($response) || empty($response->validatedAddresses)) {
             return $changes;
         }
 
@@ -48,7 +54,7 @@ class ValidateAddress extends AbstractService
 
         foreach ($checkedAddress as $key => $value) {
             //Skip the region key
-            if (in_array($key, self::$ignoreAddressParts, true)) {
+            if (in_array($key, self::$ignoreAddressParts, false)) {
                 continue;
             }
             if (isset($suggestedAddress->$key) && $suggestedAddress->$key != $value) {
@@ -58,5 +64,4 @@ class ValidateAddress extends AbstractService
 
         return $changes;
     }
-
 }

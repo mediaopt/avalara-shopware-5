@@ -1,14 +1,23 @@
 <?php
 
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
 namespace Shopware\Plugins\MoptAvalara\Adapter;
 
 /**
  * Adapter interface for the Avalara SDK.
+ * 
+ * @author derksen mediaopt GmbH
+ * @package Shopware\Plugins\MoptAvalara\Adapter\Factory
  */
 interface AdapterInterface
 {
     /**
-     * 
+     *
      * @param string $type
      * @return \Shopware\Plugins\MoptAvalara\Adapter\Factory\AbstractFactory
      */
@@ -20,6 +29,12 @@ interface AdapterInterface
     public function getLogger();
     
     /**
+     *
+     * @return \Shopware\Plugins\MoptAvalara\Logger\LogSubscriber
+     */
+    public function getLogSubscriber();
+    
+    /**
      * @param string $type
      * @return \Shopware\Plugins\MoptAvalara\Service\AbstractService
      */
@@ -28,8 +43,8 @@ interface AdapterInterface
     /**
      * @return \Avalara\AvaTaxClient
      */
-    public function getClient();
-    
+    public function getAvaTaxClient();
+
     /**
      * @param string $key
      * @return mixed
@@ -37,8 +52,26 @@ interface AdapterInterface
     public function getPluginConfig($key);
     
     /**
-     * 
+     *
      * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
      */
     public function getBootstrap();
+    
+    /**
+     * @param int $id
+     * @return \Shopware\Models\Order\Order
+     */
+    public function getOrderById($id);
+    
+    /**
+     * @param int $orderNumber
+     * @return \Shopware\Models\Order\Order
+     */
+    public function getOrderByNumber($orderNumber);
+    
+    /**
+     * @param string $docCode
+     * @return \stdClass
+     */
+    public function getTransactionByDocCode($docCode);
 }

@@ -1,14 +1,35 @@
 <?php
-error_reporting( E_ALL );
+
+/**
+ * For the full copyright and license information, refer to the accompanying LICENSE file.
+ *
+ * @copyright derksen mediaopt GmbH
+ */
+
+use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
+use Shopware\Plugins\MoptAvalara\Bootstrap\Database;
+use Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter;
+use Shopware\Plugins\MoptAvalara\Subscriber as SubscriberNamespace;
+use Shopware\Plugins\MoptAvalara\Mail as MailNamespace;
+
 /**
  * this class configures:
  * installment, uninstallment, updates, hooks, events, payment methods
- *
+ * 
  * @extends Shopware_Components_Plugin_Bootstrap
+ * @author derksen mediaopt GmbH
  */
 class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components_Plugin_Bootstrap
 {
+    /**
+     * @var string Plugin identifier
+     */
     const PLUGIN_NAME = 'MoptAvalara';
+    
+    /**
+     * @var string
+     */
+    const SNIPPETS_NAMESPACE = 'frontend/MoptAvalara/messages';
 
     /**
      * get plugin capabilities
@@ -50,64 +71,93 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
     }
 
     /**
-     * perform all neccessary install tasks and return true if successful
+     * Perform all necessary install tasks
      *
      * @return array
      * @throws \Exception
      */
     public function install()
     {
-        $this->registerControllers();
-        $this->registerEvents();
-        $this->addAttributes();
-        $this->createForm();
+        $this
+            ->registerControllers()
+            ->registerEvents()
+            ->createForm()
+            ->updateDatabase()
+        ;
 
-        return ['success' => true, 'invalidateCache' => ['backend', 'proxy']];
+        return ['success' => true, 'invalidateCache' => ['frontend', 'backend', 'proxy']];
     }
 
     /**
-     * perform update depending on plugin version
+     * Perform all necessary update tasks
      *
-     * @param string $oldVersion
-     * @return array|bool
+     * @return array
+     * @throws \Exception
      */
-    public function update($oldVersion)
+    public function update()
     {
-        if (version_compare($oldVersion, '1.0.2', '<=')) {
-            $this->update_1_1_0();
-        }
-        if (version_compare($oldVersion, '2.0.0', '<=')) {
-            $this->update_2_0_0();
-        }
-        return true;
+        $this
+            ->registerControllers()
+            ->registerEvents()
+            ->createForm()
+            ->updateDatabase()
+        ;
+
+        return ['success' => true, 'invalidateCache' => ['frontend', 'backend', 'proxy']];
     }
 
     /**
-     *  compatibility to Shopware 5.2.
-     */
-    protected function update_1_1_0()
-    {
-        $this->addAttributes();
-    }
-
-    /**
-     * @TODO Add new fields to categories and articles
-     *  New fields
-     */
-    protected function update_2_0_0()
-    {
-        
-    }
-
-    /**
-     * perform all neccessary uninstall tasks and return true if successful
+     * Perform all necessary uninstall tasks
      *
      * @return boolean
+     * @throws \Exception
      */
     public function uninstall()
     {
-        $this->disable();
+        $this
+            ->clearDatabase()
+            ->disable()
+        ;
+
         return true;
+    }
+
+    /**
+     * Extend attributes with avalara properties
+     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
+     * @throws \Exception
+     */
+    private function updateDatabase()
+    {
+        $bootstrapDatabase = $this->getDatabaseUpdater();
+        $bootstrapDatabase->install();
+
+        return $this;
+    }
+
+
+    /**
+     * Method will remove avalara properties
+     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
+     * @throws \Exception
+     */
+    private function clearDatabase()
+    {
+        $bootstrapDatabase = $this->getDatabaseUpdater();
+        $bootstrapDatabase->uninstall();
+
+        return $this;
+    }
+
+    /**
+     * @return Database
+     */
+    private function getDatabaseUpdater()
+    {
+        $crudService = $this->get('shopware_attribute.crud_service');
+        $em = Shopware()->Models();
+
+        return new Database($crudService, $em);
     }
 
     /**
@@ -119,7 +169,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
         require_once $this->Path() . 'vendor/autoload.php';
         // @TODO remove this require after avalara will fix autoloading
         require_once $this->Path() . 'vendor/avalara/avataxclient/src/AvaTaxClient.php';
-        $serviceName = \Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter::SERVICE_NAME;
+        $serviceName = AvalaraSDKAdapter::SERVICE_NAME;
         Shopware()->Container()->set($serviceName, $this->createAvalaraSdkAdapter());
         
         //add snippets
@@ -127,32 +177,37 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
     }
     
     /**
-     * 
+     *
      * @return \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface
      */
     private function createAvalaraSdkAdapter()
     {
-        return new \Shopware\Plugins\MoptAvalara\Adapter\AvalaraSDKAdapter($this->getName(), $this->getVersion());
+        return new AvalaraSDKAdapter($this->getName(), $this->getVersion());
     }
     
     /**
      * register controllers
      * @throws \Exception
+     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap;
      */
     protected function registerControllers()
     {
         $this->registerController('Backend', 'MoptAvalaraBackendProxy');
         $this->registerController('Backend', 'MoptAvalara');
-        $this->registerController('Backend', 'MoptAvalaraLog');
+        
+        return $this;
     }
     
     /**
      * register for several events to extend shop functions
      * @throws \Exception
+     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
      */
     protected function registerEvents()
     {
         $this->subscribeEvent('Enlight_Controller_Front_DispatchLoopStartup', 'onDispatchLoopStartup');
+        
+        return $this;
     }
 
     /**
@@ -163,115 +218,51 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
     public function onDispatchLoopStartup(Enlight_Event_EventArgs $args)
     {
         $subscribers = [];
-        $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\AddressCheck($this);
-        $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\Templating($this);
-        $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\GetTax($this);
-        $subscribers[] = new Shopware\Plugins\MoptAvalara\Subscriber\AdjustTax($this);
+        $subscribers[] = new SubscriberNamespace\AddressSubscriber($this);
+        $subscribers[] = new SubscriberNamespace\TemplatingSubscriber($this);
+        $subscribers[] = new SubscriberNamespace\CheckoutSubscriber($this);
+        $subscribers[] = new SubscriberNamespace\BasketSubscriber($this);
+        $subscribers[] = new SubscriberNamespace\BackendOrderUpdateSubscriber($this);
+        $subscribers[] = new SubscriberNamespace\OrderSubscriber($this);
+        $subscribers[] = new SubscriberNamespace\DocumentSubscriber($this);
 
-        foreach ($subscribers as $subscriber) {
-            $this->Application()->Events()->addSubscriber($subscriber);
-        }
+        $subscribersWithMailFormatters = $this->addMailFormatterSubscriber($subscribers);
+
+        array_map(
+            [$this->Application()->Events(), 'addSubscriber'],
+            $subscribersWithMailFormatters
+        );
     }
-
+    
     /**
-     * extend attributes with avalara properties
-     * @throws \Exception
+     * 
+     * @param \Enlight\Event\SubscriberInterface[] $subscribers
+     * @return \Enlight\Event\SubscriberInterface[]
      */
-    public function addAttributes()
+    private function addMailFormatterSubscriber($subscribers = [])
     {
-        /** @var \Shopware\Bundle\AttributeBundle\Service\CrudService $attributeCrudService */
-        $attributeCrudService = $this->get('shopware_attribute.crud_service');
-        $attributeCrudService->update('s_categories_attributes', 'mopt_avalara_taxcode', 'string', [
-            'label' => 'Avalara Tax Code',
-            'supportText' => 'Hier wird der Avalara Tax-Code der Kategorie angegeben, der an Avalara übersendet wird.',
-            'helpText' => '',
-            'translatable' => false,
-            'displayInBackend' => true,
-            'position' => 10,
-            'custom' => true,
-        ]);
-        $attributeCrudService->update('s_articles_attributes', 'mopt_avalara_taxcode', 'string', [
-            'label' => 'Avalara Tax Code',
-            'supportText' => 'Hier wird der Avalara Tax-Code des Artikel angegeben, der an Avalara übersendet wird.',
-            'helpText' => '',
-            'translatable' => false,
-            'displayInBackend' => true,
-            'position' => 10,
-            'custom' => true,
-        ]);
-        $attributeCrudService->update('s_user_attributes', 'mopt_avalara_exemption_code', 'string', [
-            'label' => 'Avalara Exemption Code',
-            'supportText' => 'Hier wird der Exemption-Code für einen Benutzen angegeben, der steuerfrei bei Ihnen einkaufen kann.',
-            'helpText' => '',
-            'translatable' => false,
-            'displayInBackend' => true,
-            'position' => 10,
-            'custom' => true,
-        ]);
-        $attributeCrudService->update('s_order_attributes', 'mopt_avalara_doc_code', 'string', [
-            'displayInBackend' => false,
-            'custom' => true,
-        ]);
-        $attributeCrudService->update('s_premium_dispatch_attributes', 'mopt_avalara_taxcode', 'string', [
-            'label' => 'Avalara Tax Code',
-            'supportText' => 'Hier wird der Avalara Tax-Code für den Versand angegeben, der an Avalara übersendet wird.',
-            'helpText' => '',
-            'translatable' => false,
-            'displayInBackend' => true,
-            'position' => 10,
-            'custom' => true,
-        ]);
-        $attributeCrudService->update('s_emarketing_vouchers_attributes', 'mopt_avalara_taxcode', 'string', [
-            'label' => 'Avalara Tax Code',
-            'supportText' => 'Hier wird der Avalara Tax-Code für Gutscheine angegeben, der an Avalara übersendet wird.',
-            'helpText' => '',
-            'translatable' => false,
-            'displayInBackend' => true,
-            'position' => 10,
-            'custom' => true,
-        ]);
-        $attributeCrudService->update('s_order_attributes', 'mopt_avalara_order_changed', 'boolean', [
-            'displayInBackend' => false,
-            'custom' => true,
-        ]);
-
-        $tables = [
-            's_categories_attributes',
-            's_articles_attributes',
-            's_user_attributes',
-            's_order_attributes',
-            's_premium_dispatch_attributes',
-            's_emarketing_vouchers_attributes',
-        ];
-
-        $this->refreshAttributeModels($tables);
-    }
-
-    /**
-     *
-     * @param array $tables
-     */
-    private function refreshAttributeModels($tables = [])
-    {
-        if (empty($tables)) {
-            return;
-        }
-
-        $modelManager = $this->get('models');
-        $modelManager
-            ->getConfiguration()
-            ->getMetadataCacheImpl()
-            ->deleteAll()
+        $templateMailService = $this->get('TemplateMail');
+        $config = $this->get('config');
+        
+        $mailSubscriber = new SubscriberNamespace\SendOrderMailSubscriber($this);
+        $mailSubscriber
+            ->addMailFormatter(new MailNamespace\BodyHtmlZendMailFormatter($templateMailService, $config))
+            ->addMailFormatter(new MailNamespace\BodyTextZendMailFormatter($templateMailService, $config))
         ;
-        $modelManager->generateAttributeModels($tables);
+        $subscribers[] = $mailSubscriber;
+
+        return $subscribers;
     }
 
     /**
      * create config form
+     * @return \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
      */
-    public function createForm()
+    private function createForm()
     {
-        $formCreator = new \Shopware\Plugins\MoptAvalara\Form\FormCreator($this);
-        $formCreator->createForms();
+        $pluginConfigForm = new Form($this);
+        $pluginConfigForm->create();
+        
+        return $this;
     }
 }

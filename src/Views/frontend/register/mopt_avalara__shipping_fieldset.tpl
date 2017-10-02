@@ -1,6 +1,6 @@
 {extends file="parent:frontend/address/form.tpl"}
 
-{block name='frontend_address_form_input_zip_and_city' prepend}
+{block name='frontend_address_form_input_zip_and_city'}
     {if $MoptAvalaraAddressChanges['postalCode'] || $MoptAvalaraAddressChanges['city']}
     <div class="mopt_avalara__address_change">
         <span class="zipcode">
@@ -9,9 +9,10 @@
         </span>
     </div>
     {/if}
+    {$smarty.block.parent}
 {/block}
 
-{block name='frontend_address_form_input_street' prepend}
+{block name='frontend_address_form_input_street'}
     {if $MoptAvalaraAddressChanges['line1']}
     <div class="mopt_avalara__address_change">
         <span class="zipcode">
@@ -19,4 +20,5 @@
         </span>
     </div>
     {/if}
+    {$smarty.block.parent}
 {/block}
