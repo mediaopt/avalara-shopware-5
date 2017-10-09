@@ -286,14 +286,14 @@ class Form
         ]);
         
         $form->setElement('boolean', self::LANDEDCOST_ENABLED_FIELD, [
-            'label' => 'Enable Avalara Landed cost calculation',
-            'description' => 'Choose, if you want to use the Avalara Landed cost calculation.',
+            'label' => 'Enable Avalara Landed cost calculation (beta)',
+            'description' => 'Choose, if you want to use the Avalara Landed cost calculation (beta).',
             'scope' => FormElement::SCOPE_SHOP
         ]);
 
         $form->setElement('select', self::INCOTERMS_FIELD, [
-            'label' => 'Default incoterms for Landed cost',
-            'description' => 'Terms of sale. Used to determine buyer obligations for a landed cost.',
+            'label' => 'Default incoterms for Landed cost (beta)',
+            'description' => 'Terms of sale. Used to determine buyer obligations for a landed cost (beta).',
             'value' => self::INCOTERMS_DAP,
             'scope' => FormElement::SCOPE_SHOP,
             'store' => [

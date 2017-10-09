@@ -2,7 +2,7 @@
 == develop ==
 
 == 2.1.0 ==
-* Avalara LandedCost has been implemented
+* Avalara LandedCost (beta) has been implemented
 
 == 2.0.5 ==
 * It is now possible to setup all plugin configuration per subshop.
