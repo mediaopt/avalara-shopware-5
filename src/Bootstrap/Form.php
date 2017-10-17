@@ -297,7 +297,7 @@ class Form
             'value' => self::INCOTERMS_DAP,
             'scope' => FormElement::SCOPE_SHOP,
             'store' => [
-                [self::INCOTERMS_DAP, self::INCOTERMS_DAP_LABEL],
+                //[self::INCOTERMS_DAP, self::INCOTERMS_DAP_LABEL],
                 [self::INCOTERMS_DDP, self::INCOTERMS_DDP_LABEL],
             ],
         ]);
