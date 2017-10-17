@@ -332,10 +332,10 @@ class Database
                         'key' => Form::INCOTERMS_DDP,
                         'value' => Form::INCOTERMS_DDP_LABEL
                     ],
-                    [
-                        'key' => Form::INCOTERMS_DAP,
-                        'value' => Form::INCOTERMS_DAP_LABEL
-                    ],
+//                    [
+//                        'key' => Form::INCOTERMS_DAP,
+//                        'value' => Form::INCOTERMS_DAP_LABEL
+//                    ],
                     [
                         'key' => Form::INCOTERMS_DEFAULT,
                         'value' => Form::INCOTERMS_DEFAULT_LABEL
