@@ -182,7 +182,11 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
      */
     private function createAvalaraSdkAdapter()
     {
-        return new AvalaraSDKAdapter($this->getName(), $this->getVersion());
+        return new AvalaraSDKAdapter(
+            $this->get('shopware.plugin.cached_config_reader'),
+            $this->getName(),
+            $this->getVersion()
+        );
     }
     
     /**

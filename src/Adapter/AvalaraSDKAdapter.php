@@ -2,6 +2,9 @@
 
 namespace Shopware\Plugins\MoptAvalara\Adapter;
 
+use Shopware\Models\Shop\Shop;
+use Shopware\Models\Shop\DetachedShop;
+use Shopware\Components\Plugin\CachedConfigReader;
 use Shopware_Plugins_Backend_MoptAvalara_Bootstrap;
 use Shopware\Plugins\MoptAvalara\Logger\Formatter;
 use Shopware\Plugins\MoptAvalara\Logger\LogSubscriber;
@@ -89,14 +92,37 @@ class AvalaraSDKAdapter implements AdapterInterface
      * @var AbstractService[]
      */
     private $services = [];
-    
+
+    /**
+     * A subshop to be used
+     * @var Shop
+     */
+    private $shopContext;
+
+    /**
+     * @var array
+     */
+    private $pluginConfig;
+
+    /**
+     * @var CachedConfigReader
+     */
+    private $cachedConfigReader;
+
     /**
      *
+     * @param \Shopware\Components\Form\Container
+     */
+    private $container;
+    
+    /**
+     * @param CachedConfigReader $cachedConfigReader
      * @param string $pluginName
      * @param string $pluginVersion
      */
-    public function __construct($pluginName, $pluginVersion)
+    public function __construct(CachedConfigReader $cachedConfigReader, $pluginName, $pluginVersion)
     {
+        $this->cachedConfigReader = $cachedConfigReader;
         $this->pluginName = $pluginName;
         $this->pluginVersion = $pluginVersion;
     }
@@ -156,6 +182,27 @@ class AvalaraSDKAdapter implements AdapterInterface
         
         return $this->avaTaxClient;
     }
+
+    /**
+     * @param Shop $shopContext
+     * @return $this
+     */
+    public function setShopContext(Shop $shopContext)
+    {
+        $this->shopContext = $shopContext;
+        //We have to reset the plugin config after changing the shop context
+        $this->pluginConfig = null;
+
+        return $this;
+    }
+
+    /**
+     * @return Shop
+     */
+    private function getShopContext()
+    {
+        return $this->shopContext ?: $this->getContainer()->get('Shop');
+    }
     
     /**
      * Lazy load of the LogSubscriber
@@ -214,11 +261,17 @@ class AvalaraSDKAdapter implements AdapterInterface
      */
     public function getPluginConfig($key)
     {
-        if (Shopware()->Plugins()->Backend()->get(Shopware_Plugins_Backend_MoptAvalara_Bootstrap::PLUGIN_NAME) && isset(Shopware()->Plugins()->Backend()->MoptAvalara()->Config()->$key)) {
-            return Shopware()->Plugins()->Backend()->MoptAvalara()->Config()->$key;
+        // Load plugin configuration
+        if (null === $this->pluginConfig) {
+            $detachedShop = DetachedShop::createFromShop($this->getShopContext());
+            $this->pluginConfig = $this->cachedConfigReader->getByPluginName(Shopware_Plugins_Backend_MoptAvalara_Bootstrap::PLUGIN_NAME, $detachedShop);
         }
-        
-        return null;
+
+        if (!array_key_exists($key, $this->pluginConfig)) {
+            throw new \RuntimeException('You have requested not existing plugin config ' . $key);
+        }
+
+        return $this->pluginConfig[$key];
     }
     
     /**
@@ -336,5 +389,18 @@ class AvalaraSDKAdapter implements AdapterInterface
             ->getAvaTaxClient()
             ->getTransactionByCode($companyCode, $docCode, '')
         ;
+    }
+
+    /**
+     *
+     * @return \Shopware\Components\Form\Container
+     */
+    protected function getContainer()
+    {
+        if (null === $this->container) {
+            $this->container = Shopware()->Container();
+        }
+
+        return $this->container;
     }
 }
