@@ -189,6 +189,10 @@ class AvalaraSDKAdapter implements AdapterInterface
      */
     public function setShopContext(Shop $shopContext)
     {
+        if ($this->shopContext->getId() === $shopContext->getId()) {
+            return $this;
+        }
+
         $this->shopContext = $shopContext;
         //We have to reset the plugin config after changing the shop context
         $this->pluginConfig = null;
