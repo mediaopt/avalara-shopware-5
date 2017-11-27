@@ -44,6 +44,8 @@ class CommitTax extends AbstractService
     public function commitOrder(Order $order)
     {
         $adapter = $this->getAdapter();
+        $adapter->setShopContext($order->getShop());
+
         try {
             $docCommitEnabled = $adapter->getPluginConfig(Form::DOC_COMMIT_ENABLED_FIELD);
             if (!$docCommitEnabled) {

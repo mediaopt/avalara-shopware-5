@@ -28,6 +28,8 @@ class CancelTax extends AbstractService
     public function cancel(Order $order)
     {
         $adapter = $this->getAdapter();
+        $adapter->setShopContext($order->getShop());
+
         try {
             if (!$attr = $order->getAttribute()) {
                 throw new \RuntimeException('Cannot cancel an order without attributes.');
