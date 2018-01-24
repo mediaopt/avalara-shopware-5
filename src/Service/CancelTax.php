@@ -28,7 +28,7 @@ class CancelTax extends AbstractService
     public function cancel(Order $order)
     {
         $adapter = $this->getAdapter();
-        $adapter->setShopContext($order->getShop());
+        $adapter->setShopContext($adapter->getShopContextFromOrder($order));
 
         try {
             if (!$attr = $order->getAttribute()) {

@@ -109,6 +109,11 @@ class Database
      * @var string Attribute to be created
      */
     const TRANSACTION_TYPE_FIELD = 'mopt_avalara_transaction_type';
+
+    /**
+     * @var string Attribute to be created
+     */
+    const SUBSHOP_ID_FIELD = 'mopt_avalara_subshop_id';
     
     /**
      *
@@ -214,6 +219,14 @@ class Database
             self::ORDER_ATTR_TABLE,
             self::DOC_CODE_FIELD,
             'string',
+            null, null, null,
+            false
+        );
+
+        $this->addField(
+            self::ORDER_ATTR_TABLE,
+            self::SUBSHOP_ID_FIELD,
+            'integer',
             null, null, null,
             false
         );
