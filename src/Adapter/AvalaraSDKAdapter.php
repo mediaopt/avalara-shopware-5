@@ -189,7 +189,7 @@ class AvalaraSDKAdapter implements AdapterInterface
      */
     public function setShopContext(Shop $shopContext)
     {
-        if ($this->shopContext->getId() === $shopContext->getId()) {
+        if ($this->shopContext && $this->shopContext->getId() === $shopContext->getId()) {
             return $this;
         }
 
@@ -274,6 +274,8 @@ class AvalaraSDKAdapter implements AdapterInterface
         if (!array_key_exists($key, $this->pluginConfig)) {
             throw new \RuntimeException('You have requested not existing plugin config ' . $key);
         }
+        var_dump($this->pluginConfig);
+        die('Shop is: '.$this->getShopContext()->getId());
 
         return $this->pluginConfig[$key];
     }
