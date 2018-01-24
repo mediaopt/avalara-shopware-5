@@ -126,6 +126,14 @@ class OrderSubscriber extends AbstractSubscriber
         $insurance = $service->getInsuranceCost($taxResult);
 
         $order->getAttribute()->setMoptAvalaraTransactionType(DocumentType::C_SALESORDER);
+
+        $subshopId = $this
+            ->getAdapter()
+            ->getShopContext()
+            ->getId()
+        ;
+
+        $order->getAttribute()->setMoptAvalaraSubshopId($subshopId);
         $order->getAttribute()->setMoptAvalaraIncoterms($incoterms);
         $order->getAttribute()->setMoptAvalaraLandedcost($landedCost);
         $order->getAttribute()->setMoptAvalaraInsurance($insurance);

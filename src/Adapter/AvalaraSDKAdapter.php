@@ -4,6 +4,7 @@ namespace Shopware\Plugins\MoptAvalara\Adapter;
 
 use Shopware\Models\Shop\Shop;
 use Shopware\Models\Shop\DetachedShop;
+use Shopware\Models\Order\Order;
 use Shopware\Components\Plugin\CachedConfigReader;
 use Shopware_Plugins_Backend_MoptAvalara_Bootstrap;
 use Shopware\Plugins\MoptAvalara\Logger\Formatter;
@@ -189,7 +190,7 @@ class AvalaraSDKAdapter implements AdapterInterface
      */
     public function setShopContext(Shop $shopContext)
     {
-        if ($this->shopContext->getId() === $shopContext->getId()) {
+        if ($this->shopContext && $this->shopContext->getId() === $shopContext->getId()) {
             return $this;
         }
 
@@ -200,10 +201,36 @@ class AvalaraSDKAdapter implements AdapterInterface
         return $this;
     }
 
+
+    /**
+     * @param Order $order
+     * @return Shop
+     */
+    public function getShopContextFromOrder(Order $order)
+    {
+        $repository = Shopware()
+            ->Models()
+            ->getRepository('Shopware\Models\Shop\Shop')
+        ;
+
+        if (!$attr = $order->getAttribute()) {
+            throw new \RuntimeException('Order has no attributes.');
+        }
+        if (!$attr->getMoptAvalaraSubshopId()) {
+            //This is an old order, use shop directly
+            return $order->getShop();
+        }
+        if (!$shop = $repository->find($attr->getMoptAvalaraSubshopId())) {
+            throw new \RuntimeException('Subshop linked to this order does not exists anymore.');
+        }
+
+        return $shop;
+    }
+
     /**
      * @return Shop
      */
-    private function getShopContext()
+    public function getShopContext()
     {
         return $this->shopContext ?: $this->getContainer()->get('Shop');
     }
