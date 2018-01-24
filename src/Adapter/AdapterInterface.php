@@ -8,6 +8,9 @@
 
 namespace Shopware\Plugins\MoptAvalara\Adapter;
 
+use Shopware\Models\Shop\Shop;
+use Shopware\Models\Order\Order;
+
 /**
  * Adapter interface for the Avalara SDK.
  * 
@@ -50,6 +53,23 @@ interface AdapterInterface
      * @return mixed
      */
     public function getPluginConfig($key);
+
+    /**
+     * @return Shop
+     */
+    public function getShopContext();
+
+    /**
+     * @param Shop $shopContext
+     * @return $this
+     */
+    public function setShopContext(Shop $shopContext);
+
+    /**
+     * @param Order $order
+     * @return Shop
+     */
+    public function getShopContextFromOrder(Order $order);
     
     /**
      *
