@@ -1,6 +1,12 @@
 
 == develop ==
 
+== 2.1.2 ==
+* Leave only DDP option in incoterm plugin config
+
+== 2.1.1 ==
+* The 'Beta' has been added to LandedCost features
+
 == 2.1.0 ==
 * Avalara LandedCost (beta) has been implemented
 
