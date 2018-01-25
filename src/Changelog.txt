@@ -1,6 +1,10 @@
 
 == develop ==
 
+== 2.2.0 ==
+* Bugfix: Use right plugin config for a subshop in backend
+* Check basket for consistency on checkout completion is now optional
+
 == 2.1.2 ==
 * Leave only DDP option in incoterm plugin config
 
