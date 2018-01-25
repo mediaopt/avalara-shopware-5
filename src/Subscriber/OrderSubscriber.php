@@ -4,6 +4,7 @@ namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
 use Shopware\Models\Order\Order;
 use Shopware\Plugins\MoptAvalara\Bootstrap\Database;
+use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 use Avalara\DocumentType;
 use Shopware\Plugins\MoptAvalara\LandedCost\LandedCostRequestParams;
 
@@ -183,8 +184,11 @@ class OrderSubscriber extends AbstractSubscriber
         $adapter->getLogger()->debug('validateCommitCall...');
         //prevent parent execution on request mismatch
         if ($session->MoptAvalaraGetTaxRequestHash != $service->getHashFromRequest($model)) {
-            $adapter->getLogger()->error('Mismatching requests, do not proceed.');
-            throw new \RuntimeException('MoptAvalara: mismatching requests, do not proceed.');
+            $adapter->getLogger()->info('Mismatching requests, basket has been changed by someone.');
+
+            if ($adapter->getPluginConfig(Form::BASKET_CONSISTENCY_CHECK_FIELD)) {
+                throw new \RuntimeException('Mismatching requests, basket has been changed by someone. That might be a plugin. If you are sure that does not change price, count or other sensitive data of the basket, disable "Check basket for consistency on checkout completion" in the Avalara plugin config.');
+            }
         }
 
         $adapter->getLogger()->debug('Matching requests, proceed...', [$model]);

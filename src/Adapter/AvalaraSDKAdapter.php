@@ -294,7 +294,10 @@ class AvalaraSDKAdapter implements AdapterInterface
     {
         // Load plugin configuration
         if (null === $this->pluginConfig) {
-            $detachedShop = DetachedShop::createFromShop($this->getShopContext());
+            $detachedShop = $this->getShopContext()
+                ? DetachedShop::createFromShop($this->getShopContext())
+                : null
+            ;
             $this->pluginConfig = $this->cachedConfigReader->getByPluginName(Shopware_Plugins_Backend_MoptAvalara_Bootstrap::PLUGIN_NAME, $detachedShop);
         }
 

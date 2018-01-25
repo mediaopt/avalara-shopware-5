@@ -123,6 +123,11 @@ class Form
      * @var string Field name for the plugin config
      */
     const ORIGIN_COUNTRY_FIELD = 'mopt_avalara__origin_address__country';
+
+    /**
+     * @var string Field name for the plugin config
+     */
+    const BASKET_CONSISTENCY_CHECK_FIELD = 'mopt_avalara__basket_consistency_check';
     
     
     /**
@@ -315,6 +320,12 @@ class Form
             'scope' => FormElement::SCOPE_SHOP
         ]);
 
+        $form->setElement('boolean', self::BASKET_CONSISTENCY_CHECK_FIELD, [
+            'label' => 'Check basket for consistency on checkout completion',
+            'value' => 1,
+            'scope' => FormElement::SCOPE_SHOP
+        ]);
+
         $form->setElement('select', self::LOG_LEVEL_FIELD, [
             'label' => 'Log level',
             'description' => 'Choose the loglevel of Avalara, which will be logged ',
@@ -377,7 +388,7 @@ class Form
         ]);
 
         $form->setElement('select', self::ORIGIN_COUNTRY_FIELD, [
-            'label' => 'Country (ISO 3166 country code)',
+            'label' => 'Country',
             'required' => true,
             'store' => $this->getCountriesISO(),
             'scope' => FormElement::SCOPE_SHOP
@@ -464,6 +475,7 @@ class Form
             self::LANDEDCOST_ENABLED_FIELD,
             self::INCOTERMS_FIELD,
             self::ADDRESS_VALIDATION_COUNTRIES_FIELD,
+            self::BASKET_CONSISTENCY_CHECK_FIELD,
             self::LOG_LEVEL_FIELD,
             self::LOG_ROTATION_DAYS_FIELD,
             'mopt_avalara__fieldset__origin_address',
@@ -476,7 +488,6 @@ class Form
             self::ORIGIN_CITY_FIELD,
             'mopt_avalara__fieldset__test',
             'mopt_avalara__license_check',
-            'mopt_avalara__log',
         ];
 
         /* @var $element \Shopware\Models\Config\Element */
