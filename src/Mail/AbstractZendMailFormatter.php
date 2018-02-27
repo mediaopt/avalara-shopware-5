@@ -200,7 +200,10 @@ abstract class AbstractZendMailFormatter
     {
         preg_match(self::SHIPPING_COST_TAG_PREG, $template, $matched);
 
-        return $matched[0] ?: null;
+        return $matched !== []
+            ? $matched[0]
+            : null
+        ;
     }
 
     /**
