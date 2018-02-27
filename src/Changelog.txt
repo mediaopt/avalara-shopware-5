@@ -1,6 +1,9 @@
 
 == develop ==
 
+== 2.2.1 ==
+* Make the plugin to be compatible with Shopware 5.4
+
 == 2.2.0 ==
 * Bugfix: Use right plugin config for a subshop in backend
 * Check basket for consistency on checkout completion is now optional
