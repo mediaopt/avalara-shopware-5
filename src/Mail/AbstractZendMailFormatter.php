@@ -15,7 +15,7 @@ abstract class AbstractZendMailFormatter
     /**
      * @var string Preg to find shipping tag in email template
      */
-    const SHIPPING_COST_TAG_PREG = '/{\$sShippingCosts[^}]*?}/';
+    const SHIPPING_COST_TAG_PREG = '/{\$sShippingCosts[^}]*}/';
    
     /**
      * @var \Shopware_Components_TemplateMail
