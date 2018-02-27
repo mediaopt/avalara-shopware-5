@@ -13,9 +13,9 @@ use Shopware_Plugins_Backend_MoptAvalara_Bootstrap as AvalaraBootstrap;
 abstract class AbstractZendMailFormatter
 {
     /**
-     * @var string Shipping tag in email template
+     * @var string Preg to find shipping tag in email template
      */
-    const SHIPPING_COST_TAG = '{$sShippingCosts}';
+    const SHIPPING_COST_TAG_PREG = '/{\$sShippingCosts[^}]*?}/';
    
     /**
      * @var \Shopware_Components_TemplateMail
@@ -177,16 +177,32 @@ abstract class AbstractZendMailFormatter
         $potentialSurcharges[] = $this->getIncuranceSurcharge($context);
         $potentialSurcharges[] = $this->getLandedCostSurcharge($context);
         $surcharges = array_filter($potentialSurcharges);
-        
+
+        if (!$shippingCostTag = $this->getShippingCostTag($template)) {
+            return $template;
+        }
+
         $shippingInfo = sprintf(
-            static::AVALARA_DELIVERY_COST_BLOCK, 
-            self::SHIPPING_COST_TAG, 
+            static::AVALARA_DELIVERY_COST_BLOCK,
+            $shippingCostTag,
             implode(static::LINE_BREAK, $surcharges)
         );
 
-        return str_replace(self::SHIPPING_COST_TAG, $shippingInfo, $template);
+        return str_replace($shippingCostTag, $shippingInfo, $template);
     }
-    
+
+
+    /**
+     * @param string $template
+     * @return null|string
+     */
+    private function getShippingCostTag($template)
+    {
+        preg_match(self::SHIPPING_COST_TAG_PREG, $template, $matched);
+
+        return $matched[0] ?: null;
+    }
+
     /**
      * @param float $value
      * @return string
