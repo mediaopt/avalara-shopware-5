@@ -123,9 +123,11 @@ abstract class AbstractZendMailFormatter
      */
     private function getShopURL()
     {
-        return $this->getShop()->getAlwaysSecure()
-            ? 'https://' . $this->getShop()->getSecureHost() . $this->getShop()->getSecureBasePath()
-            : 'http://' . $this->getShop()->getHost() . $this->getShop()->getBasePath()
+        $protocol = $this->getShop()->getSecure()
+            ? 'https://'
+            : 'http://'
+        ;
+        return $protocol . $this->getShop()->getHost() . $this->getShop()->getBasePath()
         ;
     }
     
