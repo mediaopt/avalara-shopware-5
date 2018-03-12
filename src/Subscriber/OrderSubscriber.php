@@ -35,6 +35,10 @@ class OrderSubscriber extends AbstractSubscriber
     public function onFilterOrders(\Enlight_Event_EventArgs $args)
     {
         $orders = $args->getReturn();
+        if (empty($orders)) {
+            return $orders;
+        }
+
         $avalaraAttributes = $this->getAvalaraAttributes(array_column($orders, 'id'));
 
         foreach ($orders as $i => $orderData) {
