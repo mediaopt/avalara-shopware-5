@@ -1,6 +1,9 @@
 
 == develop ==
 
+== 2.2.2 ==
+* Bugfix: error on account->orders has been solved if there are no orders.
+
 == 2.2.1 ==
 * Make the plugin to be compatible with Shopware 5.4
 
