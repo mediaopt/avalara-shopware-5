@@ -1,5 +1,5 @@
 {
-  "version": "2.2.2",
+  "version": "2.2.3",
   "author": "derksen mediaopt GmbH",
   "label": "Avalara",
   "description": "<p><img src=\"data:image/png;base64,%s\" /></p> <p style=\"font-size:12px; font-weight: bold;\">For more information visit <a href=\"https://www.mediaopt.de\">www.mediaopt.de</a></p><p><a href=\"https://projects.mediaopt.de/projects/mopt-twl/wiki/User_Manual_EN\" target=\"_blank\">User Manual</a></p>",
@@ -12,6 +12,7 @@
     "update": true
   },
   "changelog": {
+    "2.2.3": "Change the way to calculate tax in case of a partial tax.",
     "2.2.2": "Bugfix: error on account->orders has been solved if there are no orders.",
     "2.2.1": "Make the plugin to be compatible with Shopware 5.4",
     "2.2.0": "Check basket for consistency on checkout completion is now optional",
