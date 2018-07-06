@@ -116,10 +116,12 @@ class BasketSubscriber extends AbstractSubscriber
 
         return (float)substr($taxId, strlen(self::TAX_ID));
     }
-    
+
     /**
      * Calculate tax for items in a basket
+     *
      * @param \Enlight_Event_EventArgs $args
+     * @return array
      */
     public function onGetPriceForUpdateArticle(\Enlight_Event_EventArgs $args)
     {
