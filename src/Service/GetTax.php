@@ -82,9 +82,13 @@ class GetTax extends AbstractService
     {
         $taxLine = $this->getTaxLineForOrderBasketId($taxResult, $id);
         if (!$taxLine || !((float)$taxLine->taxableAmount)) {
-            return null;
+            return 0;
         }
-        $taxRate = $this->bcMath->bcdiv($taxLine->tax, $taxLine->taxableAmount);
+        /**
+         * Recalculate a tax rate by subdividing tax amount with a total price
+         * This solves a problem with a tax calculated only for a part of amount
+         */
+        $taxRate = $this->bcMath->bcdiv($taxLine->tax, $taxLine->lineAmount);
         
         return $this->bcMath->bcmul($taxRate, 100);
     }
