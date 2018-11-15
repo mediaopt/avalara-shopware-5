@@ -1,6 +1,9 @@
 
 == develop ==
 
+== 2.3.0 ==
+* Compatibility to Shopware 5.5
+
 == 2.2.3 ==
 * Change the way to calculate tax in case of a partial tax.
 
