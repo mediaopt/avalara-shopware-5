@@ -94,7 +94,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
      * @return array
      * @throws \Exception
      */
-    public function update()
+    public function update($varsion)
     {
         $this
             ->registerControllers()
