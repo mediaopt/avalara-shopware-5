@@ -65,9 +65,9 @@ class SendOrderMailSubscriber extends AbstractSubscriber
      */
     private function updateContext($context)
     {
-        /* @var $shop \Shopware\Models\Shop\DetachedShop */
-        $shop = $this->getContainer()->get('Shop');
-        $context['sShopURL'] = 'http://' . $shop->getHost() . $shop->getBasePath();
+        $shop = $this->getShopService();
+        $sShopURL = $shop ? $shop->getHost() . $shop->getBasePath() : '';
+        $context['sShopURL'] = 'http://' . $sShopURL;
         $surcharges = $this->getShippingSurcharges();
 
         $context['moptAvalaraShippingCostSurcharge'] = $surcharges['shippingCostSurcharge'];
@@ -81,6 +81,14 @@ class SendOrderMailSubscriber extends AbstractSubscriber
         $context['sShippingCosts'] = $this->updateShippingCostInContext($context, $surcharges['shippingCostSurcharge']);
 
         return $context;
+    }
+
+    /**
+     * @return Shop|null
+     */
+    protected function getShopService()
+    {
+        return $this->getContainer()->has('Shop') ? $this->getContainer()->get('Shop') : null;
     }
 
     /**

@@ -53,8 +53,8 @@ class InvoiceTransactionModelFactory extends AbstractTransactionModelFactory
         $model->companyCode = $this->getCompanyCode();
         $model->parameters = $this->getTransactionParameters();
         
-        if ($customer->getBilling() && $customer->getBilling()->getVatId()) {
-            $model->businessIdentificationNo = $customer->getBilling()->getVatId();
+        if ($order->getBilling() && $order->getBilling()->getVatId()) {
+            $model->businessIdentificationNo = $order->getBilling()->getVatId();
         }
         
         if ($customer->getAttribute() && $customer->getAttribute()->getMoptAvalaraExemptionCode()) {

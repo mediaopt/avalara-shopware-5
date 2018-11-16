@@ -232,9 +232,17 @@ class AvalaraSDKAdapter implements AdapterInterface
      */
     public function getShopContext()
     {
-        return $this->shopContext ?: $this->getContainer()->get('Shop');
+        return $this->shopContext ?: $this->getShopService();
     }
-    
+
+    /**
+     * @return Shop|null
+     */
+    protected function getShopService()
+    {
+        return $this->getContainer()->has('Shop') ? $this->getContainer()->get('Shop') : null;
+    }
+
     /**
      * Lazy load of the LogSubscriber
      * @return LogSubscriber
