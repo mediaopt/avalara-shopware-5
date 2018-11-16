@@ -65,8 +65,9 @@ class SendOrderMailSubscriber extends AbstractSubscriber
      */
     private function updateContext($context)
     {
-        $shop = $this->getContainer()->getShopService();
-        $context['sShopURL'] = 'http://' . $shop->getHost() . $shop->getBasePath();
+        $shop = $this->getShopService();
+        $sShopURL = $shop ? $shop->getHost() . $shop->getBasePath() : '';
+        $context['sShopURL'] = 'http://' . $sShopURL;
         $surcharges = $this->getShippingSurcharges();
 
         $context['moptAvalaraShippingCostSurcharge'] = $surcharges['shippingCostSurcharge'];
