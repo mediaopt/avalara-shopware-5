@@ -1,6 +1,9 @@
 
 == develop ==
 
+== 2.3.1 ==
+* Compatibility to php5.4
+
 == 2.3.0 ==
 * Compatibility to Shopware 5.5
 
