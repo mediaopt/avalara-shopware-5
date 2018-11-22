@@ -8,11 +8,11 @@
 
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
-use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 use Avalara\AddressLocationInfo;
-use Shopware\Plugins\MoptAvalara\Adapter\Factory\AddressFactory;
-use Shopware_Plugins_Backend_MoptAvalara_Bootstrap as AvalaraBootstrap;
 use GuzzleHttp\Exception\TransferException;
+use Shopware\Plugins\MoptAvalara\Adapter\Factory\AddressFactory;
+use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
+use Shopware_Plugins_Backend_MoptAvalara_Bootstrap as AvalaraBootstrap;
 
 /**
  * @author derksen mediaopt GmbH
@@ -55,9 +55,9 @@ class AddressSubscriber extends AbstractSubscriber
             $service = $adapter->getService('validateAddress');
             $response = $service->validate($address);
             $session->MoptAvalaraCheckedAddress = $this->getAddressHash($address);
-            if (empty($activeShippingAddressId = $session->offsetGet('checkoutShippingAddressId', null))) {
-                $activeShippingAddressId = $userData['additional']['user']['default_shipping_address_id'];
-            }
+            $activeShippingAddressId = $session->offsetGet('checkoutShippingAddressId', null)
+                ?: $userData['additional']['user']['default_shipping_address_id'];
+
             if ($changes = $service->getAddressChanges($address, $response)) {
                 $args->getSubject()->forward('edit', 'address', null, [
                     'MoptAvalaraAddressChanges' => $changes,
