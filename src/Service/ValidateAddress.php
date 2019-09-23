@@ -62,6 +62,10 @@ class ValidateAddress extends AbstractService
             }
         }
 
+        if (isset($suggestedAddress->addressType) && $suggestedAddress->addressType === 'UnknownAddressType') {
+            $changes['IsInvalidAddress'] = true;
+        }
+
         return $changes;
     }
 }
