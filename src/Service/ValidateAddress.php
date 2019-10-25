@@ -58,7 +58,7 @@ class ValidateAddress extends AbstractService
             if (in_array($key, self::$ignoreAddressParts, false)) {
                 continue;
             }
-            if (isset($suggestedAddress->$key) && $suggestedAddress->$key !== $value) {
+            if (isset($suggestedAddress->$key) && $suggestedAddress->$key != $value) {
                 $changes[$key] = $suggestedAddress->$key;
             }
         }
