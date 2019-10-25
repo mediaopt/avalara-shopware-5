@@ -64,9 +64,12 @@ class AddressSubscriber extends AbstractSubscriber
                     'sTarget' => 'checkout',
                     'id' => $activeShippingAddressId
                 ]);
+                $session->MoptAvalaraValidAddress = false;
 
                 return true;
             }
+
+            $session->MoptAvalaraValidAddress = true;
         } catch (TransferException $e) {
             //address check failed - nothing to do
             $adapter->getLogger()->info('address check failed: ' . $e->getMessage());
@@ -90,6 +93,15 @@ class AddressSubscriber extends AbstractSubscriber
         }
         
         if ($session->MoptAvalaraCheckedAddress !== $this->getAddressHash($address)) {
+            return true;
+        }
+
+        $validAddressRequired = $this
+            ->getAdapter()
+            ->getPluginConfig(Form::ADDRESS_VALIDATION_REQUIRED_FIELD)
+        ;
+
+        if (!$session->MoptAvalaraValidAddress && $validAddressRequired) {
             return true;
         }
 
@@ -168,6 +180,14 @@ class AddressSubscriber extends AbstractSubscriber
         if (!$changes = $request->getParam('MoptAvalaraAddressChanges')) {
             return;
         }
+
+        if (isset($changes['IsInvalidAddress'])) {
+            $this->addErrorMessage($view, 'shippingAddressInvalid');
+            unset($changes['IsInvalidAddress']);
+
+            return;
+        }
+
         $formData = $args->getSubject()->View()->formData;
         $view->assign('sUserDataOld', $formData);
         foreach ($changes as $key => $value) {
@@ -186,15 +206,16 @@ class AddressSubscriber extends AbstractSubscriber
         $view->assign('formData', $formData);
         $view->assign('MoptAvalaraAddressChanges', $changes);
 
-        $this->addErrorMessage($view);
+        $this->addErrorMessage($view, 'shippingAddressChangesFound');
     }
 
     /**
      * Add error message
      *
      * @param \Enlight_View_Default $view
+     * @param string                $message
      */
-    protected function addErrorMessage(\Enlight_View_Default $view)
+    protected function addErrorMessage(\Enlight_View_Default $view, $message)
     {
         $snippets = $this
             ->getContainer()
@@ -203,13 +224,18 @@ class AddressSubscriber extends AbstractSubscriber
         ;
 
 
-        $errorMessages = $view->getAssign('sErrorMessages');
+        $errorMessages = $view->getAssign('sErrorMessages')
+            ? $view->getAssign('error_messages')
+            : $view->getAssign('sErrorMessages')
+        ;
+
         if (!is_array($errorMessages)) {
             $errorMessages = [];
         }
 
-        $errorMessages[] = $snippets->get('shippingAddressChangesFound');
+        $errorMessages[] = $snippets->get($message);
 
         $view->assign('sErrorMessages', $errorMessages);
+        $view->assign('error_messages', $errorMessages);
     }
 }
