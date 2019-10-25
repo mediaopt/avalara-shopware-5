@@ -214,9 +214,9 @@ class GetTax extends AbstractService
             $data['commit']
         );
 
-        //Normalize floats
+        //Normalize float to int. We need this in case bcmath is not installed.
         foreach ($data['lines'] as $key => $line) {
-            $data['lines'][$key]['amount'] = number_format($line['amount'], 2);
+            $data['lines'][$key]['amount'] = number_format($line['amount'], 0);
         }
 
         return md5(json_encode($data));
