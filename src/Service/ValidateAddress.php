@@ -9,6 +9,7 @@
 namespace Shopware\Plugins\MoptAvalara\Service;
 
 use Avalara\AddressLocationInfo;
+use Avalara\AddressResolutionModel;
 
 /**
  * @author derksen mediaopt GmbH
@@ -29,7 +30,7 @@ class ValidateAddress extends AbstractService
     /**
      *
      * @param \Avalara\AddressLocationInfo $address
-     * @return \stdClass
+     * @return AddressResolutionModel
      */
     public function validate(AddressLocationInfo $address)
     {
@@ -57,12 +58,12 @@ class ValidateAddress extends AbstractService
             if (in_array($key, self::$ignoreAddressParts, false)) {
                 continue;
             }
-            if (isset($suggestedAddress->$key) && $suggestedAddress->$key != $value) {
+            if (isset($suggestedAddress->$key) && $suggestedAddress->$key !== $value) {
                 $changes[$key] = $suggestedAddress->$key;
             }
         }
 
-        if (isset($suggestedAddress->addressType) && $suggestedAddress->addressType === 'UnknownAddressType') {
+        if (isset($response->messages) && count($response->messages) >= 1) {
             $changes['IsInvalidAddress'] = true;
         }
 
