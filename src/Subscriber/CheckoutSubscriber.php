@@ -133,7 +133,7 @@ class CheckoutSubscriber extends AbstractSubscriber
             /* @var $model \Avalara\CreateTransactionModel */
             $model = $adapter->getFactory('OrderTransactionModelFactory')->build();
 
-            if (!$service->isGetTaxCallAvailable($model, $this->getSession())
+            if (!$service->isGetTaxCallAvailable($model, $session)
                 || empty($args->getSubject()->View()->sUserLoggedIn)
             ) {
                 $adapter->getLogger()->info('GetTax call for current basket already done / not enabled.');

@@ -73,12 +73,17 @@ class Form
      * @var string Field name for the plugin config
      */
     const INCOTERMS_FIELD = 'mopt_avalara__incoterms';
-    
+
     /**
      * @var string Field name for the plugin config
      */
     const ADDRESS_VALIDATION_COUNTRIES_FIELD = 'mopt_avalara_addressvalidation_countries';
-    
+
+    /**
+     * @var string Field name for the plugin config
+     */
+    const ADDRESS_VALIDATION_REQUIRED_FIELD = 'mopt_avalara_addressvalidation_required';
+
     /**
      * @var string Field name for the plugin config
      */
@@ -324,6 +329,12 @@ class Form
             'scope' => FormElement::SCOPE_SHOP
         ]);
 
+        $form->setElement('boolean', self::ADDRESS_VALIDATION_REQUIRED_FIELD, [
+            'label' => 'Valid address is required',
+            'description' => 'If this option is set, a customer has to provide a valid address during checkout.',
+            'scope' => FormElement::SCOPE_SHOP
+        ]);
+
         $form->setElement('boolean', self::BASKET_CONSISTENCY_CHECK_FIELD, [
             'label' => 'Check basket for consistency on checkout completion',
             'value' => 1,
@@ -488,6 +499,7 @@ class Form
             self::LANDEDCOST_ENABLED_FIELD,
             self::INCOTERMS_FIELD,
             self::ADDRESS_VALIDATION_COUNTRIES_FIELD,
+            self::ADDRESS_VALIDATION_REQUIRED_FIELD,
             self::BASKET_CONSISTENCY_CHECK_FIELD,
             self::TAX_COUNTRY_RESTRICTION_FIELD,
             self::LOG_LEVEL_FIELD,

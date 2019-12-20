@@ -91,10 +91,10 @@ class GetTax extends AbstractService
             return 0;
         }
         /**
-         * Recalculate a tax rate by subdividing tax amount with a total price
+         * Recalculate a tax rate by subdividing tax amount with a taxable amount
          * This solves a problem with a tax calculated only for a part of amount
          */
-        $taxRate = $this->bcMath->bcdiv($taxLine->tax, $taxLine->lineAmount);
+        $taxRate = $this->bcMath->bcdiv($taxLine->tax, $taxLine->taxableAmount);
         
         return $this->bcMath->bcmul($taxRate, 100);
     }
@@ -116,7 +116,7 @@ class GetTax extends AbstractService
                 $totalLandedCost = $this->bcMath->bcadd(
                     $totalLandedCost,
                     $this->bcMath->bcadd(
-                        $line->lineAmount,
+                        $line->taxableAmount,
                         $line->tax
                     )
                 );
@@ -135,7 +135,7 @@ class GetTax extends AbstractService
     {
         foreach ($taxResult->lines as $line) {
             if (InsuranceFactory::ARTICLE_ID === $line->lineNumber) {
-                return $this->bcMath->bcadd($line->lineAmount, $line->tax);
+                return $this->bcMath->bcadd($line->taxableAmount, $line->tax);
             }
         }
 
@@ -151,7 +151,7 @@ class GetTax extends AbstractService
     {
         foreach ($taxResult->lines as $line) {
             if (ShippingFactory::ARTICLE_ID === $line->lineNumber) {
-                return $this->bcMath->bcadd($line->lineAmount, $line->tax);
+                return $this->bcMath->bcadd($line->taxableAmount, $line->tax);
             }
         }
 
@@ -224,9 +224,9 @@ class GetTax extends AbstractService
             $data['commit']
         );
 
-        //Normalize floats
+        //Normalize float to int. We need this in case bcmath is not installed.
         foreach ($data['lines'] as $key => $line) {
-            $data['lines'][$key]['amount'] = number_format($line['amount'], 2);
+            $data['lines'][$key]['amount'] = number_format($line['amount'], 0);
         }
 
         return md5(json_encode($data));
