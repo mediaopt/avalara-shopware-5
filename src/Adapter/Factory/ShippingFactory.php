@@ -8,6 +8,7 @@
 
 namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
+use Shopware\Models\Dispatch\Dispatch;
 use Avalara\LineItemModel;
 
 /**
@@ -28,7 +29,7 @@ class ShippingFactory extends AbstractFactory
     
     /**
      *
-     * @var \Shopware\Models\Dispatch\Dispatch
+     * @var Dispatch
      */
     private $dispatchEntity;
 
@@ -36,7 +37,7 @@ class ShippingFactory extends AbstractFactory
      * build Line-model based on passed in lineData
      * @param int $id Dispatch entity id
      * @param float $price
-     * @return \Avalara\LineItemModel
+     * @return LineItemModel
      */
     public function build($id, $price)
     {
@@ -74,7 +75,8 @@ class ShippingFactory extends AbstractFactory
     /**
      *
      * @param int $id
-     * @return \Shopware\Models\Dispatch\Dispatch | null
+     *
+     * @return Dispatch | null
      */
     protected function getShippingEntity($id)
     {
@@ -84,7 +86,7 @@ class ShippingFactory extends AbstractFactory
         if (null === $this->dispatchEntity) {
             $this->dispatchEntity = Shopware()
                 ->Models()
-                ->getRepository('\Shopware\Models\Dispatch\Dispatch')
+                ->getRepository(Dispatch::class)
                 ->find($id)
             ;
         }

@@ -9,8 +9,10 @@
 namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
 use Shopware\Models\Article\Article;
+use Shopware\Models\Voucher\Voucher;
 use Avalara\LineItemModel;
 use Shopware\Plugins\MoptAvalara\LandedCost\LandedCostRequestParams;
+use Shopware\Plugins\MoptAvalara\Service\GetTax;
 
 /**
  *
@@ -45,7 +47,7 @@ class LineFactory extends AbstractFactory
      * build Line-model based on passed in lineData
      *
      * @param mixed $lineData
-     * @return \Avalara\LineItemModel
+     * @return LineItemModel
      */
     public function build($lineData)
     {
@@ -88,7 +90,7 @@ class LineFactory extends AbstractFactory
         }
         
         //load model
-        if (!$article = Shopware()->Models()->getRepository('Shopware\Models\Article\Article')->find($articleId)) {
+        if (!$article = Shopware()->Models()->getRepository(Article::class)->find($articleId)) {
             return null;
         }
 
@@ -122,7 +124,7 @@ class LineFactory extends AbstractFactory
         
         $voucherRepository = Shopware()
             ->Models()
-            ->getRepository('\Shopware\Models\Voucher\Voucher')
+            ->getRepository(Voucher::class)
         ;
 
         /*
@@ -159,7 +161,7 @@ class LineFactory extends AbstractFactory
         }
         
         //load model
-        if (!$article = Shopware()->Models()->getRepository('Shopware\Models\Article\Article')->find($articleId)) {
+        if (!$article = Shopware()->Models()->getRepository(Article::class)->find($articleId)) {
             return $params;
         }
 
@@ -176,7 +178,7 @@ class LineFactory extends AbstractFactory
      */
     private function getHsCode(Article $article)
     {
-        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
+        /* @var $service GetTax */
         $service = $this->getAdapter()->getService('GetTax');
         if (!$service->isLandedCostEnabled()) {
             return null;
@@ -224,20 +226,14 @@ class LineFactory extends AbstractFactory
             return true;
         }
 
+        $vaucherRepository = Shopware()->Models()->getRepository(Voucher::class);
+
         // Find voucher by orderCode
-        $voucher = Shopware()
-            ->Models()
-            ->getRepository('\Shopware\Models\Voucher\Voucher')
-            ->findOneBy(['orderCode' => $position['ordernumber']])
-        ;
+        $voucher = $vaucherRepository->findOneBy(['orderCode' => $position['ordernumber']]);
 
         // Find voucher by ID
         if (!$voucher) {
-            $voucher = Shopware()
-                ->Models()
-                ->getRepository('\Shopware\Models\Voucher\Voucher')
-                ->find($position['articleID'])
-            ;
+            $voucher = $vaucherRepository->find($position['articleID']);
         }
 
         return !$voucher || !$voucher->getStrict();

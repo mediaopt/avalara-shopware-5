@@ -9,6 +9,7 @@
 namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
 use Avalara\AddressLocationInfo;
+use Shopware\Models\Country\Country;
 use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 use Shopware\Models\Order\Order;
 
@@ -34,7 +35,7 @@ class AddressFactory extends AbstractFactory
     /**
      * build Address-model based on delivery address
      *
-     * @return \Avalara\AddressLocationInfo
+     * @return AddressLocationInfo
      */
     public function buildDeliveryAddress()
     {
@@ -55,7 +56,8 @@ class AddressFactory extends AbstractFactory
      * build Address-model based on delivery address
      *
      * @param Order $order
-     * @return \Avalara\AddressLocationInfo
+     *
+     * @return AddressLocationInfo
      */
     public function buildDeliveryAddressFromOrder(Order $order)
     {
@@ -73,7 +75,8 @@ class AddressFactory extends AbstractFactory
     
     /**
      * Origination (ship-from) address
-     * @return \Avalara\AddressLocationInfo
+     *
+     * @return AddressLocationInfo
      */
     public function buildOriginAddress()
     {
@@ -159,7 +162,7 @@ class AddressFactory extends AbstractFactory
     /**
      *
      * @param int $id
-     * @return \Shopware\Models\Country\Country
+     * @return Country
      * @throws \InvalidArgumentException
      */
     public function getDeliveryCountry($id)
@@ -169,7 +172,7 @@ class AddressFactory extends AbstractFactory
         }
         return Shopware()
             ->Models()
-            ->getRepository('\Shopware\Models\Country\Country')
+            ->getRepository(Country::class)
             ->find($id)
         ;
     }
