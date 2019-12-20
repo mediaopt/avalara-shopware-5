@@ -57,6 +57,10 @@ class CheckoutSubscriber extends AbstractSubscriber
             return;
         }
 
+        if ($service->isGetTaxDisabledForCountry()) {
+            return;
+        }
+
         $taxRate = $service->getTaxRateForOrderBasketId($session->MoptAvalaraGetTaxResult, ShippingFactory::ARTICLE_ID);
         
         if (!$taxRate) {

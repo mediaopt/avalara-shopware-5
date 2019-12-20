@@ -45,9 +45,15 @@ class BasketSubscriber extends AbstractSubscriber
         /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
         $service = $this->getAdapter()->getService('GetTax');
         $session = $this->getSession();
+
         if (empty($session->MoptAvalaraGetTaxResult) || !$service->isGetTaxEnabled()) {
             return;
         }
+
+        if ($service->isGetTaxDisabledForCountry()) {
+            return;
+        }
+
         //abfangen voucher mode==2 strict=1 => eigene TaxRate zuweisen aus Avalara Response
         $taxResult = $session->MoptAvalaraGetTaxResult;
         if ($taxResult->totalTaxable < 0.0) {
@@ -71,6 +77,10 @@ class BasketSubscriber extends AbstractSubscriber
         /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
         $service = $this->getAdapter()->getService('GetTax');
         if (empty($session->MoptAvalaraGetTaxResult) || !$service->isGetTaxEnabled()) {
+            return;
+        }
+
+        if ($service->isGetTaxDisabledForCountry()) {
             return;
         }
 
@@ -138,7 +148,11 @@ class BasketSubscriber extends AbstractSubscriber
         if (!$taxResult = $session->MoptAvalaraGetTaxResult) {
             return $newPrice;
         }
-        
+
+        if ($service->isGetTaxDisabledForCountry()) {
+            return $newPrice;
+        }
+
         $taxRate = $service->getTaxRateForOrderBasketId($taxResult, $args->get('id'));
 
         if (null === $taxRate) {

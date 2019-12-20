@@ -1,6 +1,10 @@
 
 == develop ==
 
+== 2.3.3 ==
+* Get Tax check could be restricted to certain countries.
+* Bugfix: Handle vouchers with individual codes.
+
 == 2.3.1 ==
 * Compatibility to php5.4
 

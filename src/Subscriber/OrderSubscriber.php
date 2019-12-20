@@ -121,6 +121,10 @@ class OrderSubscriber extends AbstractSubscriber
             return;
         }
 
+        if ($service->isGetTaxDisabledForCountry()) {
+            return;
+        }
+
         $incoterms = isset($taxRequest->parameters->{LandedCostRequestParams::LANDED_COST_INCOTERMS})
             ? $taxRequest->parameters->{LandedCostRequestParams::LANDED_COST_INCOTERMS}
             : null

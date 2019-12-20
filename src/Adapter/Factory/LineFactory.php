@@ -83,7 +83,7 @@ class LineFactory extends AbstractFactory
     protected function getTaxCode($lineData)
     {
         $articleId = $lineData['articleID'];
-        if ($voucherTaxCode = $this->getVoucherTaxCode($articleId, $lineData['modus'])) {
+        if ($voucherTaxCode = $this->getVoucherTaxCode($articleId, $lineData['ordernumber'], $lineData['modus'])) {
             return $voucherTaxCode;
         }
         
@@ -108,14 +108,15 @@ class LineFactory extends AbstractFactory
     }
 
     /**
-     *
-     * @param int $id
-     * @param int $modus
-     * @return string
+     * Retrieves the tax code for a voucher
+     * @param int    $id        Article ID of the basket item, which is the primary ID of the voucher
+     * @param string $orderCode Oordernumber of the basket item, which is the orderCode of the voucher
+     * @param int    $modus     Modus for the basket item
+     * @return string|null The related Avalara Tax Code or null
      */
-    private function getVoucherTaxCode($id, $modus)
+    private function getVoucherTaxCode($id, $orderCode, $modus)
     {
-        if (self::MODUS_VOUCHER !== $modus) {
+        if (self::MODUS_VOUCHER !== (int)$modus) {
             return null;
         }
         
@@ -123,7 +124,21 @@ class LineFactory extends AbstractFactory
             ->Models()
             ->getRepository('\Shopware\Models\Voucher\Voucher')
         ;
-        if (!$voucher = $voucherRepository->find($id)) {
+
+        /*
+         * Find related voucher by orderCode
+         * This is more precise, since SW uses the ID of the individual voucher code (s_emarketing_voucher_codes)
+         * as article ID instead of the voucher itself.
+         * Under certain circumstances searching voucher by ID could lead to incorrect results.
+         */
+        $voucher = $voucherRepository->findOneBy(['orderCode' => $orderCode]);
+
+        // Find voucher by id
+        if (!$voucher) {
+            $voucher = $voucherRepository->find($id);
+        }
+
+        if (!$voucher) {
             return null;
         }
 
@@ -203,15 +218,28 @@ class LineFactory extends AbstractFactory
      */
     public static function isNotVoucher($position)
     {
-        if ($position['modus'] != self::MODUS_VOUCHER || empty($position['articleID'])) {
+        if ((int)$position['modus'] !== self::MODUS_VOUCHER
+            || (empty($position['articleID']) && empty($position['ordernumber']))
+        ) {
             return true;
         }
+
+        // Find voucher by orderCode
         $voucher = Shopware()
             ->Models()
             ->getRepository('\Shopware\Models\Voucher\Voucher')
-            ->find($position['articleID'])
+            ->findOneBy(['orderCode' => $position['ordernumber']])
         ;
-        
+
+        // Find voucher by ID
+        if (!$voucher) {
+            $voucher = Shopware()
+                ->Models()
+                ->getRepository('\Shopware\Models\Voucher\Voucher')
+                ->find($position['articleID'])
+            ;
+        }
+
         return !$voucher || !$voucher->getStrict();
     }
     
@@ -234,7 +262,7 @@ class LineFactory extends AbstractFactory
     protected function getHsCodeFromAttr($attr = null)
     {
         return null === $attr
-            ? null 
+            ? null
             : $attr->getMoptAvalaraHscode()
         ;
     }
