@@ -37,6 +37,12 @@ class GetTax extends AbstractService
     protected $bcMath;
 
     /**
+     * Array containing the user data
+     * @var array
+     */
+    protected $userData;
+
+    /**
      *
      * @param AdapterInterface $adapter
      */
@@ -164,6 +170,10 @@ class GetTax extends AbstractService
             return false;
         }
 
+        if ($this->isGetTaxDisabledForCountry()) {
+            return false;
+        }
+
         if (!$session->MoptAvalaraGetTaxResult || !$session->MoptAvalaraGetTaxRequestHash) {
             return true;
         }
@@ -273,5 +283,54 @@ class GetTax extends AbstractService
         }
         
         return $data;
+    }
+
+    /**
+     * Indicates if tax calculation is disabled for the users country
+     * @return bool True, if tax calculation is disabled.
+     */
+    public function isGetTaxDisabledForCountry()
+    {
+        $restriction = $this
+            ->getAdapter()
+            ->getPluginConfig(Form::TAX_COUNTRY_RESTRICTION_FIELD)
+        ;
+
+        // No restriction set
+        if (empty($restriction)) {
+            return false;
+        }
+
+        // Restriction should be an array containing the related country ID's
+        if (!is_array($restriction)) {
+            return false;
+        }
+
+        // Fetch data for current user
+        $userData = $this->getUserData();
+        if (empty($userData)) {
+            return false;
+        }
+
+        // Check if shipping country is set
+        if (!isset($userData['additional']['countryShipping']['id'])) {
+            return false;
+        }
+
+        return !in_array($userData['additional']['countryShipping']['id'], $restriction, false);
+    }
+
+    /**
+     * Get all data from the current logged in user
+     * @see sAdmin::sGetUserData()
+     * @return array|false User data, of false if interrupted
+     */
+    protected function getUserData()
+    {
+        if ($this->userData !== null) {
+            return $this->userData;
+        }
+
+        return $this->userData = Shopware()->Modules()->Admin()->sGetUserData();
     }
 }

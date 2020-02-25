@@ -2,6 +2,7 @@
 
 namespace Shopware\Plugins\MoptAvalara\Adapter;
 
+use Shopware\Components\Form\Container;
 use Shopware\Models\Shop\Shop;
 use Shopware\Models\Shop\DetachedShop;
 use Shopware\Models\Order\Order;
@@ -61,13 +62,13 @@ class AvalaraSDKAdapter implements AdapterInterface
 
     /**
      *
-     * @var \Avalara\AvaTaxClient
+     * @var AvaTaxClient
      */
     protected $avaTaxClient;
     
     /**
      *
-     * @var \Monolog\Logger
+     * @var Logger
      */
     protected $logger;
     
@@ -112,7 +113,7 @@ class AvalaraSDKAdapter implements AdapterInterface
 
     /**
      *
-     * @param \Shopware\Components\Form\Container
+     * @param Container
      */
     private $container;
     
@@ -158,7 +159,7 @@ class AvalaraSDKAdapter implements AdapterInterface
     }
     
     /**
-     * @return \Avalara\AvaTaxClient
+     * @return AvaTaxClient
      */
     public function getAvaTaxClient()
     {
@@ -210,7 +211,7 @@ class AvalaraSDKAdapter implements AdapterInterface
     {
         $repository = Shopware()
             ->Models()
-            ->getRepository('Shopware\Models\Shop\Shop')
+            ->getRepository(Shop::class)
         ;
 
         if (!$attr = $order->getAttribute()) {
@@ -259,7 +260,8 @@ class AvalaraSDKAdapter implements AdapterInterface
     
     /**
      * Lazy load logger
-     * @return \Monolog\Logger
+     *
+     * @return Logger
      */
     public function getLogger()
     {
@@ -318,21 +320,23 @@ class AvalaraSDKAdapter implements AdapterInterface
     
     /**
      * @param int $id
-     * @return \Shopware\Models\Order\Order
+     *
+     * @return Order
      */
     public function getOrderById($id)
     {
-        $respository = Shopware()->Models()->getRepository('Shopware\Models\Order\Order');
+        $respository = Shopware()->Models()->getRepository(Order::class);
         return $respository->find($id);
     }
 
     /**
      * @param int $orderNumber
-     * @return \Shopware\Models\Order\Order
+     *
+     * @return Order
      */
     public function getOrderByNumber($orderNumber)
     {
-        $respository = Shopware()->Models()->getRepository('Shopware\Models\Order\Order');
+        $respository = Shopware()->Models()->getRepository(Order::class);
         return $respository->findOneByNumber($orderNumber);
     }
 
@@ -409,9 +413,8 @@ class AvalaraSDKAdapter implements AdapterInterface
     {
         $logLevel = $this->getLogLevel();
         switch ($logLevel) {
-            case Logger::INFO:
-                return Formatter::CLF;
             case Logger::ERROR:
+            case Logger::INFO:
                 return Formatter::CLF;
             case 'DEBUG':
             default:
@@ -435,7 +438,7 @@ class AvalaraSDKAdapter implements AdapterInterface
 
     /**
      *
-     * @return \Shopware\Components\Form\Container
+     * @return Container
      */
     protected function getContainer()
     {

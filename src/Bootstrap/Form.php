@@ -133,8 +133,12 @@ class Form
      * @var string Field name for the plugin config
      */
     const BASKET_CONSISTENCY_CHECK_FIELD = 'mopt_avalara__basket_consistency_check';
-    
-    
+
+    /**
+     * @var string Field name for the plugin config
+     */
+    const TAX_COUNTRY_RESTRICTION_FIELD = 'mopt_avalara__country_restriction';
+
     /**
      * Values and options
      */
@@ -473,6 +477,15 @@ class Form
             }'
         ]);
 
+        $form->setElement('select', self::TAX_COUNTRY_RESTRICTION_FIELD, [
+            'label' => 'Restrict Avalara SalesTax calculation to selected countries',
+            'description' => 'If selected, Avalara SalesTax calculation is only applied for the selected countries. Leave empty to enable Avalara SalesTax calculation for all countries.',
+            'required' => false,
+            'store' => 'Shopware.apps.Base.store.Country',
+            'multiSelect' => true,
+            'scope' => FormElement::SCOPE_SHOP,
+        ]);
+
         //set positions
         $elements = [
             'mopt_avalara__fieldset__credentials',
@@ -488,6 +501,7 @@ class Form
             self::ADDRESS_VALIDATION_COUNTRIES_FIELD,
             self::ADDRESS_VALIDATION_REQUIRED_FIELD,
             self::BASKET_CONSISTENCY_CHECK_FIELD,
+            self::TAX_COUNTRY_RESTRICTION_FIELD,
             self::LOG_LEVEL_FIELD,
             self::LOG_ROTATION_DAYS_FIELD,
             'mopt_avalara__fieldset__origin_address',
