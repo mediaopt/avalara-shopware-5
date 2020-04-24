@@ -58,7 +58,7 @@ class InvoiceTransactionModelFactory extends AbstractTransactionModelFactory
         }
         
         if ($customer->getAttribute() && $customer->getAttribute()->getMoptAvalaraExemptionCode()) {
-            $model->exemptionNo = $customer->getAttribute()->getMoptAvalaraExemptionCode();
+            $model->customerUsageType = $customer->getAttribute()->getMoptAvalaraExemptionCode();
         }
         
         return $model;

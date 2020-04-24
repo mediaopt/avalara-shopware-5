@@ -47,7 +47,7 @@ class OrderTransactionModelFactory extends AbstractTransactionModelFactory
         $model->parameters = $this->getTransactionParameters();
 
         if (!empty($user['additional']['user']['mopt_avalara_exemption_code'])) {
-            $model->exemptionNo = $user['additional']['user']['mopt_avalara_exemption_code'];
+            $model->customerUsageType = $user['additional']['user']['mopt_avalara_exemption_code'];
         }
 
         return $model;
