@@ -1,6 +1,12 @@
 
 == develop ==
 
+== 2.3.5 ==
+Added configuration option to hide the discard button
+
+== 2.3.4 ==
+ExemptionNo is replaced with CustomerUsageType (Entity/Use Codes)
+
 == 2.3.3 ==
 * Get Tax check could be restricted to certain countries.
 * Bugfix: Handle vouchers with individual codes.

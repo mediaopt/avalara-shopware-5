@@ -87,11 +87,11 @@ class AddressSubscriber extends AbstractSubscriber
         if (!$this->isCountryForDelivery($address->country)) {
             return false;
         }
-        
+
         if (!$session->MoptAvalaraCheckedAddress) {
             return true;
         }
-        
+
         if ($session->MoptAvalaraCheckedAddress !== $this->getAddressHash($address)) {
             return true;
         }
@@ -107,7 +107,7 @@ class AddressSubscriber extends AbstractSubscriber
 
         return false;
     }
-    
+
     /**
      *
      * @param string $country
@@ -138,13 +138,13 @@ class AddressSubscriber extends AbstractSubscriber
                     AddressFactory::COUNTRY_CODE__CA,
                     AddressFactory::COUNTRY_CODE__US
                 ];
-                
+
                 if (in_array($country, $usaAndCanada, true)) {
                     return true;
                 }
                 break;
         }
-        
+
         return false;
     }
 
@@ -205,6 +205,9 @@ class AddressSubscriber extends AbstractSubscriber
         }
         $view->assign('formData', $formData);
         $view->assign('MoptAvalaraAddressChanges', $changes);
+        $view->assign('MoptAvalaraAddressHidden', $this
+            ->getAdapter()
+            ->getPluginConfig(Form::ADDRESS_VALIDATION_SKIPPABLE));
 
         $this->addErrorMessage($view, 'shippingAddressChangesFound');
     }

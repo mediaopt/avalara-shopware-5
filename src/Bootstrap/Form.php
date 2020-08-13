@@ -13,7 +13,7 @@ use Shopware\Models\Shop\Shop;
 
 /**
  * This class will represent the plugin config options
- * 
+ *
  * @author derksen mediaopt GmbH
  * @package Shopware\Plugins\MoptAvalara\Bootstrap
  */
@@ -23,7 +23,7 @@ class Form
      * @var int Number of rotated log files / days to be logged
      */
     const LOGGER_DEFAULT_ROTATING_DAYS = 7;
-    
+
     /**
      * @var string Default logfile name
      */
@@ -33,32 +33,32 @@ class Form
      * @var string Default logfile extension
      */
     const LOG_FILE_EXT = '.log';
-    
+
     /**
      * @var string Field name for the plugin config
      */
     const IS_LIVE_MODE_FIELD = 'mopt_avalara__is_live_mode';
-    
+
     /**
      * @var string Field name for the plugin config
      */
     const ACCOUNT_NUMBER_FIELD = 'mopt_avalara__account_number';
-    
+
     /**
      * @var string Field name for the plugin config
      */
     const LICENSE_KEY_FIELD = 'mopt_avalara__license_key';
-    
+
     /**
      * @var string Field name for the plugin config
      */
     const COMPANY_CODE_FIELD = 'mopt_avalara__company_code';
-    
+
     /**
      * @var string Field name for the plugin config
      */
     const TAX_ENABLED_FIELD = 'mopt_avalara__tax_enabled';
-    
+
     /**
      * @var string Field name for the plugin config
      */
@@ -68,7 +68,7 @@ class Form
      * @var string Field name for the plugin config
      */
     const LANDEDCOST_ENABLED_FIELD = 'mopt_avalara__landedcost_enabled';
-    
+
     /**
      * @var string Field name for the plugin config
      */
@@ -87,43 +87,48 @@ class Form
     /**
      * @var string Field name for the plugin config
      */
+    const ADDRESS_VALIDATION_SKIPPABLE = 'mopt_avalara_addressvalidation_skippable';
+
+    /**
+     * @var string Field name for the plugin config
+     */
     const LOG_LEVEL_FIELD = 'mopt_avalara_loglevel';
-    
+
     /**
      * @var string Field name for the plugin config
      */
     const LOG_ROTATION_DAYS_FIELD = 'mopt_avalara_log_rotation_days';
-    
+
     /**
      * @var string Field name for the plugin config
      */
     const ORIGIN_ADDRESS_LINE_1_FIELD = 'mopt_avalara__origin_address__line1';
-    
+
     /**
      * @var string Field name for the plugin config
      */
     const ORIGIN_ADDRESS_LINE_2_FIELD = 'mopt_avalara__origin_address__line2';
-    
+
     /**
      * @var string Field name for the plugin config
      */
     const ORIGIN_ADDRESS_LINE_3_FIELD = 'mopt_avalara__origin_address__line3';
-    
+
     /**
      * @var string Field name for the plugin config
      */
     const ORIGIN_POSTAL_CODE_FIELD = 'mopt_avalara__origin_address__postal_code';
-    
+
     /**
      * @var string Field name for the plugin config
      */
     const ORIGIN_CITY_FIELD = 'mopt_avalara__origin_address__city';
-    
+
     /**
      * @var string Field name for the plugin config
      */
     const ORIGIN_REGION_FIELD = 'mopt_avalara__origin_address__region';
-    
+
     /**
      * @var string Field name for the plugin config
      */
@@ -146,7 +151,7 @@ class Form
     const DELIVERY_COUNTRY_USA = 2;
     const DELIVERY_COUNTRY_CANADA = 3;
     const DELIVERY_COUNTRY_USA_AND_CANADA = 4;
-    
+
     /**
      * Incoterms
      */
@@ -156,13 +161,13 @@ class Form
     const INCOTERMS_DAP_LABEL = 'Delivered at Place (DAP)';
     const INCOTERMS_DDP = 'DDP';
     const INCOTERMS_DDP_LABEL = 'Delivered Duty Paid (DDP)';
-    
+
     /**
      *
      * @var \Shopware_Plugins_Backend_MoptAvalara_Bootstrap
      */
     private $bootstrap;
-    
+
     /**
      *
      * @param \Shopware_Plugins_Backend_MoptAvalara_Bootstrap $bootstrap
@@ -183,21 +188,21 @@ class Form
         if (!$json = json_decode(file_get_contents($filePath), true)) {
             return $countries;
         }
-        
+
         foreach ($json as $line) {
             $countries[] = [$line['code'], ucfirst(strtolower($line['name']))];
         }
-        
+
         usort($countries, function ($a, $b) {
             return ($a[1] > $b[1])
                 ? 1
                 : -1
             ;
         });
-        
+
         return $countries;
     }
-    
+
     /**
      * Will return array of arrays ['iso', 'Region name']
      * @param string $countryIso
@@ -210,24 +215,24 @@ class Form
         if (!$json = json_decode(file_get_contents($filePath), true)) {
             return $regions;
         }
-        
+
         foreach ($json as $line) {
             if ($countryIso && $line['countryCode'] != $countryIso) {
                 continue;
             }
             $regions[] = [$line['code'], ucfirst(strtolower($line['name']))];
         }
-        
+
         usort($regions, function ($a, $b) {
             return ($a[1] > $b[1])
                 ? 1
                 : -1
             ;
         });
-        
+
         return $regions;
     }
-    
+
     /**
      * Will create all plugin config forms and fields
      */
@@ -266,7 +271,7 @@ class Form
             'required' => true,
             'scope' => FormElement::SCOPE_SHOP
         ]);
-        
+
         $form->setElement('text', self::COMPANY_CODE_FIELD, [
             'label' => 'Company code',
             'required' => true,
@@ -298,7 +303,7 @@ class Form
             'description' => 'Disable document committing will result that all calls will be done with DocType=SalesOrder and suppress any non-getTax calls(i.e.canceltax,postTax)',
             'scope' => FormElement::SCOPE_SHOP
         ]);
-        
+
         $form->setElement('boolean', self::LANDEDCOST_ENABLED_FIELD, [
             'label' => 'Enable Avalara Landed cost calculation (beta)',
             'description' => 'Choose, if you want to use the Avalara Landed cost calculation (beta).',
@@ -315,7 +320,7 @@ class Form
                 [self::INCOTERMS_DDP, self::INCOTERMS_DDP_LABEL],
             ],
         ]);
-        
+
         $form->setElement('select', self::ADDRESS_VALIDATION_COUNTRIES_FIELD, [
             'label' => 'Address-validation for following countries',
             'description' => 'Choose the delivery countries, which should be covered by the Avalara Tax Calculation',
@@ -332,6 +337,12 @@ class Form
         $form->setElement('boolean', self::ADDRESS_VALIDATION_REQUIRED_FIELD, [
             'label' => 'Valid address is required',
             'description' => 'If this option is set, a customer has to provide a valid address during checkout.',
+            'scope' => FormElement::SCOPE_SHOP
+        ]);
+
+        $form->setElement('boolean', self::ADDRESS_VALIDATION_SKIPPABLE, [
+            'label' => 'Hide discard button on address change',
+            'description' => 'If this option is set, the button discard is hidden when an address change is suggested due to the validation.',
             'scope' => FormElement::SCOPE_SHOP
         ]);
 
@@ -414,7 +425,7 @@ class Form
             'required' => true,
             'scope' => FormElement::SCOPE_SHOP
         ]);
-        
+
         $form->setElement('text', self::ORIGIN_CITY_FIELD, [
             'label' => 'City',
             'required' => true,
@@ -500,6 +511,7 @@ class Form
             self::INCOTERMS_FIELD,
             self::ADDRESS_VALIDATION_COUNTRIES_FIELD,
             self::ADDRESS_VALIDATION_REQUIRED_FIELD,
+            self::ADDRESS_VALIDATION_SKIPPABLE,
             self::BASKET_CONSISTENCY_CHECK_FIELD,
             self::TAX_COUNTRY_RESTRICTION_FIELD,
             self::LOG_LEVEL_FIELD,
