@@ -95,7 +95,7 @@ class LineFactory extends AbstractFactory
         }
 
         //directly assigned to article ?
-        if ($taxCode = $this->getTaxCodeFromAttr($article->getAttribute())) {
+        if ($taxCode = $this->getTaxCodeFromAttr($article->getMainDetail()->getAttribute())) {
             return $taxCode;
         }
 
@@ -185,7 +185,7 @@ class LineFactory extends AbstractFactory
         }
 
         //directly assigned to article ?
-        if ($hsCode = $this->getHsCodeFromAttr($article->getAttribute())) {
+        if ($hsCode = $this->getHsCodeFromAttr($article->getMainDetail()->getAttribute())) {
             return $hsCode;
         }
 

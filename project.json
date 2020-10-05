@@ -4,12 +4,12 @@
     "pluginFolder": "Community",
     "prefix": "Mopt",
     "suffix": "",
-    "version": "2.3.5",
+    "version": "2.4.0",
     "projectName": "Avalara",
     "pathToModule": "src",
     "compatibility": {
         "minimumVersion": "5.2.0",
-        "maximumVersion": "5.5.10",
+        "maximumVersion": "5.6.8",
         "blacklist": [
         ]
     }
