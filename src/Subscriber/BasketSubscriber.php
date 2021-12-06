@@ -9,6 +9,8 @@
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
+use Shopware\Plugins\MoptAvalara\Service\CheckoutPrice;
+use Shopware\Plugins\MoptAvalara\Service\GetTax;
 
 /**
  * @author derksen mediaopt GmbH
@@ -42,7 +44,7 @@ class BasketSubscriber extends AbstractSubscriber
      */
     public function onBeforeGetBasket(\Enlight_Hook_HookArgs $args)
     {
-        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
+        /* @var $service GetTax */
         $service = $this->getAdapter()->getService('GetTax');
         $session = $this->getSession();
 
@@ -74,7 +76,7 @@ class BasketSubscriber extends AbstractSubscriber
     public function onBeforeAddVoucher(\Enlight_Hook_HookArgs $args)
     {
         $session = $this->getSession();
-        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
+        /* @var $service GetTax */
         $service = $this->getAdapter()->getService('GetTax');
         if (empty($session->MoptAvalaraGetTaxResult) || !$service->isGetTaxEnabled()) {
             return;
@@ -137,8 +139,8 @@ class BasketSubscriber extends AbstractSubscriber
     {
         $newPrice = $args->getReturn();
         $adapter = $this->getAdapter();
-        
-        /* @var $service \Shopware\Plugins\MoptAvalara\Service\GetTax */
+
+        /* @var $service GetTax */
         $service = $adapter->getService('GetTax');
         if (!$service->isGetTaxEnabled()) {
             return $newPrice;
@@ -166,6 +168,20 @@ class BasketSubscriber extends AbstractSubscriber
         $newPrice['taxID'] = self::TAX_ID . $taxRate;
         $newPrice['tax_rate'] = $taxRate;
         $newPrice['tax'] = $service->getTaxForOrderBasketId($taxResult, $args->get('id'));
+
+        /** @var CheckoutPrice $service */
+        $serviceCheckoutPrice = $adapter->getService('CheckoutPrice');
+
+        if ($serviceCheckoutPrice->isDvsGrossFixedPluginActive()) {
+            $newPrice['price'] = $serviceCheckoutPrice->getGrossPriceWithTax($newPrice);
+        }
+
+        if ($service->isTaxIncludedEnabled() && !$service->isGetTaxDisabledForCountry()) {
+            $newPrice['price'] = $serviceCheckoutPrice->getPriceWithTaxIncluded(
+                $newPrice['price'],
+                $newPrice['tax_rate']
+            );
+        }
 
         return $newPrice;
     }

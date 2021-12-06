@@ -333,4 +333,12 @@ class GetTax extends AbstractService
 
         return $this->userData = Shopware()->Modules()->Admin()->sGetUserData();
     }
+
+    /**
+     * @return bool
+     */
+    public function isTaxIncludedEnabled()
+    {
+        return $this->getAdapter()->getPluginConfig(Form::TAX_INCLUDED_ENABLED);
+    }
 }

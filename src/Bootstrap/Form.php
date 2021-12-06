@@ -145,6 +145,11 @@ class Form
     const TAX_COUNTRY_RESTRICTION_FIELD = 'mopt_avalara__country_restriction';
 
     /**
+     * @var string Field name for the plugin config
+     */
+    const TAX_INCLUDED_ENABLED = 'mopt_avalara__tax_included_enabled';
+
+    /**
      * Values and options
      */
     const DELIVERY_COUNTRY_NO_VALIDATION = 1;
@@ -497,6 +502,14 @@ class Form
             'scope' => FormElement::SCOPE_SHOP,
         ]);
 
+        $form->setElement('boolean', self::TAX_INCLUDED_ENABLED, [
+            'label' => 'Tax included',
+            'description' => 'If this option is set, the total sum will contain the tax.',
+            'value' => 0,
+            'required' => false,
+            'scope' => FormElement::SCOPE_SHOP
+        ]);
+
         //set positions
         $elements = [
             'mopt_avalara__fieldset__credentials',
@@ -514,6 +527,7 @@ class Form
             self::ADDRESS_VALIDATION_SKIPPABLE,
             self::BASKET_CONSISTENCY_CHECK_FIELD,
             self::TAX_COUNTRY_RESTRICTION_FIELD,
+            self::TAX_INCLUDED_ENABLED,
             self::LOG_LEVEL_FIELD,
             self::LOG_ROTATION_DAYS_FIELD,
             'mopt_avalara__fieldset__origin_address',
