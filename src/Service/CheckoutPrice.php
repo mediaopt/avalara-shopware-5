@@ -22,22 +22,15 @@ class CheckoutPrice extends AbstractService
         parent::__construct($adapter);
     }
 
-    public function getPriceWithTaxIncluded(float $price, float $taxRate): float
+    public function isDvsGrossFixedPluginActive()
     {
-        return $price - (round($price, 2) * round(($taxRate / 100), 2));
-    }
+        try {
+            $pluginManager = Shopware()->Container()->get('shopware_plugininstaller.plugin_manager');
+            $plugin = $pluginManager->getPluginByName('DvsnArticleFixedGross');
 
-    public function getGrossPriceWithTax(array $price): float
-    {
-        return ($price['price'] * (1 + (19 / 100)) / (1 + (0 / 100))) + $price['tax'];
-    }
-
-    public function isDvsGrossFixedPluginActive(): bool
-    {
-        /** @var InstallerService $pluginManager */
-        $pluginManager = Shopware()->Container()->get('shopware_plugininstaller.plugin_manager');
-        $plugin = $pluginManager->getPluginByName('DvsnArticleFixedGross');
-
-        return $plugin->getActive();
+            return $plugin->getActive();
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }

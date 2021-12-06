@@ -167,20 +167,10 @@ class BasketSubscriber extends AbstractSubscriber
         
         $newPrice['taxID'] = self::TAX_ID . $taxRate;
         $newPrice['tax_rate'] = $taxRate;
-        $newPrice['tax'] = $service->getTaxForOrderBasketId($taxResult, $args->get('id'));
-
-        /** @var CheckoutPrice $service */
         $serviceCheckoutPrice = $adapter->getService('CheckoutPrice');
 
-        if ($serviceCheckoutPrice->isDvsGrossFixedPluginActive()) {
-            $newPrice['price'] = $serviceCheckoutPrice->getGrossPriceWithTax($newPrice);
-        }
-
-        if ($service->isTaxIncludedEnabled() && !$service->isGetTaxDisabledForCountry()) {
-            $newPrice['price'] = $serviceCheckoutPrice->getPriceWithTaxIncluded(
-                $newPrice['price'],
-                $newPrice['tax_rate']
-            );
+        if (!$serviceCheckoutPrice->isDvsGrossFixedPluginActive()) {
+            $newPrice['tax'] = $service->getTaxForOrderBasketId($taxResult, $args->get('id'));
         }
 
         return $newPrice;

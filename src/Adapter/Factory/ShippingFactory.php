@@ -49,7 +49,7 @@ class ShippingFactory extends AbstractFactory
         $line->description = self::ARTICLE_ID;
         $line->taxCode = $this->getTaxCode($id);
         $line->discounted = false;
-        $line->taxIncluded = false;
+        $line->taxIncluded = $this->isTaxIncluded();
         
         return $line;
     }
