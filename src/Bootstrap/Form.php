@@ -150,6 +150,11 @@ class Form
     const TAX_INCLUDED_ENABLED = 'mopt_avalara__tax_included_enabled';
 
     /**
+     * @var string Field name for the plugin config
+     */
+    const ADD_SHIPPING_TAX_TO_SHIPPING_COST = 'mopt_avalara__add_shipping_tax_to_shipping_cost';
+
+    /**
      * Values and options
      */
     const DELIVERY_COUNTRY_NO_VALIDATION = 1;
@@ -477,11 +482,11 @@ class Form
                         closable : true,
                         draggable : true,
                         items: [
-                          {  
+                          {
                             bodyPadding: 5,
                             title: "Connection test",
                             html: htmlConnectionTest
-                          }, 
+                          },
                         ]
                     });
                     connectionTestForm.show();
@@ -510,6 +515,14 @@ class Form
             'scope' => FormElement::SCOPE_SHOP
         ]);
 
+        $form->setElement('boolean', self::ADD_SHIPPING_TAX_TO_SHIPPING_COST, [
+            'label' => 'Add Shipping Tax to shipping cost',
+            'description' => 'If this option is set, the shipping cost is increased by the calculated tax',
+            'value' => 0,
+            'required' => false,
+            'scope' => FormElement::SCOPE_SHOP
+        ]);
+
         //set positions
         $elements = [
             'mopt_avalara__fieldset__credentials',
@@ -528,6 +541,7 @@ class Form
             self::BASKET_CONSISTENCY_CHECK_FIELD,
             self::TAX_COUNTRY_RESTRICTION_FIELD,
             self::TAX_INCLUDED_ENABLED,
+            self::ADD_SHIPPING_TAX_TO_SHIPPING_COST,
             self::LOG_LEVEL_FIELD,
             self::LOG_ROTATION_DAYS_FIELD,
             'mopt_avalara__fieldset__origin_address',

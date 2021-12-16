@@ -208,6 +208,7 @@ class AddressSubscriber extends AbstractSubscriber
         $view->assign('MoptAvalaraAddressHidden', $this
             ->getAdapter()
             ->getPluginConfig(Form::ADDRESS_VALIDATION_SKIPPABLE));
+        $view->assign('MoptAvalaraIsOneTimeAccount', $this->getSession()->offsetGet('sOneTimeAccount'));
 
         $this->addErrorMessage($view, 'shippingAddressChangesFound');
     }

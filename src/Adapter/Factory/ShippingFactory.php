@@ -10,6 +10,7 @@ namespace Shopware\Plugins\MoptAvalara\Adapter\Factory;
 
 use Shopware\Models\Dispatch\Dispatch;
 use Avalara\LineItemModel;
+use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 
 /**
  * @author derksen mediaopt GmbH
@@ -21,12 +22,12 @@ class ShippingFactory extends AbstractFactory
      * @var string Article ID for a shipping
      */
     const ARTICLE_ID = 'Shipping';
-    
+
     /**
      * @var string Avalara default taxcode for a voucher
      */
     const TAXCODE = 'FR010000';
-    
+
     /**
      *
      * @var Dispatch
@@ -49,8 +50,9 @@ class ShippingFactory extends AbstractFactory
         $line->description = self::ARTICLE_ID;
         $line->taxCode = $this->getTaxCode($id);
         $line->discounted = false;
-        $line->taxIncluded = $this->isTaxIncluded();
-        
+        $line->taxIncluded =
+            !$this->getAdapter()->getPluginConfig(Form::ADD_SHIPPING_TAX_TO_SHIPPING_COST) && $this->isTaxIncluded();
+
         return $line;
     }
 
@@ -71,7 +73,7 @@ class ShippingFactory extends AbstractFactory
 
         return self::TAXCODE;
     }
-    
+
     /**
      *
      * @param int $id
@@ -90,10 +92,10 @@ class ShippingFactory extends AbstractFactory
                 ->find($id)
             ;
         }
-        
+
         return $this->dispatchEntity;
     }
-    
+
     /**
      *
      * @param int $id
@@ -104,15 +106,15 @@ class ShippingFactory extends AbstractFactory
         if (!$id) {
             return false;
         }
-        
+
         $shippingEntity = $this->getShippingEntity($id);
         if (!$shippingEntity || !$attr = $shippingEntity->getAttribute()) {
             return false;
         }
-        
+
         return $attr->getMoptAvalaraInsured();
     }
-    
+
     /**
      *
      * @param int $id
@@ -123,12 +125,12 @@ class ShippingFactory extends AbstractFactory
         if (!$id) {
             return false;
         }
-        
+
         $shippingEntity = $this->getShippingEntity($id);
         if (!$shippingEntity || !$attr = $shippingEntity->getAttribute()) {
             return false;
         }
-        
+
         return (bool)$attr->getMoptAvalaraExpressShipping();
     }
 }
