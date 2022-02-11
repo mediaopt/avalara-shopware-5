@@ -155,6 +155,11 @@ class Form
     const ADD_SHIPPING_TAX_TO_SHIPPING_COST = 'mopt_avalara__add_shipping_tax_to_shipping_cost';
 
     /**
+     * @var string Field name for the plugin config
+     */
+    const NETTO_MODE_IN_SHOP_ACTIVE = 'mopt_avalara__netto_mode_in_shop_active';
+
+    /**
      * Values and options
      */
     const DELIVERY_COUNTRY_NO_VALIDATION = 1;
@@ -207,7 +212,7 @@ class Form
             return ($a[1] > $b[1])
                 ? 1
                 : -1
-            ;
+                ;
         });
 
         return $countries;
@@ -237,7 +242,7 @@ class Form
             return ($a[1] > $b[1])
                 ? 1
                 : -1
-            ;
+                ;
         });
 
         return $regions;
@@ -523,6 +528,14 @@ class Form
             'scope' => FormElement::SCOPE_SHOP
         ]);
 
+        $form->setElement('boolean', self::NETTO_MODE_IN_SHOP_ACTIVE, [
+            'label' => 'Is Netto mode in shop active',
+            'description' => 'If this option is set, the plugin expect that the customer only see the netto mode',
+            'value' => 0,
+            'required' => false,
+            'scope' => FormElement::SCOPE_SHOP
+        ]);
+
         //set positions
         $elements = [
             'mopt_avalara__fieldset__credentials',
@@ -542,6 +555,7 @@ class Form
             self::TAX_COUNTRY_RESTRICTION_FIELD,
             self::TAX_INCLUDED_ENABLED,
             self::ADD_SHIPPING_TAX_TO_SHIPPING_COST,
+            self::NETTO_MODE_IN_SHOP_ACTIVE,
             self::LOG_LEVEL_FIELD,
             self::LOG_ROTATION_DAYS_FIELD,
             'mopt_avalara__fieldset__origin_address',

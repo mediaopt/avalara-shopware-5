@@ -126,7 +126,7 @@ class InvoiceTransactionModelFactory extends AbstractTransactionModelFactory
      */
     protected function getShippingPrice()
     {
-        if ($this->getAdapter()->getPluginConfig(Form::ADD_SHIPPING_TAX_TO_SHIPPING_COST) || $this->isTaxIncluded()) {
+        if ($this->isTaxIncluded()) {
             return $this->orderContext->getInvoiceShipping();
         }
         return $this->orderContext->getInvoiceShippingNet();
@@ -154,11 +154,12 @@ class InvoiceTransactionModelFactory extends AbstractTransactionModelFactory
      */
     private function convertOrderDetailToLineData(Detail $detail)
     {
+        $netMode = $this->getAdapter()->getPluginConfig(Form::NETTO_MODE_IN_SHOP_ACTIVE);
         $lineData = [];
         $lineData['id'] = $detail->getId();
         $lineData['ean'] = $detail->getEan();
         $lineData['quantity'] = $detail->getQuantity();
-        $lineData['netprice'] = $this->getNetPrice($detail);
+        $lineData['netprice'] = $netMode ? $detail->getPrice() : $this->getNetPrice();
         $lineData['articlename'] = $detail->getArticleName();
         $lineData['articleID'] = $detail->getArticleId();
         $lineData['ordernumber'] = $detail->getArticleNumber();
