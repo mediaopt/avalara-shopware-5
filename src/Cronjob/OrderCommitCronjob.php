@@ -51,7 +51,7 @@ class OrderCommitCronjob
                 INNER JOIN s_order_attributes as oa
                 ON o.id = oa.orderID
                 WHERE
-                o.status = 2 AND oa.mopt_avalara_doc_code IS NULL AND oa.mopt_avalara_transaction_type IS NOT NULL";
+                o.status = 7 AND oa.mopt_avalara_doc_code IS NULL AND oa.mopt_avalara_transaction_type IS NOT NULL";
 
         return $this
             ->getContainer()
