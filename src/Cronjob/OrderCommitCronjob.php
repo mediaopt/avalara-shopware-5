@@ -20,13 +20,17 @@ class OrderCommitCronjob
 
         $orderIds = $this->getOrderIds();
         foreach($orderIds as $orderId) {
-            if (!$order = $adapter->getOrderById($orderId)) {
-                continue;
+            try {
+                if (!$order = $adapter->getOrderById($orderId)) {
+                    continue;
+                }
+                $service->commitOrder($order);
+                $order->getAttribute()->setMoptAvalaraOrderChanged(0);
+                Shopware()->Models()->persist($order);
+                Shopware()->Models()->flush();
+            } catch (\Exception $e) {
+                //do nothing
             }
-            $service->commitOrder($order);
-            $order->getAttribute()->setMoptAvalaraOrderChanged(0);
-            Shopware()->Models()->persist($order);
-            Shopware()->Models()->flush();
         }
 
         return true;
