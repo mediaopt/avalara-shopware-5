@@ -174,7 +174,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
         Shopware()->Container()->set($serviceName, $this->createAvalaraSdkAdapter());
         
         //add snippets
-        $this->get('Snippets')->addConfigDir($this->Path() . 'Snippets/');
+        $this->get('snippets')->addConfigDir($this->Path() . 'Snippets/');
     }
     
     /**
@@ -246,7 +246,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
      */
     private function addMailFormatterSubscriber($subscribers = [])
     {
-        $templateMailService = $this->get('TemplateMail');
+        $templateMailService = $this->get('templatemail');
         $config = $this->get('config');
         
         $mailSubscriber = new SubscriberNamespace\SendOrderMailSubscriber($this);
