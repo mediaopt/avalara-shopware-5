@@ -15,7 +15,7 @@ use Shopware\Plugins\MoptAvalara\Mail as MailNamespace;
 /**
  * this class configures:
  * installment, uninstallment, updates, hooks, events, payment methods
- * 
+ *
  * @extends Shopware_Components_Plugin_Bootstrap
  * @author derksen mediaopt GmbH
  */
@@ -25,7 +25,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
      * @var string Plugin identifier
      */
     const PLUGIN_NAME = 'MoptAvalara';
-    
+
     /**
      * @var string
      */
@@ -83,6 +83,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
             ->registerEvents()
             ->createForm()
             ->updateDatabase()
+            ->registerCronjob()
         ;
 
         return ['success' => true, 'invalidateCache' => ['frontend', 'backend', 'proxy']];
@@ -102,6 +103,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
             ->registerEvents()
             ->createForm()
             ->updateDatabase()
+            ->registerCronjob()
         ;
 
         return ['success' => true, 'invalidateCache' => ['frontend', 'backend', 'proxy']];
@@ -117,6 +119,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
     {
         $this
             ->clearDatabase()
+            ->deleteCronjob()
             ->disable()
         ;
 
@@ -172,11 +175,11 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
         require_once $this->Path() . 'vendor/avalara/avataxclient/src/AvaTaxClient.php';
         $serviceName = AvalaraSDKAdapter::SERVICE_NAME;
         Shopware()->Container()->set($serviceName, $this->createAvalaraSdkAdapter());
-        
+
         //add snippets
         $this->get('snippets')->addConfigDir($this->Path() . 'Snippets/');
     }
-    
+
     /**
      *
      * @return \Shopware\Plugins\MoptAvalara\Adapter\AdapterInterface
@@ -189,7 +192,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
             $this->getVersion()
         );
     }
-    
+
     /**
      * register controllers
      * @throws \Exception
@@ -199,10 +202,10 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
     {
         $this->registerController('Backend', 'MoptAvalaraBackendProxy');
         $this->registerController('Backend', 'MoptAvalara');
-        
+
         return $this;
     }
-    
+
     /**
      * register for several events to extend shop functions
      * @throws \Exception
@@ -211,7 +214,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
     protected function registerEvents()
     {
         $this->subscribeEvent('Enlight_Controller_Front_DispatchLoopStartup', 'onDispatchLoopStartup');
-        
+
         return $this;
     }
 
@@ -230,6 +233,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
         $subscribers[] = new SubscriberNamespace\BackendOrderUpdateSubscriber($this);
         $subscribers[] = new SubscriberNamespace\OrderSubscriber($this);
         $subscribers[] = new SubscriberNamespace\DocumentSubscriber($this);
+        $subscribers[] = new SubscriberNamespace\CronjobSubscriber($this);
 
         $subscribersWithMailFormatters = $this->addMailFormatterSubscriber($subscribers);
 
@@ -238,9 +242,9 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
             $subscribersWithMailFormatters
         );
     }
-    
+
     /**
-     * 
+     *
      * @param \Enlight\Event\SubscriberInterface[] $subscribers
      * @return \Enlight\Event\SubscriberInterface[]
      */
@@ -248,7 +252,7 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
     {
         $templateMailService = $this->get('templatemail');
         $config = $this->get('config');
-        
+
         $mailSubscriber = new SubscriberNamespace\SendOrderMailSubscriber($this);
         $mailSubscriber
             ->addMailFormatter(new MailNamespace\BodyHtmlZendMailFormatter($templateMailService, $config))
@@ -267,7 +271,62 @@ class Shopware_Plugins_Backend_MoptAvalara_Bootstrap extends Shopware_Components
     {
         $pluginConfigForm = new Form($this);
         $pluginConfigForm->create();
-        
+
+        return $this;
+    }
+
+    /**
+     * register cronjob
+     * @return $this
+     */
+    private function registerCronjob()
+    {
+        $connection = Shopware()->Container()->get('dbal_connection');
+
+        $connection->insert(
+            's_crontab',
+            [
+                'name'             => 'Commit Avalara Orders',
+                'action'           => 'Shopware_CronJob_MoptAvalaraOrderCommit',
+                'next'             => new \DateTime(),
+                'start'            => null,
+                '`interval`'       => '600',
+                'active'           => 1,
+                'end'              => new \DateTime(),
+                'pluginID'         => null
+            ],
+            [
+                'next' => 'datetime',
+                'end'  => 'datetime',
+            ]
+        );
+
+        $this->subscribeEvent(
+            'Shopware_CronJob_MoptAvalaraOrderCommit',
+            'onCronJobRun'
+        );
+
+        return $this;
+    }
+
+    public function onCronJobRun(\Shopware_Components_Cron_CronJob $job)
+    {
+        $cronjob = new \Shopware\Plugins\MoptAvalara\Cronjob\OrderCommitCronjob();
+        $cronjob->onCronjobExecute($job);
+    }
+
+    /**
+     * delete cronjob
+     * @return $this
+     */
+    private function deleteCronjob()
+    {
+        $connection = Shopware()->Container()->get('dbal_connection');
+
+        $connection->executeQuery('DELETE FROM s_crontab WHERE `action` = ?', [
+            'Shopware_CronJob_MoptAvalaraOrderCommit'
+        ]);
+
         return $this;
     }
 }

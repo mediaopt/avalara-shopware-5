@@ -8,8 +8,8 @@
 
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
-use Shopware\Models\Order\Order;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\ShippingFactory;
+use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
 
 /**
  * @author derksen mediaopt GmbH
@@ -62,13 +62,13 @@ class CheckoutSubscriber extends AbstractSubscriber
         }
 
         $taxRate = $service->getTaxRateForOrderBasketId($session->MoptAvalaraGetTaxResult, ShippingFactory::ARTICLE_ID);
-        
+
         if (!$taxRate) {
             return $return;
         }
         $return['tax_calculation'] = true;
         $return['tax_calculation_value'] = $taxRate;
-        
+
         return $return;
     }
 
@@ -83,10 +83,30 @@ class CheckoutSubscriber extends AbstractSubscriber
     public function onAfterGetShippingCosts(\Enlight_Hook_HookArgs $args)
     {
         $shippingCost = $this->saveOriginalShippingCost($args);
+        if ($this->getAdapter()->getPluginConfig(Form::ADD_SHIPPING_TAX_TO_SHIPPING_COST)) {
+            $shippingCost = $this->addTaxToShippingCost($shippingCost);
+        }
 
         return $this->addSurchargesToShippingCost($shippingCost);
     }
 
+    private function addTaxToShippingCost($shippingCost)
+    {
+        $service = $this->getAdapter()->getService('GetTax');
+        $tax = $service->getTaxForOrderBasketId($this->getSession()->MoptAvalaraGetTaxResult, ShippingFactory::ARTICLE_ID);
+
+        $shippingCost['brutto'] = $this
+            ->bcMath
+            ->bcadd($shippingCost['brutto'], $tax);
+
+        $shippingCost['value'] = (string)$shippingCost['brutto'];
+
+        $shippingCost['netto'] = $this
+            ->bcMath
+            ->bcsub($shippingCost['brutto'], $tax);
+        return $shippingCost;
+
+    }
     /**
      * Method will decrease a shipping cost in view
      *
@@ -163,6 +183,7 @@ class CheckoutSubscriber extends AbstractSubscriber
         $shippingCost = $args->getReturn();
         $session = $this->getSession();
         $session->moptAvalaraShippingcostsNetOrigin = $shippingCost['netto'];
+        $session->moptAvalaraShippingcostsBrutOrigin = $shippingCost['brutto'];
 
         return $shippingCost;
     }

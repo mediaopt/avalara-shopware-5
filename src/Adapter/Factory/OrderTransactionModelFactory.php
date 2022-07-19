@@ -19,7 +19,7 @@ use Shopware\Plugins\MoptAvalara\Bootstrap\Form;
  * Factory to create CreateTransactionModel from the basket.
  * Just to get estimated tax and landed cost
  * Without commiting it to Avalara
- * 
+ *
  * @author derksen mediaopt GmbH
  * @package Shopware\Plugins\MoptAvalara\Adapter\Factory
  */
@@ -65,10 +65,10 @@ class OrderTransactionModelFactory extends AbstractTransactionModelFactory
         $addressesModel = new AddressesModel();
         $addressesModel->shipFrom = $addressFactory->buildOriginAddress();
         $addressesModel->shipTo = $addressFactory->buildDeliveryAddress();
-        
+
         return $addressesModel;
     }
-    
+
     /**
      * @param array $positions
      * @return LineItemModel[]
@@ -79,7 +79,7 @@ class OrderTransactionModelFactory extends AbstractTransactionModelFactory
 
         return parent::getLineModels($basketPositions['content']);
     }
-    
+
     /**
      * Discount amount from a voucher is a negative value!
      * @return float
@@ -88,12 +88,12 @@ class OrderTransactionModelFactory extends AbstractTransactionModelFactory
     {
         $positions = Shopware()->Modules()->Basket()->sGetBasket();
         $discount = 0.0;
-        
+
         foreach ($positions['content'] as $position) {
             if (!LineFactory::isDiscount($position['modus'])) {
                 continue;
             }
-            
+
             if (LineFactory::isNotVoucher($position)) {
                 $discount -= (float)$position['netprice'];
             }
@@ -111,13 +111,13 @@ class OrderTransactionModelFactory extends AbstractTransactionModelFactory
         if (!$orderVars = $this->getOrderVariables()) {
             return null;
         }
-        
+
         return (isset($orderVars['sDispatch']) && isset($orderVars['sDispatch']['id']))
             ? $orderVars['sDispatch']['id']
             : null
         ;
     }
-    
+
     /**
      *
      * @return float
@@ -127,12 +127,16 @@ class OrderTransactionModelFactory extends AbstractTransactionModelFactory
         if (!$orderVars = $this->getOrderVariables()) {
             return null;
         }
+        if ($this->getAdapter()->getPluginConfig(Form::ADD_SHIPPING_TAX_TO_SHIPPING_COST) || $this->isTaxIncluded()) {
+            return  Shopware()->Session()->moptAvalaraShippingcostsBrutOrigin
+                ?: $orderVars['sBasket']['sShippingcostsWithTax'];
+        }
 
         return Shopware()->Session()->moptAvalaraShippingcostsNetOrigin
             ?: $orderVars['sBasket']['sShippingcostsNet']
         ;
     }
-    
+
     /**
      *
      * @return array
@@ -152,21 +156,21 @@ class OrderTransactionModelFactory extends AbstractTransactionModelFactory
         if (!$countryId = $user['additional']['countryShipping']['id']) {
             return null;
         }
-        
+
         $addressFactory = $this->getAddressFactory();
         if (!$country = $addressFactory->getDeliveryCountry($countryId)) {
             return null;
         }
-        
+
         if (!$attr = $country->getAttribute()) {
             return null;
         }
-        
+
         $incoterms = $attr->getMoptAvalaraIncoterms();
         if (!$incoterms || Form::INCOTERMS_DEFAULT === $incoterms) {
             return null;
         }
-        
+
         return $incoterms;
     }
 }
