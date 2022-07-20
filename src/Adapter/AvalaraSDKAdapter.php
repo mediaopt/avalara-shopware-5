@@ -178,9 +178,6 @@ class AvalaraSDKAdapter implements AdapterInterface
         $licenseKey = $this->getPluginConfig(Form::LICENSE_KEY_FIELD);
         $avaClient->withSecurity($accountNumber, $licenseKey);
         $this->avaTaxClient = $avaClient;
-
-        // Attach a handler to log all requests
-        $avaClient->getHttpClient()->getEmitter()->attach($this->getLogSubscriber());
         
         return $this->avaTaxClient;
     }
@@ -241,7 +238,7 @@ class AvalaraSDKAdapter implements AdapterInterface
      */
     protected function getShopService()
     {
-        return $this->getContainer()->has('Shop') ? $this->getContainer()->get('Shop') : null;
+        return $this->getContainer()->has('shop') ? $this->getContainer()->get('shop') : null;
     }
 
     /**
@@ -365,7 +362,7 @@ class AvalaraSDKAdapter implements AdapterInterface
      */
     private function getLogDir()
     {
-        return Shopware()->Application()->Kernel()->getLogDir() . '/';
+        return $this->getContainer()->get('kernel')->getLogDir() . '/';
     }
 
     /**
