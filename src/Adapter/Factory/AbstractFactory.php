@@ -91,4 +91,14 @@ abstract class AbstractFactory
     {
         return $this->getAdapter()->getPluginConfig($key);
     }
+
+    /**
+     * @return bool
+     */
+    protected function isTaxIncluded()
+    {
+        $service = $this->adapter->getService('GetTax');
+
+        return $service->isTaxIncludedEnabled();
+    }
 }
