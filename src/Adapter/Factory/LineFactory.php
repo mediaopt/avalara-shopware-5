@@ -241,7 +241,7 @@ class LineFactory extends AbstractFactory
             $voucher = $vaucherRepository->find($position['articleID']);
         }
 
-        return !$voucher || !$voucher->getStrict();
+        return !$voucher;
     }
     
     /**
