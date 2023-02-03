@@ -101,10 +101,6 @@ class BasketSubscriber extends AbstractSubscriber
             [$voucherCode]
         ) ?: [];
 
-        if (empty($voucherDetails['strict'])) {
-            return;
-        }
-
         //get tax rate for voucher
         $taxRate = $service->getTaxRateForOrderBasketId($session->MoptAvalaraGetTaxResult, LineFactory::ARTICLEID_VOUCHER);
         if (!$taxRate) {
