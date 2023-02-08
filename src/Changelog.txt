@@ -1,5 +1,7 @@
 
 == develop ==
+Avalara tax calculation for general vouchers
+
 == 2.4.0 ==
 Shopware 5.6. Compatibility
 
