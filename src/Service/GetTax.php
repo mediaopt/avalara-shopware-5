@@ -341,4 +341,27 @@ class GetTax extends AbstractService
     {
         return $this->getAdapter()->getPluginConfig(Form::TAX_INCLUDED_ENABLED);
     }
+
+    /**
+     * @param $taxResult
+     * @param $voucherDetails
+     * @return float|int
+     */
+    public function getGeneralVoucherTaxRate($taxResult, $voucherValue)
+    {
+        $voucherDiscount = 0;
+        if ($voucherValue <= 0) {
+            return 0;
+        }
+
+        foreach ($taxResult->lines as $line) {
+            if ($line->taxableAmount <= 0 || $line->discountAmount <= 0) {
+                continue;
+            }
+
+            $voucherDiscount += $line->discountAmount * ($line->taxCalculated / $line->taxableAmount);
+        }
+
+        return ($voucherDiscount / $voucherValue) * 100;
+    }
 }

@@ -22,7 +22,7 @@ class BasketSubscriber extends AbstractSubscriber
      * @var string Temporary tax ID to be used on checkout process
      */
     const TAX_ID = 'mopt_avalara__';
-    
+
     /**
      * return array with all subsribed events
      *
@@ -100,8 +100,14 @@ class BasketSubscriber extends AbstractSubscriber
               )',
             [$voucherCode]
         ) ?: [];
+        $config = Shopware()->Config();
 
         if (empty($voucherDetails['strict'])) {
+            $voucherTaxRate = $service->getGeneralVoucherTaxRate($session->MoptAvalaraGetTaxResult, $voucherDetails['value']);
+            if ($voucherTaxRate) {
+                $config['sVOUCHERTAX'] = $voucherTaxRate;
+            }
+
             return;
         }
 
@@ -110,10 +116,9 @@ class BasketSubscriber extends AbstractSubscriber
         if (!$taxRate) {
             return;
         }
-        $config = Shopware()->Config();
         $config['sVOUCHERTAX'] = $taxRate;
     }
-    
+
     /**
      * set tax rate
      * @param \Enlight_Hook_HookArgs $args
@@ -145,7 +150,7 @@ class BasketSubscriber extends AbstractSubscriber
         if (!$service->isGetTaxEnabled()) {
             return $newPrice;
         }
-        
+
         $session = $this->getSession();
         if (!$taxResult = $session->MoptAvalaraGetTaxResult) {
             return $newPrice;
@@ -164,7 +169,7 @@ class BasketSubscriber extends AbstractSubscriber
 
             return $newPrice;
         }
-        
+
         $newPrice['taxID'] = self::TAX_ID . $taxRate;
         $newPrice['tax_rate'] = $taxRate;
         $serviceCheckoutPrice = $adapter->getService('CheckoutPrice');
