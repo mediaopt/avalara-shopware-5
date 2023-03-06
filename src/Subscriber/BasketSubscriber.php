@@ -103,11 +103,8 @@ class BasketSubscriber extends AbstractSubscriber
         $config = Shopware()->Config();
 
         if (empty($voucherDetails['strict'])) {
-            $voucherTaxRate = $service->getGeneralVoucherTaxRate($session->MoptAvalaraGetTaxResult, $voucherDetails['value']);
-            if ($voucherTaxRate) {
-                $config['sVOUCHERTAX'] = $voucherTaxRate;
-            }
 
+            $config['sVOUCHERTAX'] = 0;
             return;
         }
 
