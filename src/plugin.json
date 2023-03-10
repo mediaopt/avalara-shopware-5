@@ -1,5 +1,5 @@
 {
-  "version": "2.6.1",
+  "version": "2.7.0",
   "author": "derksen mediaopt GmbH",
   "label": "Avalara",
   "description": "<p><img src=\"data:image/png;base64,%s\" /></p> <p style=\"font-size:12px; font-weight: bold;\">For more information visit <a href=\"https://www.mediaopt.de\">www.mediaopt.de</a></p><p><a href=\"https://projects.mediaopt.de/projects/mopt-twl/wiki/User_Manual_EN\" target=\"_blank\">User Manual</a></p>",
@@ -12,6 +12,7 @@
     "update": true
   },
   "changelog": {
+    "2.7.0": "Changed voucher behaviour in general + manufacturer vouchers",
     "2.6.1": "Cronjob tries to commit every order independent from errors",
     "2.6.0": "Added Cronjob for automatically commitment",
     "2.5.2": "Added net mode in avalara plugin",
