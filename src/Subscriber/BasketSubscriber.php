@@ -108,6 +108,12 @@ class BasketSubscriber extends AbstractSubscriber
             return;
         }
 
+        if ($voucherDetails['strict'] && !empty($voucherDetails['bindtosupplier'])) {
+
+            $config['sVOUCHERTAX'] = 0;
+            return;
+        }
+        $test = $session->MoptAvalaraGetTaxResult;
         //get tax rate for voucher
         $taxRate = $service->getTaxRateForOrderBasketId($session->MoptAvalaraGetTaxResult, LineFactory::ARTICLEID_VOUCHER);
         if (!$taxRate) {
