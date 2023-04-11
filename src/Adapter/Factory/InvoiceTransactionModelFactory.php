@@ -159,7 +159,7 @@ class InvoiceTransactionModelFactory extends AbstractTransactionModelFactory
         $lineData['id'] = $detail->getId();
         $lineData['ean'] = $detail->getEan();
         $lineData['quantity'] = $detail->getQuantity();
-        $lineData['netprice'] = $netMode ? $detail->getPrice() : $this->getNetPrice();
+        $lineData['netprice'] = $netMode ? $detail->getPrice() : $this->getNetPrice($detail);
         $lineData['articlename'] = $detail->getArticleName();
         $lineData['articleID'] = $detail->getArticleId();
         $lineData['ordernumber'] = $detail->getArticleNumber();
