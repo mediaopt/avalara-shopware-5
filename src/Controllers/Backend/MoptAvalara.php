@@ -95,7 +95,7 @@ class Shopware_Controllers_Backend_MoptAvalara extends Shopware_Controllers_Back
             throw new \RuntimeException('Avalara: invalid order.');
         }
         
-        if (null === $order->getAttribute() || !$transactionType = $order->getAttribute()->getMoptAvalaraTransactionType()) {
+        if (null === $order->getAttribute() || null === $order->getAttribute()->getMoptAvalaraTransactionType()) {
             $adapter->getLogger()->error('Avalara: order with id: ' . $id . ' is not registered with Avalara.');
             throw new \RuntimeException('Avalara: order is not registered with Avalara.');
         }
