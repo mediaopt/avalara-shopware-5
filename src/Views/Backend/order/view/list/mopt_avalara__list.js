@@ -69,10 +69,12 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.list.List', {
 
         switch (transactionType) {
             case 'SalesOrder':
+            case '0':
                 output = '<img src="' + me.avalaraUrls.statusSalesOrder + '" data-qtip="' + me.avalaraSnippets.statusSalesOrder + '" />';
                 break;
                 
             case 'SalesInvoice':
+            case '1':
                 output = (orderChanged)
                     ? '<img src="' + me.avalaraUrls.orderChanged + '" data-qtip="' + me.avalaraSnippets.orderChanged + '" />'
                     : '<img src="' + me.avalaraUrls.statusSalesInvoice + '" data-qtip="' + me.avalaraSnippets.statusSalesInvoice + '" />'
