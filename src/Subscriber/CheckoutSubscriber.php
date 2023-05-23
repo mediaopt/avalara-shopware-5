@@ -66,7 +66,7 @@ class CheckoutSubscriber extends AbstractSubscriber
         if (!$taxRate) {
             return $return;
         }
-        $return['tax_calculation'] = true;
+        $return['tax_calculation'] = 'mopt_avalara';
         $return['tax_calculation_value'] = $taxRate;
 
         return $return;
