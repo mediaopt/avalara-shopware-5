@@ -25,7 +25,7 @@ class GetTax extends AbstractService
      * @var string Item ID in Avalara response
      */
     const IMPORT_FEES_LINE = 'ImportFees';
-    
+
     /**
      * @var string Item ID in Avalara response
      */
@@ -62,7 +62,7 @@ class GetTax extends AbstractService
         $client = $this->getAdapter()->getAvaTaxClient();
         return $client->createTransaction(null, $model);
     }
-    
+
     /**
      * get tax ammount from avalara response
      * @param \stdClass $taxResult
@@ -77,7 +77,7 @@ class GetTax extends AbstractService
 
         return (float)$taxLineInformation->tax;
     }
-    
+
     /**
      * get tax rate from avalara response
      * @param \stdClass $taxResult
@@ -87,18 +87,18 @@ class GetTax extends AbstractService
     public function getTaxRateForOrderBasketId($taxResult, $id)
     {
         $taxLine = $this->getTaxLineForOrderBasketId($taxResult, $id);
-        if (!$taxLine || !((float)$taxLine->taxableAmount)) {
+        if (!$taxLine || !((float)$taxLine->lineAmount)) {
             return 0;
         }
         /**
          * Recalculate a tax rate by subdividing tax amount with a taxable amount
          * This solves a problem with a tax calculated only for a part of amount
          */
-        $taxRate = $this->bcMath->bcdiv($taxLine->tax, $taxLine->taxableAmount);
-        
+        $taxRate = $this->bcMath->bcdiv($taxLine->tax, $taxLine->lineAmount);
+
         return $this->bcMath->bcmul($taxRate, 100);
     }
-    
+
     /**
      * get LandedCost from avalara response
      * @param \stdClass $taxResult
@@ -125,7 +125,7 @@ class GetTax extends AbstractService
 
         return $totalLandedCost;
     }
-    
+
     /**
      * Get insurance cost  from avalara response
      * @param \stdClass $taxResult
@@ -184,7 +184,7 @@ class GetTax extends AbstractService
 
         return false;
     }
-    
+
     /**
      * @return bool
      */
@@ -195,7 +195,7 @@ class GetTax extends AbstractService
             ->getPluginConfig(Form::TAX_ENABLED_FIELD)
         ;
     }
-    
+
     /**
      * @return bool
      */
@@ -206,7 +206,7 @@ class GetTax extends AbstractService
             ->getPluginConfig(Form::LANDEDCOST_ENABLED_FIELD)
         ;
     }
-    
+
     /**
      * get hash from request to compare calculate & commit call
      * unset changing fields during both calls
@@ -247,7 +247,7 @@ class GetTax extends AbstractService
         $result->totalTaxable = $data->totalTaxable;
         $result->totalTax = $data->totalTax;
         $result->lines = $data->lines;
-        
+
         return $result;
     }
 
@@ -281,7 +281,7 @@ class GetTax extends AbstractService
                 $data[$key] = $this->objectToArray($value);
             }
         }
-        
+
         return $data;
     }
 

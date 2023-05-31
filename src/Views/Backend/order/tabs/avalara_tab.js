@@ -132,9 +132,10 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
                 });
             }
         }];
-    
+
         switch (transactionType) {
             case 'SalesOrder':
+            case '0':
                 items.push({
                     xtype: 'button',
                     text: me.avalaraSnippets.commitOrder,
@@ -160,6 +161,7 @@ Ext.define('Shopware.apps.moptAvalara.Order.view.order.tabs.avalara_tab', {
                 break;
                 
             case 'SalesInvoice':
+            case '1':
                 items.push({
                     xtype: 'button',
                     text: me.avalaraSnippets.cancelCommitOrder,
