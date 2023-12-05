@@ -8,8 +8,8 @@
 
 namespace Shopware\Plugins\MoptAvalara\Subscriber;
 
+use DivisionByZeroError;
 use Shopware\Plugins\MoptAvalara\Adapter\Factory\LineFactory;
-use Shopware\Plugins\MoptAvalara\Service\CheckoutPrice;
 use Shopware\Plugins\MoptAvalara\Service\GetTax;
 
 /**
@@ -61,8 +61,11 @@ class BasketSubscriber extends AbstractSubscriber
         if ($taxResult->totalTaxable < 0.0) {
             return;
         }
-
-        $taxRate = $this->bcMath->bcdiv($taxResult->totalTax, $taxResult->totalTaxable);
+        try {
+            $taxRate = $this->bcMath->bcdiv($taxResult->totalTax, $taxResult->totalTaxable);
+        } catch (DivisionByZeroError $e) {
+            $taxRate = 0;
+        }
 
         $config = Shopware()->Config();
         $config['sDISCOUNTTAX'] = $this->bcMath->bcmul($taxRate, 100);

@@ -1,3 +1,6 @@
+== 2.7.2 ==
+Prevent DivisionByZero on GetBasket
+
 == 2.7.1 ==
 Fixed tax calculation for 5.7.14 and after; Voucher behaviour for Shopware 5.7
 
