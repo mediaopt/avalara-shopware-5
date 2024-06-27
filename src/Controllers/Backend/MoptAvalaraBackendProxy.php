@@ -41,8 +41,6 @@ class Shopware_Controllers_Backend_MoptAvalaraBackendProxy extends Shopware_Cont
         $response = $this->Response();
         $response->setBody(json_encode($result));
         $response->sendResponse();
-        
-        exit;
     }
 
     /**
